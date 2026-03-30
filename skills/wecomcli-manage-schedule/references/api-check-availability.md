@@ -1,4 +1,4 @@
-# check_availablity API
+# check_availability API
 
 查询指定用户在某时间范围内的忙碌时段。
 
@@ -13,7 +13,7 @@
 ## 请求示例
 
 ```bash
-wecom-cli schedule check_availablity '{"check_user_list": ["USER_ID_1", "USER_ID_2"], "start_time": "YYYY-MM-DD HH:MM:SS", "end_time": "YYYY-MM-DD HH:MM:SS"}'
+wecom-cli schedule check_availability '{"check_user_list": ["USER_ID_1", "USER_ID_2"], "start_time": "YYYY-MM-DD HH:MM:SS", "end_time": "YYYY-MM-DD HH:MM:SS"}'
 ```
 
 ## 返回字段

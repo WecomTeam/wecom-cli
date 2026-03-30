@@ -108,12 +108,11 @@ wecom-cli doc smartsheet_delete_fields '{"docid": "DOCID", "sheet_id": "SHEETID"
 
 1. **了解表结构** → 
 ```bash
-wecom-cli doc smartsheet_get_sheet
+wecom-cli doc smartsheet_get_sheet '{"docid": "DOCID"}'
 ```
  →
 ```bash
-wecom-cli doc smartsheet_get_fields
+wecom-cli doc smartsheet_get_fields '{"docid": "DOCID", "sheet_id": "SHEETID"}'
 ```
 2. **创建表结构** → `smartsheet_add_sheet` 添加子表 → `smartsheet_add_fields` 定义列
 3. **修改表结构** → `smartsheet_update_fields` 改列名 / `smartsheet_delete_fields` 删列
-
