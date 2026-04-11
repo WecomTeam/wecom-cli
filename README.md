@@ -50,6 +50,10 @@ wecom-cli contact get_userlist '{}'
 
 📖 更多使用方法，请参阅 [CLI 命令参考](docs/cli-reference.md)。
 
+## 卸载
+
+如果需要彻底移除 wecom-cli，请参考 [卸载指南](docs/uninstall.md)，按照 CLI、Skill、配置三步清理。
+
 ## Agent Skills
 
 🤖 支持的 Skills 使用说明，请参阅 [Skills 文档](docs/skills.md)。
