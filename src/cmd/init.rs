@@ -3,6 +3,7 @@ use std::io::IsTerminal;
 use crate::auth;
 use crate::mcp;
 use crate::mcp::config::McpBindSource;
+use crate::constants;
 use anyhow::Result;
 use clap::{ArgMatches, Args, Command, FromArgMatches};
 
@@ -32,15 +33,27 @@ pub async fn handle_init_cmd(matches: &ArgMatches) -> Result<()> {
     cliclack::intro("企业微信机器人初始化")?;
 
     let (bot, bind_source) = if args.noninteractive {
-        (init_qrcode().await?, McpBindSource::Qrcode)
+        init_noninteractive().await?
     } else {
-        let method: &str = cliclack::select("请选择企微机器人接入方式：")
-            .item("qrcode", "扫码接入（推荐）", "")
-            .item("manual", "手动输入 Bot ID 和 Secret", "")
-            .interact()?;
+        let env_available = std::env::var(constants::env::BOT_ID).is_ok()
+            && std::env::var(constants::env::BOT_SECRET).is_ok();
+
+        let method: &str = if env_available {
+            cliclack::select("请选择企微机器人接入方式：")
+                .item("qrcode", "扫码接入（推荐）", "")
+                .item("manual", "手动输入 Bot ID 和 Secret", "")
+                .item("env", "从环境变量读取（WECOM_BOT_ID / WECOM_SECRET）", "")
+                .interact()?
+        } else {
+            cliclack::select("请选择企微机器人接入方式：")
+                .item("qrcode", "扫码接入（推荐）", "")
+                .item("manual", "手动输入 Bot ID 和 Secret", "")
+                .interact()?
+        };
 
         match method {
             "qrcode" => (init_qrcode().await?, McpBindSource::Qrcode),
+            "env" => (init_env()?, McpBindSource::Env),
             _ => (init_manual().await?, McpBindSource::Interactive),
         }
     };
@@ -52,6 +65,27 @@ pub async fn handle_init_cmd(matches: &ArgMatches) -> Result<()> {
 /// 扫码接入流程
 async fn init_qrcode() -> Result<auth::Bot> {
     auth::scan_qrcode_for_bot().await
+}
+
+/// 环境变量接入流程
+fn init_env() -> Result<auth::Bot> {
+    let bot_id = std::env::var(constants::env::BOT_ID)
+        .map_err(|_| anyhow::anyhow!("环境变量 {} 未设置", constants::env::BOT_ID))?;
+    let bot_secret = std::env::var(constants::env::BOT_SECRET)
+        .map_err(|_| anyhow::anyhow!("环境变量 {} 未设置", constants::env::BOT_SECRET))?;
+    Ok(auth::Bot::new(bot_id, bot_secret))
+}
+
+/// 非交互式接入流程：优先从环境变量读取，否则走扫码
+async fn init_noninteractive() -> Result<(auth::Bot, McpBindSource)> {
+    if let (Ok(bot_id), Ok(bot_secret)) = (
+        std::env::var(constants::env::BOT_ID),
+        std::env::var(constants::env::BOT_SECRET),
+    ) {
+        cliclack::log::info("使用环境变量 WECOM_BOT_ID / WECOM_SECRET 初始化")?;
+        return Ok((auth::Bot::new(bot_id, bot_secret), McpBindSource::Env));
+    }
+    Ok((init_qrcode().await?, McpBindSource::Qrcode))
 }
 
 /// 手动输入 Bot ID 和 Secret

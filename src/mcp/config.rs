@@ -22,6 +22,8 @@ pub enum McpBindSource {
     Interactive = 1,
     /// QR Code
     Qrcode = 2,
+    /// Environment variable (WECOM_BOT_ID + WECOM_SECRET)
+    Env = 3,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -367,6 +369,8 @@ mod tests {
         assert_eq!(json, "1", "Expected number 1, got: {json}");
         let json = serde_json::to_string(&McpBindSource::Qrcode).unwrap();
         assert_eq!(json, "2", "Expected number 2, got: {json}");
+        let json = serde_json::to_string(&McpBindSource::Env).unwrap();
+        assert_eq!(json, "3", "Expected number 3, got: {json}");
     }
 
     #[test]

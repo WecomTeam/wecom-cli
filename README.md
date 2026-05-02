@@ -55,7 +55,7 @@ wecom-cli init
 wecom-cli contact get_userlist '{}'
 ```
 
-📖 更多使用方法，请参阅 [CLI 命令参考](docs/cli-reference.md)。
+📖 更多使用方法，请参阅 [CLI 命令参考](docs/cli-reference.md)。如需卸载，请参阅 [卸载指南](docs/uninstall.md)。
 
 ## Agent Skills
 
