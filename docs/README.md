@@ -7,6 +7,7 @@
 - 查看 CLI 使用方法、运行时路径和环境变量：[`docs/cli-reference.md`](cli-reference.md)
 - 查看内置 Skills 的分工和入口：[`docs/skills.md`](skills.md)
 - 本地开发、调试和仓库结构：[`docs/development.md`](development.md)
+- 卸载 CLI 和清理配置：[`docs/uninstall.md`](uninstall.md)
 
 ## 维护约定
 
