@@ -55,6 +55,18 @@ wecom-cli init
 wecom-cli contact get_userlist '{}'
 ```
 
+#### 非交互式初始化（AI Agent / CI / 沙箱预配置）
+
+无人值守场景下可通过环境变量预置凭据，跳过所有交互：
+
+```bash
+export WECOM_CLI_BOOTSTRAP_BOT_ID="aibXXXXXXXXXXXX"
+export WECOM_CLI_BOOTSTRAP_BOT_SECRET="..."
+wecom-cli init --bootstrap
+```
+
+凭据校验失败时会自动回滚（与交互模式一致），不会留下半成品状态。
+
 📖 更多使用方法，请参阅 [CLI 命令参考](docs/cli-reference.md)。
 
 ## Agent Skills
