@@ -63,6 +63,10 @@ wecom-cli doc <tool_name> '<json_params>'
 
 获取文档完整内容数据，只能以 Markdown 格式返回。采用**异步轮询机制**：首次调用无需传 `task_id`，接口返回 `task_id`；若 `task_done` 为 false，需携带该 `task_id` 再次调用，直到 `task_done` 为 true 时返回完整内容。
 
+建议写脚本自动轮询下载文档，不要手工复制轮询结果。下载后如果正文里包含 `data:image/...;base64,...` 图片，直接运行
+`node scripts/extract-md-images.mjs <markdown-file>`
+把图片导出到 `image/` 并同步改写 markdown 引用。
+
 - 首次调用（不传 task_id）：
 ```bash
 wecom-cli doc get_doc_content '{"docid": "DOCID", "type": 2}'
@@ -175,12 +179,17 @@ wecom-cli doc smartpage_get_export_result '{"task_id": "TASK_ID"}'
 wecom-cli doc get_doc_content '{"docid": "DOCID", "type": 2}'
 ```
 ，若 `task_done` 为 false 则携带 `task_id` 继续轮询
-2. **创建新文档** → 
+2. **清理图片** → 下载后的 markdown 若带 base64 图片，运行
+```bash
+node .scripts/extract-md-images.mjs xxx.md
+```
+导出图片到 `image/`，并把引用改成相对路径
+3. **创建新文档** → 
 ```bash
 wecom-cli doc create_doc '{"doc_type": 3, "doc_name": "文档名"}'
 ```
 ，保存返回的 docid
-3. **编辑文档** → 先 get_doc_content 了解当前内容，再 edit_doc_content 覆写
+4. **编辑文档** → 先 get_doc_content 了解当前内容，再 edit_doc_content 覆写
 
 ### 智能文档操作
 
@@ -200,4 +209,3 @@ wecom-cli doc smartpage_export_task '{"docid": "DOCID", "content_type": 1}'
 wecom-cli doc smartpage_get_export_result '{"task_id": "TASK_ID"}'
 ```
 ，若 `task_done` 为 `false` 则继续轮询，直到 `task_done` 为 `true`，返回的 `content` 字段即为 Markdown 内容
-
