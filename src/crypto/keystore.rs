@@ -107,19 +107,25 @@ pub fn decrypt_data<T: serde::de::DeserializeOwned>(data: &[u8], key: &[u8; 32])
     serde_json::from_slice(&decrypted).map_err(|e| anyhow::anyhow!("JSON deserialize error: {e:#}"))
 }
 
-/// Try to decrypt data using the cached/keyring key first; on failure, fall back to the file key.
+/// Try to decrypt data using the file key first; on failure, fall back to the keyring key.
 pub fn try_decrypt_data<T: serde::de::DeserializeOwned>(data: &[u8]) -> Result<T> {
-    // 1. Try cached key (covers both keyring and file sources)
+    // 1. Try file key first
     if let Some(key) = load_key_from_file() {
         if let Ok(result) = decrypt_data::<T>(data, &key) {
             return Ok(result);
         }
-        tracing::debug!("Cached key failed to decrypt, trying file key directly…");
+        tracing::debug!("File key failed to decrypt, trying keyring key…");
     }
 
-    // 2. Fall back to file key (in case cache holds a stale keyring key)
-    let key = load_key_from_file().ok_or(anyhow::anyhow!("解密数据失败（未找到有效密钥）",))?;
-    decrypt_data(data, &key)
+    // 2. Fall back to keyring key (in case file key is stale or unavailable)
+    if let Some(key) = load_key_from_keyring() {
+        if let Ok(result) = decrypt_data::<T>(data, &key) {
+            return Ok(result);
+        }
+        tracing::debug!("Keyring key also failed to decrypt");
+    }
+
+    Err(anyhow::anyhow!("解密数据失败（未找到有效密钥）"))
 }
 
 #[cfg(test)]
