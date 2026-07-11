@@ -22,10 +22,17 @@ pub mod env {
 /// Return the MCP config endpoint URL (env override or the default WeCom API).
 pub fn mcp_config_endpoint() -> String {
     #[cfg(feature = "custom-endpoint")]
-    if let Ok(url) = std::env::var(env::MCP_CONFIG_ENDPOINT) {
+    if let Some(url) = normalize_custom_endpoint(std::env::var(env::MCP_CONFIG_ENDPOINT).ok()) {
         return url;
     }
     DEFAULT_MCP_CONFIG_ENDPOINT.to_string()
+}
+
+#[cfg(feature = "custom-endpoint")]
+fn normalize_custom_endpoint(value: Option<String>) -> Option<String> {
+    value
+        .map(|url| url.trim().to_string())
+        .filter(|url| !url.is_empty())
 }
 
 pub fn get_user_agent() -> String {

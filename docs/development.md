@@ -22,3 +22,14 @@
 - 根包名为 `@wecom/cli`，实际可执行入口是 `bin/wecom.js`。
 - 平台二进制通过 `optionalDependencies` 分发，位于 `packages/*`。
 - `pnpm-workspace.yaml` 当前只管理 `packages/*` 工作区。
+
+## 自定义 MCP 配置地址
+
+默认构建启用 `custom-endpoint` feature，可通过环境变量覆盖 `init` 获取 MCP 配置的地址：
+
+```bash
+WECOM_CLI_MCP_CONFIG_ENDPOINT=http://127.0.0.1:8080/mcp-config wecom-cli init
+```
+
+环境变量未设置或值为空时使用企业微信官方地址。需要禁用该能力时，可以使用
+`cargo build --no-default-features` 构建。

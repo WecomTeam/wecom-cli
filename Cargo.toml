@@ -12,6 +12,7 @@ categories = ["command-line-utilities"]
 include = ["/src/**/*", "/build.rs", "/Cargo.toml", "/Cargo.lock", "/LICENSE", "/README.md"]
 
 [features]
+default = ["custom-endpoint"]
 custom-endpoint = []
 
 [[bin]]
