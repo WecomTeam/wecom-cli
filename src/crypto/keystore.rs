@@ -9,7 +9,9 @@ use crate::{fs_util, paths};
 
 use super::cipher;
 
+#[cfg(not(target_env = "ohos"))]
 const KEYRING_SERVICE: &str = "wecom-cli";
+#[cfg(not(target_env = "ohos"))]
 const KEYRING_USER: &str = "encryption-key";
 
 // ---------------------------------------------------------------------------
@@ -49,10 +51,18 @@ pub fn generate_random_key() -> [u8; 32] {
 }
 
 /// Load the key from keyring. Returns `None` if unavailable.
+/// OHOS: keyring crate triggers SIGSYS (unsupported syscall for system
+/// secret service), so cfg-gated to non-OHOS only.
+#[cfg(not(target_env = "ohos"))]
 fn load_key_from_keyring() -> Option<[u8; 32]> {
     let entry = keyring::Entry::new(KEYRING_SERVICE, KEYRING_USER).ok()?;
     let b64 = entry.get_password().ok()?;
     decode_key(b64.trim()).ok()
+}
+
+#[cfg(target_env = "ohos")]
+fn load_key_from_keyring() -> Option<[u8; 32]> {
+    None
 }
 
 /// Load the key from the file fallback. Returns `None` if unavailable.
@@ -80,6 +90,8 @@ pub fn save_key(key: &[u8; 32]) -> Result<()> {
     let key_path = encryption_key_path();
     fs_util::atomic_write(&key_path, b64.as_bytes(), Some(0o600))?;
 
+    // OHOS: keyring crate triggers SIGSYS, skip keyring on OHOS (file-only).
+    #[cfg(not(target_env = "ohos"))]
     if keyring::Entry::new(KEYRING_SERVICE, KEYRING_USER)
         .and_then(|entry| entry.set_password(&b64))
         .is_err()

@@ -20,6 +20,7 @@ function getPlatformPackage() {
     'linux-arm64': '@wecom/cli-linux-arm64',
     'linux-x64': '@wecom/cli-linux-x64',
     'win32-x64': '@wecom/cli-win32-x64',
+    'openharmony-arm64': '@wecom/cli-openharmony-arm64',
   };
 
   const key = `${platform}-${arch}`;

@@ -28,7 +28,6 @@ serde_repr = "0.1"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tracing-appender = "0.2"
-reqwest = { version = "0.13.2", default-features = false, features = ["json", "multipart", "stream", "rustls"] }
 dotenvy = "0.15.7"
 dirs = "6.0.0"
 base64 = "0.22"
@@ -39,10 +38,20 @@ rand = "0.9"
 hex = "0.4"
 sha2 = "0.10"
 aes-gcm = "0.10"
-keyring = { version = "3", features = ["apple-native", "linux-native"] }
 sanitize-filename = "0.6.0"
 tempfile = "3.27.0"
 cliclack = "0.5"
 qr2term = "0.3"
 qrcode = "0.14"
 open = "5"
+
+# Non-OHOS: use reqwest with rustls (aws-lc-rs backend)
+[target.'cfg(not(target_env = "ohos"))'.dependencies]
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "multipart", "stream", "rustls"] }
+# keyring triggers SIGSYS (unsupported syscall for system secret service) on OHOS
+keyring = { version = "3", features = ["apple-native", "linux-native"] }
+
+# OHOS: aws-lc-rs assembly does not link, use ring as TLS crypto backend
+[target.'cfg(target_env = "ohos")'.dependencies]
+reqwest = { version = "0.13.2", default-features = false, features = ["json", "multipart", "stream", "rustls-no-provider"] }
+rustls = { version = "0.23", default-features = false, features = ["ring", "tls12", "std"] }

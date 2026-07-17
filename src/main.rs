@@ -19,6 +19,11 @@ use clap::Command;
 /// Entry point: parse CLI arguments and dispatch to the corresponding subcommand handler.
 #[tokio::main]
 async fn main() -> Result<()> {
+    // OHOS: aws-lc-rs assembly does not link, use ring as TLS crypto backend.
+    // Other platforms: use aws-lc-rs (reqwest's default).
+    #[cfg(target_env = "ohos")]
+    let _ = rustls::crypto::ring::default_provider().install_default();
+
     dotenvy::dotenv().ok();
 
     logging::init_logging();
