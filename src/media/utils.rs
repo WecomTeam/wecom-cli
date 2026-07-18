@@ -47,6 +47,11 @@ pub async fn save_media(
 
     #[cfg(unix)]
     {
+        // OHOS MAC policy: chmod succeeds but the actual mode is forced to
+        // (owner|0o6)(group|0o6)0, i.e. 0o660 instead of 0o600. This is
+        // kernel-enforced and cannot be changed from userspace. In the OHOS
+        // app sandbox the group is typically the same app process, so the
+        // wider permission is acceptable.
         use std::os::unix::fs::PermissionsExt;
         tmp.as_file()
             .set_permissions(std::fs::Permissions::from_mode(0o600))?;

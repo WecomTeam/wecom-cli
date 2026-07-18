@@ -19,6 +19,9 @@ pub fn atomic_write(path: &Path, data: &[u8], mode: Option<u32>) -> Result<()> {
     let mut tmp = tempfile::NamedTempFile::new_in(parent)?;
 
     // Set permissions before writing content (avoid permission window).
+    // OHOS MAC policy: chmod succeeds but the actual mode is forced to
+    // (owner|0o6)(group|0o6)0 — see the test mod comment below for details.
+    // The call still succeeds on OHOS, just with a wider mode than requested.
     #[cfg(unix)]
     if let Some(m) = mode {
         use std::os::unix::fs::PermissionsExt;
@@ -108,7 +111,11 @@ mod tests {
     // Unix-specific: file permissions
     // -----------------------------------------------------------------------
 
-    #[cfg(unix)]
+    // OHOS MAC policy: chmod returns success but the actual mode is forced to
+    // (owner|0o6)(group|0o6)0, i.e. owner+group always get at least rw and
+    // other is always 0. The 0o600/0o400 assertions cannot be satisfied on
+    // OHOS, so the entire unix permission test mod is cfg-gated.
+    #[cfg(all(unix, not(target_env = "ohos")))]
     mod unix {
         use super::*;
         use std::os::unix::fs::PermissionsExt;

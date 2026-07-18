@@ -127,6 +127,9 @@ fn get_plat_code() -> u8 {
     } else if cfg!(target_os = "windows") {
         2
     } else if cfg!(target_os = "linux") {
+        // OHOS satisfies cfg(target_os = "linux") and reports 3 (Linux).
+        // This is a telemetry-only code sent to the WeCom server; leaving it
+        // as Linux is safer than introducing a new code the server may reject.
         3
     } else {
         0

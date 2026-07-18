@@ -1,0 +1,19 @@
+{
+  "name": "@wecom/cli-openharmony-arm64",
+  "version": "0.1.9",
+  "description": "The openharmony-arm64 binary for @wecom/cli",
+  "license": "MIT",
+  "files": [
+    "bin",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "os": [
+    "openharmony"
+  ],
+  "cpu": [
+    "arm64"
+  ]
+}
