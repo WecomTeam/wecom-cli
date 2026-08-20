@@ -72,6 +72,7 @@ async fn run() {
         .and(body_string_contains(r#"name="media""#))
         .and(body_string_contains("fake-jpeg-content"))
         .and(body_string_contains(r#"name="type""#))
+        .and(body_string_contains("\r\n\r\nimage\r\n"))
         .respond_with(
             ResponseTemplate::new(200).set_body_json(api_response(&json!({
                 "media_id": "MEDIA_001"

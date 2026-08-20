@@ -4,6 +4,25 @@ use wecom_transport::RequestOptions;
 use crate::client::EndpointKey;
 use crate::{Client, Error, Result, fs};
 
+const MEDIA_TYPE_FILE: &str = "file";
+
+fn infer_media_type(file_path: &str) -> &'static str {
+    let Some(ext) = std::path::Path::new(file_path)
+        .extension()
+        .and_then(|ext| ext.to_str())
+        .map(str::to_ascii_lowercase)
+    else {
+        return MEDIA_TYPE_FILE;
+    };
+
+    match ext.as_str() {
+        "bmp" | "gif" | "jpg" | "jpeg" | "png" => "image",
+        "amr" => "voice",
+        "mp4" => "video",
+        _ => MEDIA_TYPE_FILE,
+    }
+}
+
 /// Response from a media upload request.
 #[derive(Debug, Deserialize)]
 pub struct UploadMediaResponse {
@@ -23,10 +42,11 @@ pub(crate) async fn upload_media(
 ) -> Result<UploadMediaResponse> {
     tracing::info!(%file_path, "upload_media begin");
 
+    let media_type = infer_media_type(file_path);
     let part = fs.open_as_multipart_part(file_path).await?;
     let form = reqwest::multipart::Form::new()
         .part("media", part)
-        .text("type", "file");
+        .text("type", media_type);
 
     let response = client
         .transport()
@@ -51,7 +71,7 @@ pub(crate) async fn upload_media(
         })
         .inspect_err(|e| tracing::warn!(error = %e, "deserialize upload_media response failed"))?;
 
-    tracing::info!(media_id = %response.media_id, "upload_media succeeded");
+    tracing::info!(media_id = %response.media_id, media_type, "upload_media succeeded");
     Ok(response)
 }
 
@@ -99,7 +119,7 @@ mod tests {
 
     /// P0：[upload_media] HTTP 路径成功上传
     /// 条件：wiremock mock /file/upload 端点，返回 media_id
-    /// 断言：result.media_id == "HTTP_MEDIA_001"
+    /// 断言：multipart type 按扩展名推断为 image，result.media_id == "HTTP_MEDIA_001"
     #[tokio::test]
     async fn upload_media_http_success() {
         let server = MockServer::start().await;
@@ -113,6 +133,10 @@ mod tests {
 
         Mock::given(method("POST"))
             .and(path("/file/upload"))
+            .and(wiremock::matchers::body_string_contains(r#"name="type""#))
+            .and(wiremock::matchers::body_string_contains(
+                "\r\n\r\nimage\r\n",
+            ))
             .respond_with(ResponseTemplate::new(200).set_body_json(serde_json::json!({
                 "result": r#"{"media_id":"HTTP_MEDIA_001"}"#,
             })))
@@ -127,5 +151,25 @@ mod tests {
             .expect("upload_media HTTP should succeed");
 
         assert_eq!(result.media_id, "HTTP_MEDIA_001");
+    }
+
+    /// P0：[infer_media_type] 图片/音频/视频扩展名映射为企业微信媒体类型
+    /// 条件：传入常见图片、amr、mp4 路径
+    /// 断言：分别返回 image / voice / video
+    #[test]
+    fn infer_media_type_known_extensions() {
+        assert_eq!(infer_media_type("/tmp/example.PNG"), "image");
+        assert_eq!(infer_media_type("/tmp/example.jpeg"), "image");
+        assert_eq!(infer_media_type("/tmp/example.amr"), "voice");
+        assert_eq!(infer_media_type("/tmp/example.mp4"), "video");
+    }
+
+    /// P1：[infer_media_type] 未识别扩展名回退为 file
+    /// 条件：传入 pdf 与无扩展名路径
+    /// 断言：返回 file
+    #[test]
+    fn infer_media_type_unknown_extensions_fallback_to_file() {
+        assert_eq!(infer_media_type("/tmp/example.pdf"), "file");
+        assert_eq!(infer_media_type("/tmp/example"), "file");
     }
 }
