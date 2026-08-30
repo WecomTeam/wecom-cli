@@ -9,7 +9,9 @@
 | 路径 | 说明 |
 | --- | --- |
 | `crates/wecom/` | 核心库（lib）：`Client`/`ClientBuilder`、discovery 服务发现与缓存、schema 指令（`x-wecom-*`）、builtins（媒体上传/下载）、HelperRegistry、端点目录（`EndpointKey`/`EndpointCatalog`）、网关扁平信封（`PayloadStringReq`/`NestedRes`） |
-| `crates/wecom-cli/` | 二进制（bin）：`main.rs` 组装 Client 并 `run`；`auth` 鉴权体系（bot 凭据/扫码/签名引导/凭据加密）；`WecomBackend`（持有 token 即注入 Bearer token、`RequireAuth` 前置门禁 + 853004 静默刷新）；config/env/logging；`auth` 命令经扩展命令点挂载 |
+| `crates/wecom-auth/` | 鉴权库：`CredentialStore`/`TokenProvider` 抽象、加密文件凭据存储、botid+secret 签名引导、扫码登录网络流程、网关扁平协议信封与鉴权能力标记（`RequireAuth`/`SuppressAuth`） |
+| `crates/wecom-runtime/` | 认证运行时：`WecomBackend`（持有 token 即注入 Bearer token、`RequireAuth` 前置门禁 + 853004 经 `TokenProvider` 静默刷新并重放一次）、`WecomClient` 门面与 `WecomClientBuilder`（第三方应用接入入口，见 `docs/library.md`）、端点目录覆写 |
+| `crates/wecom-cli/` | 二进制（bin）：`main.rs` 组装 Client 并 `run`；`auth init/show` 终端交互（二维码渲染）；config/env/logging；`auth` 命令经扩展命令点挂载 |
 | `crates/wecom-transport/` | 传输层：`TransportBackend` trait、reqwest HTTP 后端、长任务轮询、请求/响应信封 trait（`RequestEnvelope`/`ResponseEnvelope`）、端点目录泛型机制（`EndpointCatalog<K>`/`CatalogKey`） |
 | `bin/wecom.js` | npm 入口脚本，负责定位并执行当前平台的二进制 |
 | `packages/*` | 各平台的 npm 二进制包 |

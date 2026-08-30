@@ -5,6 +5,7 @@
 /// 进程内共享（`crate::env::TEST_ENV_LOCK`），避免不同模块的测试并行改写
 /// 同一环境变量而互相串扰（如 `auth::credentials` 与 `transport` 测试）。
 #[cfg(test)]
+#[cfg_attr(not(feature = "custom-endpoint"), allow(dead_code))]
 pub(crate) static TEST_ENV_LOCK: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
 
 /// 配置目录，默认为 ~/.config/wecom

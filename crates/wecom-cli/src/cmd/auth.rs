@@ -4,9 +4,14 @@ use std::path::{Path, PathBuf};
 use clap::{ArgMatches, Args, CommandFactory, FromArgMatches, Parser, Subcommand};
 use qrcode::QrCode;
 
-use crate::auth;
+use crate::auth::{self, CredentialStore};
 use crate::browser;
 use crate::{Error, Result};
+
+/// CLI 凭据存储（`credentials.enc`，位于默认配置目录）。
+fn credential_store() -> auth::EncryptedFileCredentialStore {
+    auth::EncryptedFileCredentialStore::new(crate::config::default_home_dir())
+}
 
 /// 企业微信机器人授权管理
 #[derive(Debug, Parser)]
@@ -84,7 +89,7 @@ async fn handle_auth_cmd(run: &wecom::CliRun<'_>, matches: &ArgMatches) -> Resul
 /// 输出当前授权状态（纯文本，经 [`wecom::CliRunOutput`] 写出以支持 writer 注入）。
 fn handle_show(run: &wecom::CliRun<'_>, args: ShowArgs) -> Result<()> {
     let output = run.get_output();
-    let bot = auth::get_bot_info();
+    let bot = credential_store().load().ok().flatten().and_then(|c| c.bot);
 
     if args.status {
         output.print(if bot.is_some() {
@@ -187,7 +192,7 @@ async fn init_with_bot(
             // 错误文案由 fetch_auth 统一生成（业务 errmsg/专项提示/HTTP 状态等），
             // 失败提示经 spinner 展示，错误原样向上传播（保持类型与错误码）。
             spinner.stop("企业微信机器人凭证验证失败");
-            return Err(e);
+            return Err(e.into());
         }
     };
 
@@ -202,10 +207,11 @@ async fn init_with_bot(
     };
 
     // 统一原子写入：bot 凭据 + 引导换取 token
-    let mut creds = auth::load_credentials().unwrap_or_default();
+    let store = credential_store();
+    let mut creds = store.load().unwrap_or_default().unwrap_or_default();
     creds.bot = Some(bot);
     creds.token = Some(token.to_string());
-    auth::save_credentials(&creds).await?;
+    store.save(&creds)?;
 
     spinner.stop("企业微信机器人凭证验证成功");
     cliclack::outro("初始化完成 ✅")?;

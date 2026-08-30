@@ -7,7 +7,7 @@
 
 `wecom-cli` 是企业微信官方 CLI（Rust 实现，经 npm 包 `@wecom/cli` 分发），覆盖消息、邮件、在线文档、智能文档、在线表格、智能表格、待办、日程、会议、微盘、通讯录等办公能力。仓库同时内置 `skills/` 下的 Agent Skills，供 AI Agent 调用 CLI 完成业务操作。
 
-CLI 通过 discovery 协议从服务端动态下发服务目录与方法 schema，再在本地构建 clap 命令树。命令模型（按 `Client::run` 的调度顺序）：
+CLI 通过 discovery 协议从服务端动态下发服务目录与方法 schema，再在本地构建 clap 命令树。crate 依赖链：`wecom-cli` → `wecom-runtime` → `wecom-auth` → `wecom-transport`（`wecom-runtime` 同时依赖 `wecom`）。命令模型（按 `Client::run` 的调度顺序）：
 
 ```bash
 wecom-cli --version | --help                       # 版本与帮助
@@ -26,7 +26,9 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 | 路径 | 说明 |
 | --- | --- |
 | `crates/wecom/` | 核心库（lib）：`Client`/`ClientBuilder`、argv 调度、discovery 与缓存、schema 驱动命令树、指令处理、输出路由、沙箱 FS |
-| `crates/wecom-cli/` | 二进制（bin）：`main.rs` 装配入口、`auth` 鉴权体系、config/env/logging、`WecomBackend` |
+| `crates/wecom-auth/` | 鉴权库（lib）：`CredentialStore`/`TokenProvider` 抽象、加密文件凭据存储、botid+secret 签名引导、扫码登录网络流程、网关扁平协议信封与鉴权能力标记 |
+| `crates/wecom-runtime/` | 认证运行时（lib）：`WecomBackend` 鉴权出网后端、`WecomClientBuilder`、端点目录覆写；组合 wecom-auth 与 wecom |
+| `crates/wecom-cli/` | 二进制（bin）：`main.rs` 装配入口、`cmd/auth.rs` 终端交互、config/env/logging、transport 组装 |
 | `crates/wecom-transport/` | 传输层：`TransportBackend` trait、reqwest HTTP 后端、信封 trait、端点目录泛型、长任务轮询 |
 | `bin/wecom.js` | npm 入口脚本：定位并 exec 当前平台的二进制 |
 | `packages/*` | 各平台 npm 二进制包（`optionalDependencies` 分发：darwin/linux × x64/arm64、win32-x64） |
@@ -53,19 +55,43 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 
 `ClientBuilder` 主要配置点：`transport`、`endpoint_catalog`（整体/逐 key 覆写端点目录）、`command`（扩展顶层命令，优先于同名服务）、`helper`、`bin_name`、`cwd`/`home_dir`/`tmp_dir`、`readable_dirs`/`writable_dirs`（沙箱）、`path_resolver`。
 
+### `crates/wecom-auth`（鉴权库）
+
+| 模块 | 职责 |
+| --- | --- |
+| `credentials.rs` | `Credentials` 凭据总账（bot + token）、`CredentialStore` trait（load/save/clear）与 `MemoryCredentialStore` 内存实现（服务端可插拔：KMS/Vault/共享 Secret Store 另行实现该 trait） |
+| `file_store.rs` | `EncryptedFileCredentialStore`：单一凭据总账 `credentials.enc`（AES-256-GCM，0600，密钥存 `.encryption_key` + 系统 keyring 回退，`with_keyring(false)` 适配无 keyring 环境） |
+| `crypto/` | `cipher.rs` AES-256-GCM 原语；`keystore.rs` 密钥编解码与 keyring 回退 |
+| `provider.rs` | `TokenProvider` trait（`access_token` / `refresh`，刷新含并发合并）与 `BotGatewayTokenProvider`（botid+secret 签名引导换取 Bearer token，结果写回凭据存储） |
+| `bootstrap.rs` | `sign`（`sha256_hex(secret+bot_id+time+nonce)`）与 `fetch_auth` 引导调用 |
+| `gateway.rs` | AI Bot CLI 网关协议：扁平响应信封 `NestedRes`/`FlatRes`、鉴权能力标记 `RequireAuth`（门禁）/`SuppressAuth`（抑制注入）、`auth_endpoint(url)` 引导端点装配 |
+| `qrcode.rs` | 扫码登录网络流程（创建会话 → 轮询结果，3s 间隔、5 分钟超时）；终端/PNG 渲染由调用方处理 |
+| `legacy_migration.rs` | 启动时旧版 `bot.enc` 自动迁移（失败静默降级、旧文件保留） |
+| `error.rs` | `AuthError`（错误码段 893300–893399） |
+
+### `crates/wecom-runtime`（认证运行时）
+
+| 模块 | 职责 |
+| --- | --- |
+| `backend.rs` | `WecomBackend`：持有 token 即注入 `Authorization: Bearer`（无 token 忽略；挂 `RequireAuth` 的端点为前置门禁，换取 token 的引导端点挂 `SuppressAuth` 抑制注入），命中 853004 时经 `TokenProvider` 静默刷新 token 并重放一次（载荷经 `HttpRequestPayload` 工厂重放） |
+| `client.rs` | `WecomClient` 门面：包裹 `wecom::Client`（程序化方法调用 / `run(argv)` / 服务句柄） |
+| `builder.rs` | `WecomClientBuilder`：base_url/超时/默认头 + token provider → `WecomClient`（`build`）或带鉴权的 `Transport`（`build_transport`）；第三方应用接入入口（见 `docs/library.md`） |
+| `catalog.rs` | `endpoint_catalog()` 端点目录覆写（附鉴权能力与扁平信封） |
+| `lib.rs` | 转出 wecom-auth 认证构件（下游可单依赖 wecom-runtime） |
+
 ### `crates/wecom-cli`（bin）
 
 | 模块 | 职责 |
 | --- | --- |
 | `main.rs` | 装配入口：加载 `.env` 与 `config.json` → 初始化日志与 telemetry → 构建 transport 与 `Client` → `client.run(argv)`；命令未找到时在 stderr 追加 skill 更新提示 |
-| `auth/` | 鉴权体系：`credentials.rs` 单一凭据总账 `credentials.enc`（bot + token，AES-256-GCM，0600）；`crypto/` 密钥管理（系统 keyring，回退 `.encryption_key` 文件）；`qrcode.rs` 扫码会话（终端/Unicode/PNG 渲染，轮询 3s、5 分钟超时）；`bootstrap.rs` botid+secret 签名换 token（`sha256(secret+bot_id+time+nonce)`）；`legacy_migration.rs` 启动时旧版 `bot.enc` 自动迁移（失败静默降级、旧文件保留） |
-| `cmd/auth.rs` | `auth init` / `auth show` 的 clap 定义与处理，经 `CustomCommand` 挂载 |
-| `transport/` | `backend.rs` `WecomBackend`：持有 token 即注入 `Authorization: Bearer`（无 token 忽略；挂 `RequireAuth` 的端点为前置门禁，换取 token 的引导端点挂 `SuppressAuth` 抑制注入），命中 853004 时静默刷新 token 并重放一次（载荷经 `HttpRequestPayload` 工厂重放，multipart 重建表单）；`catalog.rs` 产品层端点目录覆写；`envelope.rs` 网关扁平响应信封 `NestedRes` 与 `FlatRes`；`capability.rs` 鉴权能力标记（`RequireAuth` 门禁 / `SuppressAuth` 抑制注入） |
+| `auth.rs` | 鉴权门面：re-export wecom-auth 认证构件；按 env/config 解析鉴权引导端点（`custom-endpoint` feature） |
+| `cmd/auth.rs` | `auth init` / `auth show` 的 clap 定义与处理（终端交互、二维码终端/Unicode/PNG 渲染），经 `CustomCommand` 挂载 |
+| `transport.rs` | transport 组装：凭据存储 + `BotGatewayTokenProvider` → `WecomBackend`（含旧版凭据迁移与 `WECOM_CLI_ACCESS_TOKEN` 覆盖） |
 | `config.rs` | `config.json` 解析（全字段可选）与环境变量应用；env 优先级高于配置文件 |
 | `env.rs` | `WECOM_CLI_*` 环境变量常量 |
 | `logging.rs` | `WECOM_CLI_LOG_LEVEL`（stderr 文本日志）与 `WECOM_CLI_LOG_DIR`（JSON Lines 按天滚动，前缀 `ww.log`，UTC+8） |
 | `telemetry.rs` | JSON 自动修复监听：修复成功时向 stderr 输出修复前后对照 |
-| `error.rs` | bin 层统一错误（错误码段 893200–893299） |
+| `error.rs` | bin 层统一错误（错误码段 893200–893299；wecom-auth 错误按变体映射入本层） |
 
 ### `crates/wecom-transport`（传输层）
 
@@ -81,14 +107,14 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 ## 关键机制
 
 - **服务发现**：`/service/discovery` 下发服务目录与 schema；结果缓存于 `<config_dir>/cache`（TTL 60 秒），`cache status`/`cache clear` 管理。
-- **信封双轴**：请求侧 `RequestEnvelope::wrap` 与响应侧 `ResponseEnvelope::parse` 为正交 trait，挂在 `HttpEndpoint` 上。transport 仅含默认实现；网关扁平协议（请求 `{"payload": "<stringified-json>"}`、响应 `{errcode, errmsg, results_json}`）由产品层注入：`PayloadStringReq` 在 `wecom/src/client/catalog.rs`，`NestedRes`/`FlatRes` 在 `wecom-cli/src/transport/envelope.rs`。
-- **端点目录**：非 schema 驱动的 endpoint（服务发现、媒体上传/下载、轮询、schema 方法默认信封）统一登记在 `EndpointCatalog`；`EndpointKey::builtin_default` 提供内建默认，`wecom-cli` 经 `transport::endpoint_catalog()` 覆写（附鉴权能力与扁平信封）。
-- **鉴权注入**：`WecomBackend` 持有 token 即注入 Bearer token（无 token 则忽略）；挂 `RequireAuth` 标记的端点先过前置门禁——无 token 直接报错、请求不发出；换取 token 的鉴权引导端点挂 `SuppressAuth` 抑制注入（避免 853004 刷新自死锁）。token 失效（853004）用 bot 凭据静默换 token 并重放一次。
+- **信封双轴**：请求侧 `RequestEnvelope::wrap` 与响应侧 `ResponseEnvelope::parse` 为正交 trait，挂在 `HttpEndpoint` 上。transport 仅含默认实现；网关扁平协议（请求 `{"payload": "<stringified-json>"}`、响应 `{errcode, errmsg, results_json}`）由产品层注入：`PayloadStringReq` 在 `wecom/src/client/catalog.rs`，`NestedRes`/`FlatRes` 在 `wecom-auth/src/gateway.rs`。
+- **端点目录**：非 schema 驱动的 endpoint（服务发现、媒体上传/下载、轮询、schema 方法默认信封）统一登记在 `EndpointCatalog`；`EndpointKey::builtin_default` 提供内建默认，`wecom-cli` 经 `wecom_runtime::endpoint_catalog()` 覆写（附鉴权能力与扁平信封）。
+- **鉴权注入**：`WecomBackend`（wecom-runtime）持有 token 即注入 Bearer token（无 token 则忽略）；挂 `RequireAuth` 标记的端点先过前置门禁——无 token 直接报错、请求不发出；换取 token 的鉴权引导端点挂 `SuppressAuth` 抑制注入（避免 853004 刷新自死锁）。token 失效（853004）经 `TokenProvider`（wecom-auth）静默换 token（并发刷新合并 + 写回凭据存储）并重放一次。
 - **长任务轮询**：响应含 `taskid` 时按 `long_task_poll` 配置轮询（`PollClawLongTask`，`polling_interval_ms`/`task_timeout`），超时返回错误。
 - **指令**：schema 中的 `x-wecom-*` 指令在请求前（媒体上传、multipart）与响应后（file-save、octet-stream 落盘）由 `directive/` 处理。
 - **输出路由**：默认 compact JSON 到 stdout；`--output/-o` 写文件、`--output-dir` 写目录（返回 `DownloadResult` JSON）；`--page-count` 自动分页并输出 NDJSON。
 - **JSON 修复**：`--json`/`--set` 中的非法 JSON 经 jsonrepair 自动修复，bin 侧监听在 stderr 输出修复前后对照。
-- **错误模型**：三层嵌套 `wecom_cli::Error::Wecom(wecom::Error::Transport(wecom_transport::Error))`；错误码段 893000–893099 / 893100–893199 / 893200–893299，共享兜底 893999；后台 errcode 原样透传；后台返回 10021 时渲染当前命令 help 并以退出码 2 返回。退出码约定：`0` 成功/帮助/版本，`1` 运行时错误，`2` 用法错误。
+- **错误模型**：三层嵌套 `wecom_cli::Error::Wecom(wecom::Error::Transport(wecom_transport::Error))`；错误码段 893000–893099 / 893100–893199 / 893200–893299 / 893300–893399（wecom-auth），共享兜底 893999；后台 errcode 原样透传；后台返回 10021 时渲染当前命令 help 并以退出码 2 返回。退出码约定：`0` 成功/帮助/版本，`1` 运行时错误，`2` 用法错误。
 - **沙箱 FS**：文件读写经 `Fs` 按沙箱根校验（如 `auth init --output-qrcode` 仅允许解析后落在当前目录内的路径，相对/绝对皆可）。
 
 ## 构建与测试
@@ -130,6 +156,7 @@ Git 钩子由 lefthook 管理（`pnpm install` 时自动安装）：pre-commit �
 | `docs/cli-reference.md` | CLI 使用参考：命令模型、auth、参数与 flag、运行时路径、环境变量、退出码 |
 | `docs/skills.md` | 内置 Agent Skills 导航 |
 | `docs/development.md` | 仓库结构与本地开发说明 |
+| `docs/library.md` | Library 接入指南（第三方应用经 wecom-runtime 集成） |
 | `docs/e2e/` | e2e 框架方案、desc.md 规范与生成手册 |
 | `docs/skill-trimming-guide.md` | Skill 精简指南 |
 

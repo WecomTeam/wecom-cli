@@ -93,15 +93,20 @@ where
 
         consecutive_network_err_count = 0;
 
-        let task_info = data.poll_info().ok_or_else(|| {
-            Error::Parse {
+        let task_info = data
+            .poll_info()
+            .ok_or_else(|| Error::Parse {
                 message: "Missing 'long_task_poll' field".into(),
                 endpoint: "PollClawLongTask".into(),
                 body: Box::new(serde_json::to_value(&data).unwrap_or_default()),
                 source: None,
-            }
-        })
-        .inspect_err(|_| tracing::error!(error = %format!("Missing 'long_task_poll' field in poll response"), "poll response missing long_task_poll field"))?;
+            })
+            .inspect_err(|_| {
+                tracing::error!(
+                    error = "Missing 'long_task_poll' field in poll response",
+                    "poll response missing long_task_poll field"
+                );
+            })?;
 
         if task_info.done == Some(true) {
             tracing::info!("long task poll completed");

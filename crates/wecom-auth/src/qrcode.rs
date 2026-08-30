@@ -7,8 +7,8 @@ use std::time::Duration;
 
 use serde::{Deserialize, Serialize};
 
-use super::bot::Bot;
-use crate::{Error, Result};
+use crate::bot::BotCredential;
+use crate::error::AuthError;
 
 const SOURCE: &str = "wecom_cli_external";
 const QR_GENERATE_URL: &str = "https://work.weixin.qq.com/ai/qc/generate";
@@ -32,7 +32,7 @@ pub struct QrSession {
 }
 
 /// 扫码直连请求的网络/解码失败 → transport 层 Network 错误（复用 E_NETWORK 语义与诊断链）。
-fn qr_network_error(message: &str, endpoint: &str, source: reqwest::Error) -> Error {
+fn qr_network_error(message: &str, endpoint: &str, source: reqwest::Error) -> AuthError {
     wecom_transport::Error::Network {
         message: message.to_string(),
         endpoint: endpoint.to_string(),
@@ -43,7 +43,7 @@ fn qr_network_error(message: &str, endpoint: &str, source: reqwest::Error) -> Er
 
 impl QrSession {
     /// 创建扫码会话：向服务端申请二维码。
-    pub async fn create() -> Result<Self> {
+    pub async fn create() -> Result<Self, AuthError> {
         let url = format!(
             "{}?source={}&plat={}",
             QR_GENERATE_URL,
@@ -61,7 +61,7 @@ impl QrSession {
             .map_err(|e| qr_network_error("获取二维码失败，响应格式异常", &url, e))?;
 
         let Some(data) = response.data else {
-            return Err(Error::protocol(
+            return Err(protocol_error(
                 "获取二维码失败，响应格式异常",
                 &url,
                 serde_json::to_value(response).unwrap_or_default(),
@@ -69,7 +69,7 @@ impl QrSession {
         };
 
         let (Some(scode), Some(auth_url)) = (&data.scode, &data.auth_url) else {
-            return Err(Error::protocol(
+            return Err(protocol_error(
                 "获取二维码失败，响应格式异常",
                 &url,
                 serde_json::to_value(data).unwrap_or_default(),
@@ -86,7 +86,7 @@ impl QrSession {
     }
 
     /// 轮询扫码结果，直到用户扫码成功或超时（5 分钟）。
-    pub async fn poll(&self) -> Result<Bot> {
+    pub async fn poll(&self) -> Result<BotCredential, AuthError> {
         let url = format!("{}?scode={}", QR_QUERY_URL, self.scode);
         let client = reqwest::Client::new();
 
@@ -99,7 +99,7 @@ impl QrSession {
         loop {
             if start.elapsed() >= POLL_TIMEOUT {
                 tracing::debug!("qr scan polling timed out");
-                return Err(Error::QrTimeout);
+                return Err(AuthError::QrTimeout);
             }
 
             let response: QueryResponse = client
@@ -115,14 +115,14 @@ impl QrSession {
                 && data.status.as_deref() == Some("success")
             {
                 let Some(bot_info) = &data.bot_info else {
-                    return Err(Error::protocol(
+                    return Err(protocol_error(
                         "扫码成功但未获取到 Bot 信息",
                         &url,
                         serde_json::Value::Null,
                     ));
                 };
                 let (Some(botid), Some(secret)) = (&bot_info.botid, &bot_info.secret) else {
-                    return Err(Error::protocol(
+                    return Err(protocol_error(
                         "扫码成功但未获取到 Bot 信息",
                         &url,
                         serde_json::Value::Null,
@@ -130,12 +130,24 @@ impl QrSession {
                 };
 
                 tracing::info!("qr code scanned, bot bound");
-                return Ok(Bot::new(botid.to_string(), secret.to_string()));
+                return Ok(BotCredential::new(botid.to_string(), secret.to_string()));
             }
 
             tokio::time::sleep(POLL_INTERVAL).await;
         }
     }
+}
+
+/// 后台响应协议异常（缺字段/格式不符）→ transport 层
+/// [`wecom_transport::Error::Parse`]。
+fn protocol_error(message: &str, endpoint: &str, body: serde_json::Value) -> AuthError {
+    wecom_transport::Error::Parse {
+        message: message.to_string(),
+        endpoint: endpoint.to_string(),
+        body: Box::new(body),
+        source: None,
+    }
+    .into()
 }
 
 fn get_plat_code() -> u8 {

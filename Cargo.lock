@@ -2001,9 +2001,9 @@ checksum = "384b8ab6d37215f3c5301a95a4accb5d64aa607f1fcb26a11b5303878451b4fe"
 
 [[package]]
 name = "open"
-version = "5.4.0"
+version = "5.4.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a0b3d059e795d52b8a72fef45658620edd4d9c359b338564aa14391ffa511ed5"
+checksum = "ade3be4664bc1ef537ce133015f04c176b737815c2ba9fd60edf212d6e90dd55"
 dependencies = [
  "is-wsl",
  "libc",
@@ -2512,7 +2512,7 @@ dependencies = [
  "errno",
  "libc",
  "linux-raw-sys 0.4.15",
- "windows-sys 0.59.0",
+ "windows-sys 0.52.0",
 ]
 
 [[package]]
@@ -3634,6 +3634,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "wecom-auth"
+version = "1.2.0"
+dependencies = [
+ "aes-gcm",
+ "base64 0.23.0",
+ "hex",
+ "indexmap 2.14.0",
+ "keyring",
+ "rand 0.10.2",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "serde_repr",
+ "sha2 0.11.0",
+ "tempfile",
+ "tokio",
+ "tracing",
+ "wecom-transport",
+ "wiremock",
+]
+
+[[package]]
 name = "wecom-cli"
 version = "1.2.0"
 dependencies = [
@@ -3646,21 +3668,15 @@ dependencies = [
  "cliclack",
  "dirs",
  "dotenvy",
- "hex",
  "image",
- "indexmap 2.14.0",
- "keyring",
  "mockito",
  "open",
  "predicates",
  "qr2term",
  "qrcode",
- "rand 0.10.2",
  "reqwest",
  "serde",
  "serde_json",
- "serde_repr",
- "sha2 0.11.0",
  "tempfile",
  "time",
  "tokio",
@@ -3668,6 +3684,23 @@ dependencies = [
  "tracing-appender",
  "tracing-subscriber",
  "wecom",
+ "wecom-auth",
+ "wecom-runtime",
+ "wecom-transport",
+ "wiremock",
+]
+
+[[package]]
+name = "wecom-runtime"
+version = "1.2.0"
+dependencies = [
+ "assert-json-diff",
+ "reqwest",
+ "serde_json",
+ "tokio",
+ "tracing",
+ "wecom",
+ "wecom-auth",
  "wecom-transport",
  "wiremock",
 ]
@@ -3805,15 +3838,6 @@ name = "windows-sys"
 version = "0.52.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "282be5f36a8ce781fad8c8ae18fa3f9beff57ec1b52cb3de0789201425d9a33d"
-dependencies = [
- "windows-targets",
-]
-
-[[package]]
-name = "windows-sys"
-version = "0.59.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1e38bc4d79ed67fd075bcc251a1c39b32a1776bbe92e5bef1f0bf1f8c531853b"
 dependencies = [
  "windows-targets",
 ]
