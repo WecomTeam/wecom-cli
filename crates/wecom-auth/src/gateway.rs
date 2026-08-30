@@ -1,15 +1,43 @@
-//! 网关扁平协议信封（wecom-cli 定义）。
+//! AI Bot CLI 网关协议：扁平响应信封与鉴权能力标记。
 //!
 //! 真实网关协议为顶层 `{errcode, errmsg, results_json}`，由 [`NestedRes`]
 //! 完成 errcode 校验 + results_json 内层脱壳；鉴权引导等不套网关信封的接口
 //! 使用 [`FlatRes`]——业务数据平铺在顶层，经 [`FlatApiResponse::extra`] 透传，
 //! errcode 校验与 [`NestedRes`] 共用 [`validate_flat_api_response`]。
+//!
+//! 鉴权语义：
+//! - [`RequireAuth`] 作为**门禁**标记挂在 [`Endpoint`](wecom_transport::Endpoint)
+//!   能力袋上：挂载该标记的端点若无可用的 token，请求直接报
+//!   [`AuthError::MissingCredentials`](crate::error::AuthError) 且不发出。
+//! - [`SuppressAuth`] 作为**抑制注入**标记：携带该标记的端点（如换取 token
+//!   的鉴权引导接口）即使持有 token 也不注入 `Authorization` 头。
+//! - 默认行为（不挂任何标记）：只要持有 token 就注入
+//!   `Authorization: Bearer <token>`，没有 token 则忽略（不报错）。
 
 use indexmap::IndexMap;
 use wecom_transport::{
-    ResponseEnvelope,
+    HttpEndpoint, ResponseEnvelope,
     backend::protocol::{ApiResponse, validate_api_response},
 };
+
+/// 端点调用前的 token 门禁标记（存在即生效）。
+///
+/// 挂进 [`Endpoint`](wecom_transport::Endpoint) 能力袋——鉴权门禁按 endpoint
+/// 单独声明：挂载后调用前必须已有可用 token，无 token 时报
+/// [`AuthError::MissingCredentials`](crate::error::AuthError)，请求不发出。
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct RequireAuth;
+
+/// 抑制 `Authorization` 注入的标记（换取 token 的引导端点专用）。
+///
+/// 默认所有端点「有 token 就携带、无 token 则忽略」；仅鉴权引导等换取 token
+/// 的接口挂此标记，保证引导请求绝不携带失效 token，避免 853004 刷新自死锁。
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct SuppressAuth;
+
+/// 鉴权引导端点默认 URL（botid+secret 签名调用换取 Bearer token，product/正式环境）。
+pub const DEFAULT_AUTH_ENDPOINT: &str =
+    "https://qyapi.weixin.qq.com/cgi-bin/aibot/cli/get_cli_config";
 
 /// 网关扁平协议响应体：顶层只有 `errcode` / `errmsg` / `results_json`。
 ///
@@ -23,11 +51,11 @@ pub struct FlatApiResponse {
     pub extra: IndexMap<String, serde_json::Value>,
 }
 
-/// 网关扁平协议响应信封（wecom 真实协议）。
+/// 网关扁平协议响应信封。
 ///
 /// 顶层 `{errcode, errmsg, results_json}`：`errcode` 校验 →
 /// `results_json` 脱壳为 [`ApiResponse`]（含 `error.code` 校验）。除鉴权引导
-/// （[`FlatRes`]，bin 侧扁平整体响应）外，所有端点均走此协议。
+/// （[`FlatRes`]，扁平整体响应）外，所有端点均走此协议。
 #[derive(Debug, Clone, Copy, Default)]
 pub struct NestedRes;
 
@@ -75,13 +103,12 @@ impl ResponseEnvelope for NestedRes {
     }
 }
 
-/// 扁平响应信封（产品层自定义，使用方实现 [`ResponseEnvelope`]）。
+/// 扁平响应信封（鉴权引导等「不套网关 `results_json` 信封」的接口使用）。
 ///
 /// 与 [`NestedRes`] 同为网关扁平协议（[`FlatApiResponse`]），区别仅在
 /// 业务数据的位置：`results_json` 字符串 vs 顶层平铺字段（`extra`）。
-/// 供鉴权引导等「不套网关 `results_json` 信封」的接口使用：`errcode` 校验
-/// 复用 [`validate_flat_api_response`]，`extra` 即业务结果。
-/// 引导端点须显式挂 [`SuppressAuth`](crate::transport::SuppressAuth)
+/// `errcode` 校验复用 [`validate_flat_api_response`]，`extra` 即业务结果。
+/// 引导端点须显式挂 [`SuppressAuth`]
 /// 抑制 Authorization 注入（换取 token 的请求不得携带 token）。
 #[derive(Debug, Clone, Copy, Default)]
 pub struct FlatRes;
@@ -141,9 +168,22 @@ fn validate_flat_api_response(
     Ok(data)
 }
 
+/// 按 URL 装配鉴权引导端点（换取 Bearer token 的专用 Endpoint）——引导端点
+/// 的唯一装配原语。
+///
+/// 使用 [`FlatRes`] 扁平响应信封（整体 JSON body 即业务结果
+/// `{errcode, errmsg, token}`），并挂 [`SuppressAuth`] 抑制标记——即使持有
+/// token 也不携带 Authorization 头（换取 token 的引导请求不得带失效 token，
+/// 否则 853004 刷新会自死锁）。
+pub fn auth_endpoint(url: &str) -> wecom_transport::Endpoint {
+    wecom_transport::Endpoint::new()
+        .with(HttpEndpoint::from_url(url).with_res_envelope(FlatRes))
+        .with(SuppressAuth)
+}
+
 #[cfg(test)]
 mod tests {
-    //! ## 模块摘要：envelope（网关扁平协议信封：NestedRes / FlatRes）
+    //! ## 模块摘要：gateway（AI Bot CLI 网关协议：NestedRes / FlatRes / 鉴权标记）
     //!
     //! ### 关键接口
     //! - [FlatRes::decode] — 复用 [FlatApiResponse] 解析 +

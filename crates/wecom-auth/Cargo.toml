@@ -1,0 +1,28 @@
+[package]
+name = "wecom-auth"
+version.workspace = true
+edition = "2024"
+description = "Credential storage and token provider for WeCom authentication"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+aes-gcm = "0.11"
+base64 = "0.23"
+hex = { workspace = true }
+indexmap = { workspace = true }
+keyring = "4"
+rand = { workspace = true }
+reqwest = { workspace = true }
+serde = { version = "1", features = ["derive"] }
+serde_json = { workspace = true }
+serde_repr = "0.1"
+sha2 = { workspace = true }
+tempfile = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+wecom-transport = { workspace = true }
+
+[dev-dependencies]
+wiremock = "0.6"

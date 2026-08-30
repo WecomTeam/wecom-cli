@@ -8,14 +8,18 @@
 //!
 //! 错误码段（总段 893000–893999）：
 //! - wecom：893000–893099；wecom-transport：893100–893199；wecom-cli（本层）：893200–893299；
-//! - 893999：三层共享兜底码（仅意料之外的分支 / 系统失败；逻辑错误必须有专属变体与错误码）。
+//! - wecom-auth（鉴权库）：893300–893399；
+//! - 893999：各层共享兜底码（仅意料之外的分支 / 系统失败；逻辑错误必须有专属变体与错误码）。
 //!
 //! 跨边界转换：
 //! - bin → wecom（扩展命令出口）/ bin → transport（[`WecomBackend`] 出口）：
 //!   `Wecom` 委托变体拆包（不套娃），本层变体装箱为下层的 `Other`
-//!   （Display 已携带完整文案与错误码，回程不做 downcast 还原）。
+//!   （Display 已携带完整文案与错误码，回程不做 downcast 还原）；
+//! - wecom-auth 的 [`AuthError`](wecom_auth::AuthError) 按变体映射为本层
+//!   对应变体（MissingCredentials → `Auth`、QrTimeout → `QrTimeout`、
+//!   Crypto → `Crypto`、Transport → 拆包透传）。
 //!
-//! [`WecomBackend`]: crate::transport::backend::WecomBackend
+//! [`WecomBackend`]: wecom_runtime::WecomBackend
 
 use serde_json::{Value, json};
 
@@ -186,6 +190,21 @@ impl From<wecom_transport::Error> for Error {
 impl From<std::io::Error> for Error {
     fn from(e: std::io::Error) -> Self {
         Error::Wecom(e.into())
+    }
+}
+
+impl From<wecom_auth::AuthError> for Error {
+    /// wecom-auth 错误按变体映射为本层变体；Transport 委托错误拆包透传，
+    /// 保留 Api 等变体的 errcode 语义。
+    fn from(e: wecom_auth::AuthError) -> Self {
+        match e {
+            wecom_auth::AuthError::Transport(inner) => inner.into(),
+            wecom_auth::AuthError::MissingCredentials(message) => Error::Auth(message),
+            wecom_auth::AuthError::QrTimeout => Error::QrTimeout,
+            wecom_auth::AuthError::Crypto(message) => Error::Crypto(message),
+            wecom_auth::AuthError::Storage(message) => Error::Other(message.into()),
+            wecom_auth::AuthError::Other(inner) => Error::Other(inner),
+        }
     }
 }
 

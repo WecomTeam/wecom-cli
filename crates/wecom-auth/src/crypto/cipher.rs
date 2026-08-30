@@ -2,7 +2,7 @@ use aes_gcm::aead::Aead;
 use aes_gcm::{Aes256Gcm, KeyInit};
 use rand::Rng;
 
-use crate::{Error, Result};
+use crate::error::AuthError;
 
 /// AES-GCM nonce size (96 bits).
 const NONCE_SIZE: usize = 12;
@@ -10,9 +10,9 @@ const NONCE_SIZE: usize = 12;
 const TAG_SIZE: usize = 16;
 
 /// Encrypt `plaintext` with AES-256-GCM. Returns `nonce || ciphertext || tag`.
-pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>> {
-    let cipher =
-        Aes256Gcm::new_from_slice(key).map_err(|e| Error::Crypto(format!("数据加密失败：{e}")))?;
+pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>, AuthError> {
+    let cipher = Aes256Gcm::new_from_slice(key)
+        .map_err(|e| AuthError::Crypto(format!("数据加密失败：{e}")))?;
 
     let mut nonce_bytes = [0u8; NONCE_SIZE];
     rand::rng().fill_bytes(&mut nonce_bytes);
@@ -20,7 +20,7 @@ pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>> {
 
     let ciphertext = cipher
         .encrypt(&nonce, plaintext)
-        .map_err(|e| Error::Crypto(format!("数据加密失败：{e}")))?;
+        .map_err(|e| AuthError::Crypto(format!("数据加密失败：{e}")))?;
 
     let mut out = nonce_bytes.to_vec();
     out.extend(ciphertext);
@@ -28,14 +28,14 @@ pub fn encrypt(key: &[u8; 32], plaintext: &[u8]) -> Result<Vec<u8>> {
 }
 
 /// Decrypt `data` (expected format: `nonce || ciphertext || tag`) with AES-256-GCM.
-pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>> {
+pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>, AuthError> {
     if data.len() < NONCE_SIZE + TAG_SIZE {
-        return Err(Error::Crypto(
+        return Err(AuthError::Crypto(
             "数据解密失败（数据可能已损坏或被截断）".into(),
         ));
     }
-    let cipher =
-        Aes256Gcm::new_from_slice(key).map_err(|e| Error::Crypto(format!("数据解密失败：{e}")))?;
+    let cipher = Aes256Gcm::new_from_slice(key)
+        .map_err(|e| AuthError::Crypto(format!("数据解密失败：{e}")))?;
 
     let mut nonce_bytes = [0u8; NONCE_SIZE];
     nonce_bytes.copy_from_slice(&data[..NONCE_SIZE]);
@@ -43,7 +43,7 @@ pub fn decrypt(key: &[u8; 32], data: &[u8]) -> Result<Vec<u8>> {
 
     cipher
         .decrypt(&nonce, &data[NONCE_SIZE..])
-        .map_err(|e| Error::Crypto(format!("数据解密失败：{e}")))
+        .map_err(|e| AuthError::Crypto(format!("数据解密失败：{e}")))
 }
 
 #[cfg(test)]
@@ -62,7 +62,7 @@ mod tests {
     //! - 随机 nonce → 相同明文每次加密输出不同
 
     use super::*;
-    use crate::auth::crypto::keystore::generate_random_key;
+    use crate::crypto::keystore::generate_random_key;
 
     /// P0：encrypt → decrypt roundtrip 还原明文
     /// 条件：用同一密钥加密明文

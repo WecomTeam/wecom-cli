@@ -1,0 +1,21 @@
+[package]
+name = "wecom-runtime"
+version.workspace = true
+edition = "2024"
+description = "Authenticated transport and client builder for WeCom"
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[dependencies]
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+wecom = { workspace = true }
+wecom-auth = { workspace = true }
+wecom-transport = { workspace = true }
+
+[dev-dependencies]
+assert-json-diff = "2"
+wiremock = "0.6"

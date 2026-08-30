@@ -1,3 +1,8 @@
+//! 加密密钥管理：本地密钥文件（权威来源）+ 系统 keyring 回退。
+//!
+//! 密钥与凭证文件均位于调用方给定的配置目录；keyring user 名由目录路径
+//! 规范化后 SHA-256 派生，多目录（沙箱）间互不串扰。
+
 use std::fs;
 use std::path::{Path, PathBuf};
 
@@ -5,8 +10,7 @@ use base64::prelude::*;
 use rand::RngExt;
 use sha2::{Digest, Sha256};
 
-use crate::config::default_home_dir;
-use crate::{Error, Result};
+use crate::error::AuthError;
 
 use super::cipher;
 
@@ -17,9 +21,9 @@ const KEYRING_USER_PREFIX: &str = "encryption-key";
 // Paths
 // ---------------------------------------------------------------------------
 
-/// Return the file path for the local encryption key fallback.
-pub fn encryption_key_path() -> PathBuf {
-    default_home_dir().join(".encryption_key")
+/// Return the file path for the local encryption key fallback under `dir`.
+pub fn encryption_key_path(dir: &Path) -> PathBuf {
+    dir.join(".encryption_key")
 }
 
 // ---------------------------------------------------------------------------
@@ -27,17 +31,17 @@ pub fn encryption_key_path() -> PathBuf {
 // ---------------------------------------------------------------------------
 
 /// Encode a 32-byte key as a Base64 string.
-fn encode_key(key: &[u8; 32]) -> String {
+pub(crate) fn encode_key(key: &[u8; 32]) -> String {
     BASE64_STANDARD.encode(key)
 }
 
 /// Decode a Base64 string into a 32-byte key, returning an error on invalid input.
-fn decode_key(s: &str) -> Result<[u8; 32]> {
+pub(crate) fn decode_key(s: &str) -> Result<[u8; 32], AuthError> {
     let bytes = BASE64_STANDARD
         .decode(s)
-        .map_err(|e| Error::Crypto(format!("加密密钥无效，base64 decode error: {e}")))?;
+        .map_err(|e| AuthError::Crypto(format!("加密密钥无效，base64 decode error: {e}")))?;
     <[u8; 32]>::try_from(bytes.as_slice())
-        .map_err(|_| Error::Crypto("Invalid encryption key length".into()))
+        .map_err(|_| AuthError::Crypto("Invalid encryption key length".into()))
 }
 
 // ---------------------------------------------------------------------------
@@ -49,19 +53,8 @@ pub fn generate_random_key() -> [u8; 32] {
     rand::rng().random()
 }
 
-/// 系统 keyring 是否可用：测试编译单元禁用（避免污染用户 keyring）。
-#[cfg(test)]
-fn keyring_available() -> bool {
-    false
-}
-
-#[cfg(not(test))]
-fn keyring_available() -> bool {
-    true
-}
-
 /// 由配置目录计算 keyring user 名（路径规范化后 SHA-256 hex 后缀，隔离沙箱）。
-fn keyring_user_for(dir: &Path) -> String {
+pub(crate) fn keyring_user_for(dir: &Path) -> String {
     let dir = normalize_path(&std::path::absolute(dir).unwrap_or_else(|_| dir.to_path_buf()));
     let digest = Sha256::digest(dir.to_string_lossy().as_bytes());
     format!("{KEYRING_USER_PREFIX}:{}", hex::encode(digest))
@@ -85,11 +78,8 @@ fn normalize_path(path: &Path) -> PathBuf {
 }
 
 /// Load the key from keyring. Returns `None` if unavailable.
-fn load_key_from_keyring() -> Option<[u8; 32]> {
-    if !keyring_available() {
-        return None;
-    }
-    let user = keyring_user_for(&default_home_dir());
+pub(crate) fn load_key_from_keyring(dir: &Path) -> Option<[u8; 32]> {
+    let user = keyring_user_for(dir);
     let entry = keyring::Entry::new(KEYRING_SERVICE, &user).ok()?;
     let b64 = entry.get_password().ok()?;
     decode_key(b64.trim()).ok()
@@ -97,29 +87,25 @@ fn load_key_from_keyring() -> Option<[u8; 32]> {
 
 /// Load the key from the file fallback. Returns `None` if unavailable.
 #[allow(clippy::disallowed_methods)]
-fn load_key_from_file() -> Option<[u8; 32]> {
-    let contents = fs::read_to_string(encryption_key_path()).ok()?;
+pub(crate) fn load_key_from_file(dir: &Path) -> Option<[u8; 32]> {
+    let contents = fs::read_to_string(encryption_key_path(dir)).ok()?;
     decode_key(contents.trim()).ok()
 }
 
-/// Load an existing key: file fallback first, then the keyring.
-pub fn load_existing_key() -> Option<[u8; 32]> {
-    load_key_from_file().or_else(load_key_from_keyring)
-}
-
-/// Persist the key: always write the file fallback, and the keyring when available.
-pub async fn save_key(key: &[u8; 32]) -> Result<()> {
+/// Persist the key under `dir`: always write the file fallback, and the
+/// keyring when `use_keyring` is enabled.
+pub(crate) fn save_key(dir: &Path, key: &[u8; 32], use_keyring: bool) -> Result<(), AuthError> {
     let b64 = encode_key(key);
 
     // Always write the file fallback.
-    let key_path = encryption_key_path();
-    super::atomic_write(&key_path, b64.as_bytes(), 0o600).await?;
+    let key_path = encryption_key_path(dir);
+    super::atomic_write(&key_path, b64.as_bytes(), 0o600)?;
 
-    if !keyring_available() {
+    if !use_keyring {
         return Ok(());
     }
 
-    let user = keyring_user_for(&default_home_dir());
+    let user = keyring_user_for(dir);
     if let Err(e) =
         keyring::Entry::new(KEYRING_SERVICE, &user).and_then(|entry| entry.set_password(&b64))
     {
@@ -134,23 +120,34 @@ pub async fn save_key(key: &[u8; 32]) -> Result<()> {
 // ---------------------------------------------------------------------------
 
 /// Encrypt serializable data: serialize → AES-256-GCM encrypt.
-pub fn encrypt_data<T: serde::Serialize + ?Sized>(data: &T, key: &[u8; 32]) -> Result<Vec<u8>> {
+pub fn encrypt_data<T: serde::Serialize + ?Sized>(
+    data: &T,
+    key: &[u8; 32],
+) -> Result<Vec<u8>, AuthError> {
     let json = serde_json::to_vec(data)
-        .map_err(|e| Error::Crypto(format!("JSON serialize error: {e:#}")))?;
+        .map_err(|e| AuthError::Crypto(format!("JSON serialize error: {e:#}")))?;
     cipher::encrypt(key, &json)
 }
 
 /// Decrypt data: AES-256-GCM decrypt → deserialize.
-pub fn decrypt_data<T: serde::de::DeserializeOwned>(data: &[u8], key: &[u8; 32]) -> Result<T> {
+pub fn decrypt_data<T: serde::de::DeserializeOwned>(
+    data: &[u8],
+    key: &[u8; 32],
+) -> Result<T, AuthError> {
     let decrypted = cipher::decrypt(key, data)?;
     serde_json::from_slice(&decrypted)
-        .map_err(|e| Error::Crypto(format!("JSON deserialize error: {e:#}")))
+        .map_err(|e| AuthError::Crypto(format!("JSON deserialize error: {e:#}")))
 }
 
-/// Decrypt data: the file key is authoritative, with the keyring as fallback.
-pub fn try_decrypt_data<T: serde::de::DeserializeOwned>(data: &[u8]) -> Result<T> {
+/// Decrypt data under `dir`: the file key is authoritative, with the keyring
+/// as fallback (when `use_keyring` is enabled).
+pub(crate) fn try_decrypt_data<T: serde::de::DeserializeOwned>(
+    dir: &Path,
+    use_keyring: bool,
+    data: &[u8],
+) -> Result<T, AuthError> {
     // 1. Try file key (authoritative source)
-    if let Some(key) = load_key_from_file() {
+    if let Some(key) = load_key_from_file(dir) {
         if let Ok(result) = decrypt_data::<T>(data, &key) {
             return Ok(result);
         }
@@ -158,8 +155,9 @@ pub fn try_decrypt_data<T: serde::de::DeserializeOwned>(data: &[u8]) -> Result<T
     }
 
     // 2. Fall back to keyring key
-    let key = load_key_from_keyring()
-        .ok_or_else(|| Error::Crypto("解密数据失败（未找到有效密钥）".into()))?;
+    let key = load_key_from_keyring(dir)
+        .filter(|_| use_keyring)
+        .ok_or_else(|| AuthError::Crypto("解密数据失败（未找到有效密钥）".into()))?;
     decrypt_data(data, &key)
 }
 

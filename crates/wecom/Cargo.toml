@@ -1,5 +1,5 @@
 [package]
-name = "wecom"
+name = "wecom-core"
 version.workspace = true
 edition = "2024"
 description = "Core library behind the WeCom CLI: schema-driven command tree, discovery and directives"

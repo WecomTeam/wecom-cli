@@ -91,8 +91,8 @@ mod run {
 
 - **test.rs 和 desc.md 紧挨**：修改用例时两个文件在同一目录
 - **helpers 集中共享**：所有 test.rs 通过 `use super::*` 访问同一套 helper
-- **cargo test 正常工作**：`cargo test -p wecom --test e2e` 即可运行整套
-- **单用例可定位**：`cargo test -p wecom --test e2e run::method_call`
+- **cargo test 正常工作**：`cargo test -p wecom-core --test e2e` 即可运行整套
+- **单用例可定位**：`cargo test -p wecom-core --test e2e run::method_call`
 - **新增用例只需三步**：写 desc.md + test.rs，再在 run.rs 加一段 include
 
 ## 二、测试框架设计
@@ -292,17 +292,17 @@ fn run() {}
 ## 三、运行方式
 
 ```bash
-# library-level 全套件（crates/wecom）
-cargo test -p wecom --test e2e
+# library-level 全套件（crates/wecom，发布名 wecom-core）
+cargo test -p wecom-core --test e2e
 
 # library-level 含 custom-endpoint 用例（client/006）
-cargo test -p wecom --test e2e --features custom-endpoint
+cargo test -p wecom-core --test e2e --features custom-endpoint
 
 # process-level 全套件（crates/wecom-cli，必须带 feature 才真正执行）
 cargo test -p wecom-cli --test e2e --features custom-endpoint
 
 # 运行单个用例
-cargo test -p wecom --test e2e run::method_call
+cargo test -p wecom-core --test e2e run::method_call
 cargo test -p wecom-cli --test e2e --features custom-endpoint logging::log_file
 ```
 

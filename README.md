@@ -55,6 +55,27 @@ wecom-cli auth show
 
 📖 更多使用方法，请参阅 [CLI 命令参考](docs/cli-reference.md)。
 
+### 作为 Library 集成（Rust）
+
+不经过命令行，在 Rust 应用中直接嵌入带鉴权的客户端（动态服务发现 + 方法调用 + token 自动刷新）：
+
+```rust
+use std::sync::Arc;
+use wecom_runtime::{BotGatewayTokenProvider, MemoryCredentialStore, WecomClientBuilder};
+
+let provider = BotGatewayTokenProvider::new(
+    bot_id,
+    secret,
+    Arc::new(MemoryCredentialStore::default()),
+);
+let client = WecomClientBuilder::new()
+    .token_provider(Arc::new(provider))
+    .build()
+    .await?;
+```
+
+📖 详见 [Library 接入指南](docs/library.md)。
+
 ## Agent Skills
 
 🤖 支持的 Skills 使用说明，请参阅 [Skills 文档](docs/skills.md)。
