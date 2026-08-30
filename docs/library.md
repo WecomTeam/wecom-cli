@@ -8,9 +8,9 @@
 | --- | --- | --- |
 | `wecom-auth` | 认证能力 | 凭据存储（`CredentialStore`）、Token Provider（`TokenProvider` / `BotGatewayTokenProvider`）、扫码登录、签名引导 |
 | `wecom-runtime` | 认证运行时 | `WecomClient` 门面客户端、`WecomClientBuilder`、鉴权 transport（Bearer 注入 / `RequireAuth` 门禁 / 853004 静默刷新重放）、网关协议端点目录 |
-| `wecom` | 服务调用 | 动态服务发现、schema 驱动的 clap 命令树、沙箱 FS（一般无需直接依赖） |
+| `wecom-core` | 服务调用 | 动态服务发现、schema 驱动的 clap 命令树、沙箱 FS（一般无需直接依赖；lib 名仍为 `wecom`，代码中 `use wecom::` 不变） |
 
-依赖链：`wecom-runtime` → `wecom-auth` → `wecom-transport`，`wecom-runtime` 同时依赖 `wecom`。多数场景**只依赖 `wecom-runtime`** 即可（它转出了 wecom-auth 的全部公共构件）。
+依赖链：`wecom-runtime` → `wecom-auth` → `wecom-transport`，`wecom-runtime` 同时依赖 `wecom-core`。多数场景**只依赖 `wecom-runtime`** 即可（它转出了 wecom-auth 的全部公共构件）。
 
 ## 依赖配置
 

@@ -15,7 +15,7 @@ repository = "https://github.com/WecomTeam/wecom-cli"
 homepage = "https://github.com/WecomTeam/wecom-cli"
 
 [workspace.dependencies]
-wecom = { version = "1.2.0", path = "crates/wecom", default-features = false }
+wecom = { version = "1.2.0", path = "crates/wecom", package = "wecom-core", default-features = false }
 wecom-auth = { version = "1.2.0", path = "crates/wecom-auth" }
 wecom-runtime = { version = "1.2.0", path = "crates/wecom-runtime" }
 wecom-transport = { version = "1.2.0", path = "crates/wecom-transport", default-features = false }

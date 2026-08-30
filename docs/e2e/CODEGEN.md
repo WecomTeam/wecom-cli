@@ -85,7 +85,7 @@ async fn run() {
 每个 test.rs 独占一个 module（通过 `run.rs` 的 `include!` 引入），函数名统一用 `run`。模块路径已经包含了用例信息：
 
 ```
-cargo test -p wecom --test e2e run::method_call
+cargo test -p wecom-core --test e2e run::method_call
 cargo test -p wecom-cli --test e2e --features custom-endpoint logging::log_file
 ```
 

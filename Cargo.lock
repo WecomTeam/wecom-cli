@@ -3602,38 +3602,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "wecom"
-version = "1.2.0"
-dependencies = [
- "anstyle",
- "assert-json-diff",
- "base64 0.23.0",
- "clap",
- "dirs",
- "filetime",
- "futures",
- "http",
- "indexmap 2.14.0",
- "jsonrepair-rs",
- "mockito",
- "rand 0.10.2",
- "reqwest",
- "schemars 1.2.2",
- "serde",
- "serde_json",
- "serde_with",
- "strsim",
- "tempfile",
- "thiserror",
- "time",
- "tokio",
- "tracing",
- "tracing-subscriber",
- "wecom-transport",
- "wiremock",
-]
-
-[[package]]
 name = "wecom-auth"
 version = "1.2.0"
 dependencies = [
@@ -3683,9 +3651,41 @@ dependencies = [
  "tracing",
  "tracing-appender",
  "tracing-subscriber",
- "wecom",
  "wecom-auth",
+ "wecom-core",
  "wecom-runtime",
+ "wecom-transport",
+ "wiremock",
+]
+
+[[package]]
+name = "wecom-core"
+version = "1.2.0"
+dependencies = [
+ "anstyle",
+ "assert-json-diff",
+ "base64 0.23.0",
+ "clap",
+ "dirs",
+ "filetime",
+ "futures",
+ "http",
+ "indexmap 2.14.0",
+ "jsonrepair-rs",
+ "mockito",
+ "rand 0.10.2",
+ "reqwest",
+ "schemars 1.2.2",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "strsim",
+ "tempfile",
+ "thiserror",
+ "time",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
  "wecom-transport",
  "wiremock",
 ]
@@ -3699,8 +3699,8 @@ dependencies = [
  "serde_json",
  "tokio",
  "tracing",
- "wecom",
  "wecom-auth",
+ "wecom-core",
  "wecom-transport",
  "wiremock",
 ]

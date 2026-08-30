@@ -7,7 +7,7 @@
 
 `wecom-cli` 是企业微信官方 CLI（Rust 实现，经 npm 包 `@wecom/cli` 分发），覆盖消息、邮件、在线文档、智能文档、在线表格、智能表格、待办、日程、会议、微盘、通讯录等办公能力。仓库同时内置 `skills/` 下的 Agent Skills，供 AI Agent 调用 CLI 完成业务操作。
 
-CLI 通过 discovery 协议从服务端动态下发服务目录与方法 schema，再在本地构建 clap 命令树。crate 依赖链：`wecom-cli` → `wecom-runtime` → `wecom-auth` → `wecom-transport`（`wecom-runtime` 同时依赖 `wecom`）。命令模型（按 `Client::run` 的调度顺序）：
+CLI 通过 discovery 协议从服务端动态下发服务目录与方法 schema，再在本地构建 clap 命令树。crate 依赖链：`wecom-cli` → `wecom-runtime` → `wecom-auth` → `wecom-transport`（`wecom-runtime` 同时依赖 `wecom-core`）。命令模型（按 `Client::run` 的调度顺序）：
 
 ```bash
 wecom-cli --version | --help                       # 版本与帮助
@@ -25,9 +25,9 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 
 | 路径 | 说明 |
 | --- | --- |
-| `crates/wecom/` | 核心库（lib）：`Client`/`ClientBuilder`、argv 调度、discovery 与缓存、schema 驱动命令树、指令处理、输出路由、沙箱 FS |
+| `crates/wecom/` | 核心库（lib，发布名 `wecom-core`）：`Client`/`ClientBuilder`、argv 调度、discovery 与缓存、schema 驱动命令树、指令处理、输出路由、沙箱 FS |
 | `crates/wecom-auth/` | 鉴权库（lib）：`CredentialStore`/`TokenProvider` 抽象、加密文件凭据存储、botid+secret 签名引导、扫码登录网络流程、网关扁平协议信封与鉴权能力标记 |
-| `crates/wecom-runtime/` | 认证运行时（lib）：`WecomBackend` 鉴权出网后端、`WecomClientBuilder`、端点目录覆写；组合 wecom-auth 与 wecom |
+| `crates/wecom-runtime/` | 认证运行时（lib）：`WecomBackend` 鉴权出网后端、`WecomClientBuilder`、端点目录覆写；组合 wecom-auth 与 wecom-core |
 | `crates/wecom-cli/` | 二进制（bin）：`main.rs` 装配入口、`cmd/auth.rs` 终端交互、config/env/logging、transport 组装 |
 | `crates/wecom-transport/` | 传输层：`TransportBackend` trait、reqwest HTTP 后端、信封 trait、端点目录泛型、长任务轮询 |
 | `bin/wecom.js` | npm 入口脚本：定位并 exec 当前平台的二进制 |
@@ -134,10 +134,10 @@ cargo run -p wecom-cli -- --help
 e2e 套件（规范见 `docs/e2e/`）：
 
 ```bash
-cargo test -p wecom --test e2e                                    # library-level
-cargo test -p wecom --test e2e --features custom-endpoint         # 含 custom-endpoint 用例
-cargo test -p wecom-cli --test e2e --features custom-endpoint     # process-level（须带 feature）
-cargo test -p wecom --test e2e run::method_call                   # 单个用例
+cargo test -p wecom-core --test e2e                                # library-level
+cargo test -p wecom-core --test e2e --features custom-endpoint     # 含 custom-endpoint 用例
+cargo test -p wecom-cli --test e2e --features custom-endpoint      # process-level（须带 feature）
+cargo test -p wecom-core --test e2e run::method_call               # 单个用例
 ```
 
 Git 钩子由 lefthook 管理（`pnpm install` 时自动安装）：pre-commit 跑 rustfmt --check / clippy / eslint，commit-msg 跑 commitlint（Conventional Commits），pre-push 跑 `pnpm test` + `pnpm check`。

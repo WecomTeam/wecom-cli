@@ -8,7 +8,7 @@
 
 | 路径 | 说明 |
 | --- | --- |
-| `crates/wecom/` | 核心库（lib）：`Client`/`ClientBuilder`、discovery 服务发现与缓存、schema 指令（`x-wecom-*`）、builtins（媒体上传/下载）、HelperRegistry、端点目录（`EndpointKey`/`EndpointCatalog`）、网关扁平信封（`PayloadStringReq`/`NestedRes`） |
+| `crates/wecom/` | 核心库（lib，发布名 `wecom-core`）：`Client`/`ClientBuilder`、discovery 服务发现与缓存、schema 指令（`x-wecom-*`）、builtins（媒体上传/下载）、HelperRegistry、端点目录（`EndpointKey`/`EndpointCatalog`）、网关扁平信封（`PayloadStringReq`/`NestedRes`） |
 | `crates/wecom-auth/` | 鉴权库：`CredentialStore`/`TokenProvider` 抽象、加密文件凭据存储、botid+secret 签名引导、扫码登录网络流程、网关扁平协议信封与鉴权能力标记（`RequireAuth`/`SuppressAuth`） |
 | `crates/wecom-runtime/` | 认证运行时：`WecomBackend`（持有 token 即注入 Bearer token、`RequireAuth` 前置门禁 + 853004 经 `TokenProvider` 静默刷新并重放一次）、`WecomClient` 门面与 `WecomClientBuilder`（第三方应用接入入口，见 `docs/library.md`）、端点目录覆写 |
 | `crates/wecom-cli/` | 二进制（bin）：`main.rs` 组装 Client 并 `run`；`auth init/show` 终端交互（二维码渲染）；config/env/logging；`auth` 命令经扩展命令点挂载 |
@@ -48,8 +48,8 @@ cargo run -p wecom-cli -- --help
 各 crate 的 e2e 套件统一放在各自 `<crate>/test-e2e/` 下（`run.rs` 编译入口 + `helpers/` + `cases/<group>/<NNN>-<slug>/{desc.md,test.rs}`），规范与生成手册见 [`e2e/`](e2e/FRAMEWORK.md)：
 
 ```bash
-# library-level 套件（crates/wecom）
-cargo test -p wecom --test e2e
+# library-level 套件（crates/wecom，发布名 wecom-core）
+cargo test -p wecom-core --test e2e
 
 # process-level 套件（crates/wecom-cli，需 custom-endpoint feature）
 cargo test -p wecom-cli --test e2e --features custom-endpoint
