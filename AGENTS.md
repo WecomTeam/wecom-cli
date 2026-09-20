@@ -62,7 +62,7 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 | `cmd/auth.rs` | `auth init` / `auth show` 的 clap 定义与处理，经 `CustomCommand` 挂载 |
 | `transport/` | `backend.rs` `WecomBackend`：持有 token 即注入 `Authorization: Bearer`（无 token 忽略；挂 `RequireAuth` 的端点为前置门禁，换取 token 的引导端点挂 `SuppressAuth` 抑制注入），命中 853004 时静默刷新 token 并重放一次（载荷经 `HttpRequestPayload` 工厂重放，multipart 重建表单）；`catalog.rs` 产品层端点目录覆写；`envelope.rs` 网关扁平响应信封 `NestedRes` 与 `FlatRes`；`capability.rs` 鉴权能力标记（`RequireAuth` 门禁 / `SuppressAuth` 抑制注入） |
 | `config.rs` | `config.json` 解析（全字段可选）与环境变量应用；env 优先级高于配置文件 |
-| `env.rs` | `WECOM_CLI_*` 环境变量常量 |
+| `env.rs` | `WECOM_CLI_*` 环境变量常量；`managed-auth` 构建只从运行时注入的环境变量读取 token |
 | `logging.rs` | `WECOM_CLI_LOG_LEVEL`（stderr 文本日志）与 `WECOM_CLI_LOG_DIR`（JSON Lines 按天滚动，前缀 `ww.log`，UTC+8） |
 | `trace/` | 调用链追踪：`chain.rs` 采集进程父链（自身→父→…→根，仅进程名、超长截断，macOS/Linux/Windows 三平台取父进程）；`trace_id.rs` 生成辅助唯一 ID（base64 GUID）；`mod.rs` 拼装并 base64 编码为 `X-WeCom-Trace` 头值（`main.rs` 注入为默认请求头） |
 | `telemetry.rs` | JSON 自动修复监听：修复成功时向 stderr 输出修复前后对照 |
@@ -123,6 +123,7 @@ Git 钩子由 lefthook 管理（`pnpm install` 时自动安装）：pre-commit �
 - 单元测试随源码 `#[cfg(test)]` 模块组织。
 - e2e 分两层：library-level（`crates/wecom/test-e2e/`，wiremock）与 process-level（`crates/wecom-cli/test-e2e/`，assert_cmd + mockito）。每个用例为 `cases/<group>/<NNN>-<slug>/{desc.md,test.rs}`，`desc.md` 规范见 `docs/e2e/DESC_SPEC.md`，代码生成手册见 `docs/e2e/CODEGEN.md`。
 - `custom-endpoint` 为内部 feature（注入 `WECOM_CLI_BASE_URL` 等测试端点），仅用于开发与 e2e，不随发布构建启用，也不写入用户文档。
+- `managed-auth` 为托管运行时 feature：只从 `WECOM_CLI_ACCESS_TOKEN` 读取 token、忽略本地凭据并禁用 `auth init`，且不会开放 `base_url` / `auth_endpoint` 覆盖能力。
 
 ## 文档地图
 

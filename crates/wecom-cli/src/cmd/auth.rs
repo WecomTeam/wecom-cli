@@ -81,9 +81,43 @@ async fn handle_auth_cmd(run: &wecom::CliRun<'_>, matches: &ArgMatches) -> Resul
     }
 }
 
+fn managed_auth_enabled() -> bool {
+    cfg!(feature = "managed-auth")
+}
+
+fn managed_access_token_present() -> bool {
+    #[cfg(feature = "managed-auth")]
+    {
+        std::env::var(crate::env::ACCESS_TOKEN)
+            .ok()
+            .is_some_and(|token| !token.is_empty())
+    }
+    #[cfg(not(feature = "managed-auth"))]
+    false
+}
+
 /// 输出当前授权状态（纯文本，经 [`wecom::CliRunOutput`] 写出以支持 writer 注入）。
 fn handle_show(run: &wecom::CliRun<'_>, args: ShowArgs) -> Result<()> {
     let output = run.get_output();
+
+    if managed_auth_enabled() {
+        let authorized = managed_access_token_present();
+        if args.status {
+            output.print(if authorized {
+                "authorized"
+            } else {
+                "unauthorized"
+            });
+        } else {
+            output.print(if authorized {
+                "Status: authorized (managed runtime)"
+            } else {
+                "Status: unauthorized"
+            });
+        }
+        return Ok(());
+    }
+
     let bot = auth::get_bot_info();
 
     if args.status {
@@ -107,6 +141,12 @@ fn handle_show(run: &wecom::CliRun<'_>, args: ShowArgs) -> Result<()> {
 }
 
 async fn handle_init(run: &wecom::CliRun<'_>, args: InitArgs) -> Result<()> {
+    if managed_auth_enabled() {
+        return Err(Error::Auth(
+            "当前 CLI 由托管运行时提供授权，请在宿主产品的连接器页面完成企业微信授权".to_string(),
+        ));
+    }
+
     if let (Some(botid), Some(secret)) = (args.bot_id, args.secret)
         && !std::io::stderr().is_terminal()
     {

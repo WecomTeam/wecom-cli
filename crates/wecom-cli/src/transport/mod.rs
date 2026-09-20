@@ -27,7 +27,7 @@ use wecom_transport::{HttpTransportBackend, Transport};
 use crate::Result;
 use crate::auth;
 use crate::config::{self, ConfigFile};
-#[cfg(feature = "custom-endpoint")]
+#[cfg(any(feature = "custom-endpoint", feature = "managed-auth"))]
 use crate::env;
 
 pub(crate) mod backend;
@@ -48,18 +48,24 @@ pub(crate) use envelope::FlatRes;
 /// `WECOM_CLI_BASE_URL` / `config.json::base_url` 覆盖。
 pub const DEFAULT_BASE_URL: &str = "https://qyapi.weixin.qq.com/cli";
 
-/// 解析运行时使用的 Bearer token：`custom-endpoint` feature 下优先
-/// `WECOM_CLI_ACCESS_TOKEN` 环境变量，缺省回退 `credentials.enc` 中 auth 提供的 access token。
+/// 解析运行时使用的 Bearer token。
+///
+/// - `managed-auth`：仅接受运行时注入的 `WECOM_CLI_ACCESS_TOKEN`，不读取本地凭据；
+/// - `custom-endpoint`：环境变量优先，缺省回退本地凭据；
+/// - 默认构建：仅使用本地凭据。
 fn resolve_access_token() -> Option<String> {
-    // 仅 `custom-endpoint` feature 下读取环境变量覆盖，否则回退 auth token。
-    #[cfg(feature = "custom-endpoint")]
+    #[cfg(any(feature = "custom-endpoint", feature = "managed-auth"))]
     let env_token = std::env::var(env::ACCESS_TOKEN)
         .ok()
         .filter(|t| !t.is_empty());
-    #[cfg(not(feature = "custom-endpoint"))]
+    #[cfg(not(any(feature = "custom-endpoint", feature = "managed-auth")))]
     let env_token: Option<String> = None;
 
-    env_token.or_else(auth::load_token)
+    if cfg!(feature = "managed-auth") {
+        env_token
+    } else {
+        env_token.or_else(auth::load_token)
+    }
 }
 
 /// Build a fully-configured HTTP transport.
@@ -93,13 +99,19 @@ pub async fn build(cfg: &ConfigFile) -> Result<Transport> {
     // 旧版凭据（bot.enc/token.enc）自动迁移：无 credentials.enc 时读取旧
     // botid/secret 自动走 auth 引导换取 token 并落盘；失败静默降级
     // （不阻塞启动、不清理旧文件，见 auth::legacy_migration）。
-    auth::try_migrate_legacy_credentials(&transport, &auth_endpoint).await?;
+    if !cfg!(feature = "managed-auth") {
+        auth::try_migrate_legacy_credentials(&transport, &auth_endpoint).await?;
+    }
 
     // 初始 token 与 bot 凭据均来自 credentials.enc（`auth init` 时持久化），
     // 一次性读入内存供刷新使用。不烘焙为默认头——由 WecomBackend 在调用时
     // 按端点能力动态注入。`WECOM_CLI_ACCESS_TOKEN` 存在时覆盖 auth 提供的 token。
     let init_token = resolve_access_token();
-    let bot_info = auth::get_bot_info();
+    let bot_info = if cfg!(feature = "managed-auth") {
+        None
+    } else {
+        auth::get_bot_info()
+    };
 
     Ok(transport.wrap_backend(|backend| {
         Arc::new(WecomBackend::new(

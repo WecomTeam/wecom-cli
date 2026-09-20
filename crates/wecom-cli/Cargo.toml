@@ -15,6 +15,7 @@ path = "src/main.rs"
 default = ["call-chain"]
 call-chain = ["dep:libc", "dep:windows-sys"]
 custom-endpoint = ["wecom/custom-endpoint"]
+managed-auth = []
 
 [dependencies]
 aes-gcm = "0.11"

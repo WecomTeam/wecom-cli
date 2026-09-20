@@ -487,7 +487,7 @@ async fn refresh_reuses_execute_options_without_stale_auth() {
 /// P0：[resolve_access_token] WECOM_CLI_ACCESS_TOKEN 覆盖 auth 提供的 token
 /// 条件：设置 WECOM_CLI_ACCESS_TOKEN=env-tok，隔离凭据目录（auth::load_token 返回 None）
 /// 断言：resolve_access_token() == Some("env-tok")
-#[cfg(feature = "custom-endpoint")]
+#[cfg(any(feature = "custom-endpoint", feature = "managed-auth"))]
 #[tokio::test]
 async fn access_token_env_overrides_auth_token() {
     let _guard = crate::env::TEST_ENV_LOCK.lock().await;
@@ -507,7 +507,7 @@ async fn access_token_env_overrides_auth_token() {
 /// P1：[resolve_access_token] 环境变量为空时回退 auth 提供的 token
 /// 条件：WECOM_CLI_ACCESS_TOKEN=""，隔离凭据目录（无凭据 → load_token 返回 None）
 /// 断言：resolve_access_token() == None（空环境变量不生效，走回退路径）
-#[cfg(feature = "custom-endpoint")]
+#[cfg(any(feature = "custom-endpoint", feature = "managed-auth"))]
 #[tokio::test]
 async fn access_token_env_empty_falls_back_to_auth() {
     let _guard = crate::env::TEST_ENV_LOCK.lock().await;

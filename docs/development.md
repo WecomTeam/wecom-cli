@@ -51,6 +51,9 @@ cargo test -p wecom --test e2e
 
 # process-level 套件（crates/wecom-cli，需 custom-endpoint feature）
 cargo test -p wecom-cli --test e2e --features custom-endpoint
+
+# 托管运行时构建：token 仅由 WECOM_CLI_ACCESS_TOKEN 注入，不开放自定义 endpoint
+cargo build --release --no-default-features --features managed-auth -p wecom-cli
 ```
 
 说明：

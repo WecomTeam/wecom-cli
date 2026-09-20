@@ -13,8 +13,11 @@ pub const CONFIG_DIR: &str = "WECOM_CLI_CONFIG_DIR";
 /// 额外请求头，格式：Record<string, string>
 pub const ADDITIONAL_HEADERS: &str = "WECOM_CLI_ADDITIONAL_HEADERS";
 
-/// 访问令牌（Bearer token）：存在时覆盖 `credentials.enc` 中 auth 提供的 access token。
-#[cfg(feature = "custom-endpoint")]
+/// 访问令牌（Bearer token）。
+///
+/// `custom-endpoint` 下覆盖本地凭据；`managed-auth` 下是唯一 token 来源，
+/// 供受管运行时注入短期或占位凭据，且不会同时开放 endpoint 覆盖能力。
+#[cfg(any(feature = "custom-endpoint", feature = "managed-auth"))]
 pub const ACCESS_TOKEN: &str = "WECOM_CLI_ACCESS_TOKEN";
 
 /// 服务基础 URL（`custom-endpoint` feature 下可用）
