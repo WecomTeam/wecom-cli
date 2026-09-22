@@ -29,7 +29,8 @@
     "lint": "cargo clippy --workspace --all-targets --features custom-endpoint -- -D warnings",
     "lint:all": "cargo hack clippy --workspace --all-targets --feature-powerset -- -D warnings",
     "prepare": "lefthook install",
-    "test": "pnpm test:default && pnpm test:skip-auth-check",
+    "test": "pnpm test:skills && pnpm test:default && pnpm test:skip-auth-check",
+    "test:skills": "python3 skills/wecomcli-doc/scripts/test_replace_text.py && python3 skills/wecomcli-doc/scripts/test_skill_contract.py && python3 skills/wecomcli-sheet/test_skill_contract.py",
     "test:default": "cargo test --workspace --all-targets --features custom-endpoint",
     "test:skip-auth-check": "cargo test --workspace --all-targets --features custom-endpoint,skip-auth-check",
     "test:doc": "cargo test --workspace --doc"
