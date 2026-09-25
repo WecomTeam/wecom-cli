@@ -19,6 +19,9 @@ commit-msg:
 pre-push:
   parallel: true
   commands:
+    test-skills:
+      glob: "skills/**/*.{py,md}"
+      run: pnpm test:skills
     test:
       glob: "*.rs"
       run: pnpm test

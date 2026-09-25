@@ -1,6 +1,6 @@
 ---
 name: wecomcli-doc
-description: 企业微信在线 doc 文档技能。能够新建 doc、导入本地 .doc/.docx/.txt 为 doc、读取 doc 内容、向 doc 追加或覆盖写入。仅当用户明确出现「doc」「docx」「word」「在线文档」「office 文档」等强类型词，或提供 https://doc.weixin.qq.com/doc/xxx 链接时才使用本技能。用户说"文档""新建文档""写文档""整理成文档""输出到文档"等未指定类型的泛化表达，一律使用 wecomcli-smartpage。
+description: 企业微信在线 doc 文档技能。能够新建 doc、导入本地 .doc/.docx/.txt 为 doc、读取 doc 内容，以及追加、局部替换或覆盖写入 doc。仅当用户明确出现「doc」「docx」「word」「在线文档」「office 文档」等强类型词，或提供 https://doc.weixin.qq.com/doc/xxx 链接时才使用本技能。用户说"文档""新建文档""写文档""整理成文档""输出到文档"等未指定类型的泛化表达，一律使用 wecomcli-smartpage。
 metadata:
   requires:
     bins: ["wecom-cli"]
@@ -18,7 +18,7 @@ metadata:
 
 - 新建 / 导入企微 doc 文档
 - 读取 doc 文档内容
-- 向 doc 文档追加一行 / 覆盖写入doc 文档
+- 向 doc 文档追加内容 / 局部替换指定段落 / 覆盖写入整篇 doc 文档
 
 ### 不适用
 
@@ -43,12 +43,14 @@ metadata:
 | 用户已有本地文件，要求写入 / 创建 / 新建企微doc文档 | 见下方「导入doc文档」                                                  |
 | 读取doc文档内容 | 见下方「读取doc文档内容」                                                |
 | 追加文本到doc文档末尾 | [+contents-append](references/doc-contents-append.md)       |
+| 局部替换指定段落或章节 | [+contents-replace](references/doc-contents-replace.md)     |
 | 全量覆盖doc文档内容 | [+contents-overwrite](references/doc-contents-overwrite.md) |
 
-### 写入语义裁定（追加 vs 覆盖）
+### 写入语义裁定（追加 vs 局部替换 vs 全文覆盖）
 
 - 默认追加：用户用「写入 / 写到 / 记录 / 补充 / 加进去 / 记一下」等中性动词，且未明确要求清空或替换时，一律走 `append`（追加，不破坏原有内容）。
-- 仅显式覆盖：仅当用户明确出现「覆盖 / 重写 / 替换 / 清空重写 / 整个换成」等强语义词时，才走 `overwrite`。
+- 局部替换：用户明确要求「覆盖当前段落 / 替换某段 / 修改某章节 / 删除某部分」且要保留文档其他内容时，必须走 `contents-replace` 的读取、唯一定位、替换、写前复核和写后回读流程。禁止降级成 `append`，也禁止只把新段落直接交给 `overwrite`。
+- 全文覆盖：仅当用户明确要求「覆盖整篇 / 全文重写 / 清空重写 / 整个文档换成」时，才走 `overwrite`。用户只说「覆盖」或「替换」但未说明范围时，先确认是局部还是整篇，不得自行猜测。
 
 ## 接口详述
 
