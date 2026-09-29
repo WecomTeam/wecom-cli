@@ -59,7 +59,7 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 | --- | --- |
 | `main.rs` | 装配入口：加载 `.env` 与 `config.json` → 初始化日志与 telemetry → 构建 transport 与 `Client` → `client.run(argv)`；命令未找到时在 stderr 追加 skill 更新提示 |
 | `auth/` | 鉴权体系（分层：数据 → 持久 → 解析 → 协议 → 会话）：`types.rs` 数据类型（`Bot` / `Credentials` 凭据总账 / `ResolvedAuthorization` 授权材料枚举，来源内聚于变体）；`store.rs` 单一凭据总账 `credentials.enc` 持久化（bot + token，AES-256-GCM，0600）；`crypto/` 密钥管理（系统 keyring，回退 `.encryption_key` 文件）；`resolve.rs` 授权材料解析（`resolve_authorization`：`WECOM_CLI_ACCESS_TOKEN` 优先、文件回退，文件来源携带同源 bot 凭据）；`bootstrap.rs` botid+secret 签名换 token（`sha256(secret+bot_id+time+nonce)`，无状态协议）；`qrcode.rs` 扫码会话网络流程（轮询 3s、5 分钟超时；渲染在 `cmd/auth.rs`）；`session.rs` `AuthSession` 运行时授权会话（token 内存缓存 + 853004 静默刷新编排，供 `WecomBackend` 委托）；`legacy_migration.rs` 启动时旧版 `bot.enc` 自动迁移（失败静默降级、旧文件保留） |
-| `cmd/auth.rs` | `auth init` / `auth show` 的 clap 定义与处理，经 `CustomCommand` 挂载 |
+| `cmd/auth.rs` | `auth init` / `auth show` 的 clap 定义与处理（含二维码渲染等表现层；浏览器唤起在子模块 `cmd/auth/browser.rs`），经 `CustomCommand` 挂载；`skip-auth-check` 构建下不注册该命令（顶层 help 不出现，调用落入"命令未找到"路径，退出码 2），整棵 `cmd::auth` 子树随之不参与编译 |
 | `transport/` | `backend.rs` `WecomBackend` 纯出网装饰器：持有 token 即注入 `Authorization: Bearer`（无 token 忽略；挂 `RequireAuth` 的端点为前置门禁，换取 token 的引导端点挂 `SuppressAuth` 抑制注入）；命中 853004 委托 `auth::AuthSession` 静默刷新并重放一次（载荷经 `HttpRequestPayload` 工厂重放，multipart 重建表单；同源语义——仅 `ResolvedAuthorization::Credentials` 携带同源 bot 可刷新，`Env` 变体直接返回原错误）；`catalog.rs` 产品层端点目录覆写；`envelope.rs` 网关扁平响应信封 `NestedRes` 与 `FlatRes`；`capability.rs` 鉴权能力标记（`RequireAuth` 门禁 / `SuppressAuth` 抑制注入） |
 | `config.rs` | `config.json` 解析（全字段可选）与环境变量应用；env 优先级高于配置文件 |
 | `env.rs` | `WECOM_CLI_*` 环境变量常量 |
@@ -124,7 +124,7 @@ Git 钩子由 lefthook 管理（`pnpm install` 时自动安装）：pre-commit �
 - e2e 分两层：library-level（`crates/wecom/test-e2e/`，wiremock）与 process-level（`crates/wecom-cli/test-e2e/`，assert_cmd + mockito）。每个用例为 `cases/<group>/<NNN>-<slug>/{desc.md,test.rs}`，`desc.md` 规范见 `docs/e2e/DESC_SPEC.md`，代码生成手册见 `docs/e2e/CODEGEN.md`。
 - 内部 feature（`wecom-cli` 定义，仅用于开发与测试，不随发布构建启用）：
   - `custom-endpoint`：允许经环境变量 / `config.json` 覆盖测试端点（`WECOM_CLI_BASE_URL`、`WECOM_CLI_AUTH_ENDPOINT`）。
-  - `skip-auth-check`：跳过 `RequireAuth` 端点的前置 token 门禁（无 token 也放行请求，由后台鉴权错误兜底）。
+  - `skip-auth-check`：跳过 `RequireAuth` 端点的前置 token 门禁（无 token 也放行请求，由后台鉴权错误兜底）；且不注册 `auth` 命令（顶层 help 不出现）。
 - 新增任何 `option_env!` / `env!` 读取的编译期变量，必须同步在 `crates/wecom-cli/build.rs` 登记 `cargo::rerun-if-env-changed`，否则变量变动不触发重编译、缓存产物会烘焙进旧值。
 
 ## 文档地图

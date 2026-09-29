@@ -3,7 +3,7 @@
 - **场景**：配置目录下仅存在旧版 `bot.enc` 时，启动 CLI 自动迁移为 `credentials.enc`
 - **Transport**：HTTP（mockito，仅鉴权引导端点）
 - **来源**：凭据存储结构回归
-- **Feature**：`custom-endpoint`
+- **Feature**：`custom-endpoint`（`skip-auth-check` 组合下不运行：该构建不注册 `auth` 命令）
 
 ## 测试等级
 

@@ -4,17 +4,17 @@
 // 启动 CLI（auth show 触发 transport::build → 自动迁移）：
 // 读取旧 botid/secret → 引导端点换 token → 落盘 credentials.enc。
 // 旧文件不主动清理。
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 use aes_gcm::KeyInit;
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 use aes_gcm::aead::Aead;
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 use base64::Engine;
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 use std::path::Path;
 
 /// 预置旧版凭据：`.encryption_key` + `bot.enc`（AES-256-GCM：nonce(12) ‖ ciphertext(含 tag16)）。
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 fn setup_legacy_bot(dir: &Path, key: &[u8; 32]) {
     #[allow(clippy::disallowed_methods)]
     std::fs::write(
@@ -42,7 +42,7 @@ fn setup_legacy_bot(dir: &Path, key: &[u8; 32]) {
 }
 
 /// 启动 CLI 并返回输出。
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 fn run_cli(dir: &Path, auth_endpoint: &str) -> std::process::Output {
     assert_cmd::Command::cargo_bin("wecom-cli")
         .unwrap()
@@ -54,7 +54,7 @@ fn run_cli(dir: &Path, auth_endpoint: &str) -> std::process::Output {
 }
 
 /// P0：迁移成功路径——引导返回 token → 落盘 credentials.enc；legacy 保留。
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 #[test]
 fn migration_succeeds_keeps_legacy() {
     let rt = tokio::runtime::Runtime::new().unwrap();
@@ -95,7 +95,7 @@ fn migration_succeeds_keeps_legacy() {
 /// P0：迁移失败路径——引导返回业务错误时静默降级
 /// 条件：引导端点返回业务错误（errcode != 0）→ 迁移静默降级
 /// 断言：退出码 0（未授权启动表现）、legacy bot.enc **保留**、credentials.enc 不生成
-#[cfg(feature = "custom-endpoint")]
+#[cfg(all(feature = "custom-endpoint", not(feature = "skip-auth-check")))]
 #[test]
 fn migration_failure_keeps_legacy() {
     let rt = tokio::runtime::Runtime::new().unwrap();

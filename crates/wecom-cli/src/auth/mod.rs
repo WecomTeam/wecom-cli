@@ -15,6 +15,10 @@
 //!
 //! 目录布局（`~/.config/wecom`）固定不变。
 
+// skip-auth-check 构建不注册 auth 命令（见 cmd/mod.rs），本域仅供该命令
+// 使用的项在该构建下无引用点。
+#![cfg_attr(feature = "skip-auth-check", allow(dead_code, unused_imports))]
+
 mod bootstrap;
 pub(crate) mod crypto;
 mod legacy_migration;

@@ -1,3 +1,5 @@
+mod browser;
+
 use std::io::IsTerminal;
 use std::path::{Path, PathBuf};
 
@@ -5,7 +7,6 @@ use clap::{ArgMatches, Args, CommandFactory, FromArgMatches, Parser, Subcommand}
 use qrcode::QrCode;
 
 use crate::auth;
-use crate::browser;
 use crate::{Error, Result};
 
 /// 企业微信机器人授权管理

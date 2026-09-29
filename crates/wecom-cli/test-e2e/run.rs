@@ -39,6 +39,10 @@ mod auth {
         use super::*;
         include!("cases/auth/001-legacy-migration/test.rs");
     }
+    mod auth_hidden_skip_auth_check {
+        use super::*;
+        include!("cases/auth/002-auth-hidden-skip-auth-check/test.rs");
+    }
 }
 
 // ── logging ─────────────────────────────────────────────────

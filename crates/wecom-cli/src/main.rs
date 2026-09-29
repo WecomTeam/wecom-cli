@@ -1,5 +1,4 @@
 mod auth;
-mod browser;
 mod cmd;
 mod config;
 mod env;
@@ -80,14 +79,19 @@ async fn main() {
             transport
         };
 
-        let client = builder
+        let builder = builder
             .private_fs(private_fs)
             .workspace_fs(std::sync::Arc::new(workspace_fs))
             .transport(transport)
             .bin_name(env!("CARGO_BIN_NAME"))
-            .cwd(&fs_cwd)
-            .command(cmd::auth::custom_command())
-            .build()?;
+            .cwd(&fs_cwd);
+
+        // skip-auth-check 构建不注册 auth 命令：顶层 help 不出现；
+        // 调用落入"命令未找到"路径（InvalidSubcommand，退出码 2）。
+        #[cfg(not(feature = "skip-auth-check"))]
+        let builder = builder.command(cmd::auth::custom_command());
+
+        let client = builder.build()?;
 
         client.run(std::env::args().collect()).await
     };
