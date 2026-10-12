@@ -1,0 +1,79 @@
+<Slide style={{ width: 1280, height: 720, background: '#2373DA', padding: '44px 73px 44px', flexDirection: 'column', gap: 24, fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: 3 }}>
+            <>核心指标 · <span style={{ fontFamily: 'Courier New', letterSpacing: 2 }}>Q3 2026</span></>
+        </Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: 3 }}>四个数字 · 07</Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 234 }}>
+        <Box style={{ gap: 12 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 17, fontWeight: 700, color: '#FFFFFF', letterSpacing: 5 }}>值得持续盯住的四个数字</Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 76, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.1, letterSpacing: 0 }}>
+                增长提速，<br />效率同步改善
+            </Text>
+        </Box>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 400, color: '#FFFFFF', lineHeight: 1.6, width: 400, marginBottom: 8 }}>
+            管理层每月复盘的一组指标。所有变化幅度对照三月定下的年度计划解读，而不是对照去年同期。
+        </Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', gap: 18, height: 326 }}>
+        <Box style={{ width: 270, height: 326, background: '#FFFFFF', padding: '24px 24px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>月活企业</Text>
+                <Text style={{ fontFamily: 'STSong', fontSize: 90, fontWeight: 900, color: '#2373DA', lineHeight: 1.0, letterSpacing: -3, whiteSpace: 'nowrap' }}>
+                    <>638<span style={{ fontSize: 40, letterSpacing: 0 }}> 万</span></>
+                </Text>
+                <Box style={{ flexDirection: 'row' }}>
+                    <Box style={{ background: '#2373DA', padding: '5px 12px' }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 14, fontWeight: 700, color: '#FFFFFF', letterSpacing: 2 }}>+ 12.4%</Text>
+                    </Box>
+                </Box>
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#10141A', lineHeight: 1.55 }}>本季度月活跃企业组织数，净新增主要来自制造与零售。</Text>
+        </Box>
+        <Box style={{ width: 270, height: 326, background: '#DCEBFD', padding: '24px 24px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>付费续约率</Text>
+                <Text style={{ fontFamily: 'STSong', fontSize: 90, fontWeight: 900, color: '#1A4785', lineHeight: 1.0, letterSpacing: -3, whiteSpace: 'nowrap' }}>
+                    <>94<span style={{ fontSize: 40, letterSpacing: 0 }}>%</span></>
+                </Text>
+                <Box style={{ flexDirection: 'row' }}>
+                    <Box style={{ background: '#1A4785', padding: '5px 12px' }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 14, fontWeight: 700, color: '#FFFFFF', letterSpacing: 2 }}>+ 3.1 PP</Text>
+                    </Box>
+                </Box>
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#1A4785', lineHeight: 1.55 }}>滚动十二个月到期付费客户的续约比例，按合同金额加权。</Text>
+        </Box>
+        <Box style={{ width: 270, height: 326, background: '#FFFFFF', padding: '24px 24px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>交付周期</Text>
+                <Text style={{ fontFamily: 'STSong', fontSize: 90, fontWeight: 900, color: '#2373DA', lineHeight: 1.0, letterSpacing: -3, whiteSpace: 'nowrap' }}>
+                    <>11<span style={{ fontSize: 40, letterSpacing: 0 }}> 天</span></>
+                </Text>
+                <Box style={{ flexDirection: 'row' }}>
+                    <Box style={{ background: '#2373DA', padding: '5px 12px' }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 14, fontWeight: 700, color: '#FFFFFF', letterSpacing: 2 }}>- 2 DAYS</Text>
+                    </Box>
+                </Box>
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#10141A', lineHeight: 1.55 }}>从签约到首次上线的中位天数，按项目数量加权。</Text>
+        </Box>
+        <Box style={{ width: 270, height: 326, background: '#DCEBFD', padding: '24px 24px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>经营毛利率</Text>
+                <Text style={{ fontFamily: 'STSong', fontSize: 90, fontWeight: 900, color: '#1A4785', lineHeight: 1.0, letterSpacing: -3, whiteSpace: 'nowrap' }}>
+                    <>37<span style={{ fontSize: 40, letterSpacing: 0 }}>%</span></>
+                </Text>
+                <Box style={{ flexDirection: 'row' }}>
+                    <Box style={{ background: '#1A4785', padding: '5px 12px' }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 14, fontWeight: 700, color: '#FFFFFF', letterSpacing: 2 }}>+ 1.8 PP</Text>
+                    </Box>
+                </Box>
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#1A4785', lineHeight: 1.55 }}>扣除直接成本后的贡献毛利率，未分摊总部费用。</Text>
+        </Box>
+    </Box>
+</Slide>

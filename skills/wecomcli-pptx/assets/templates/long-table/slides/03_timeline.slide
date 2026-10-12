@@ -1,0 +1,81 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: '50px 64px 0 64px', position: 'relative', fontFamily: 'STSong' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', top: 0, left: 0 }}>
+        <defs>
+            <pattern id='dots' width='6' height='6' patternUnits='userSpaceOnUse'>
+                <circle cx='3' cy='3' r='0.7' fill='#FBF1E0' />
+            </pattern>
+        </defs>
+        <rect x='0' y='0' width='1280' height='720' fill='#FFFFFF' />
+        <rect x='0' y='0' width='1280' height='720' fill='url(#dots)' />
+    </svg>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 84, paddingBottom: 14, borderBottom: '1.5px solid #C42819' }}>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+            <Box style={{ width: 10, height: 44, background: '#C42819' }} />
+            <Text style={{ fontSize: 46, fontWeight: 700, lineHeight: 1.2, color: '#1A1616', whiteSpace: 'nowrap' }}>从推荐到表彰的五个阶段</Text>
+        </Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 6 }}>
+            <Box style={{ flexDirection: 'row', gap: 8 }}>
+                <Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825' }} /><Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825', opacity: 0.6 }} /><Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825', opacity: 0.3 }} />
+            </Box>
+            <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.2 }}>年度表彰 · 二〇二六 · 流程</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'relative', marginTop: 18, width: 1152, height: 488 }}>
+        <Text style={{ fontSize: 17, lineHeight: 1.6, color: '#4B5563', width: 1100 }}>每一步都有明确的时间窗和公开环节，推荐名单、审核结果和最终名单在社区公告栏与居民群同步公示。</Text>
+
+        <svg width={1152} height={52} viewBox='0 0 1152 52' style={{ marginTop: 20 }}>
+            <rect x='0' y='0' width='1152' height='52' fill='#FFFFFF' />
+            <line x1='0' y1='26' x2='691' y2='26' stroke='#C42819' strokeWidth='3' />
+            <line x1='691' y1='26' x2='1152' y2='26' stroke='#E5E7EB' strokeWidth='3' />
+            <circle cx='108' cy='26' r='21' fill='#C42819' stroke='#E19825' strokeWidth='3' />
+            <circle cx='342' cy='26' r='21' fill='#C42819' stroke='#E19825' strokeWidth='3' />
+            <circle cx='576' cy='26' r='21' fill='#C42819' stroke='#E19825' strokeWidth='3' />
+            <circle cx='810' cy='26' r='21' fill='#FFFFFF' stroke='#E19825' strokeWidth='3' />
+            <circle cx='1044' cy='26' r='21' fill='#FFFFFF' stroke='#E19825' strokeWidth='3' />
+            <text x='108' y='32' textAnchor='middle' fontFamily='Times New Roman' fontStyle='italic' fontWeight='bold' fontSize='19' fill='#FFFFFF'>1</text>
+            <text x='342' y='32' textAnchor='middle' fontFamily='Times New Roman' fontStyle='italic' fontWeight='bold' fontSize='19' fill='#FFFFFF'>2</text>
+            <text x='576' y='32' textAnchor='middle' fontFamily='Times New Roman' fontStyle='italic' fontWeight='bold' fontSize='19' fill='#FFFFFF'>3</text>
+            <text x='810' y='32' textAnchor='middle' fontFamily='Times New Roman' fontStyle='italic' fontWeight='bold' fontSize='19' fill='#C42819'>4</text>
+            <text x='1044' y='32' textAnchor='middle' fontFamily='Times New Roman' fontStyle='italic' fontWeight='bold' fontSize='19' fill='#C42819'>5</text>
+        </svg>
+
+        <Box style={{ marginTop: 16, flexDirection: 'row', gap: 18 }}>
+            {[
+                ['基层推荐', '九月', '各社区按类别推荐候选集体和个人，附一年内的事项清单和居民评价。', '推荐名单 · 事项清单', '已完成'],
+                ['资格审核', '十月上旬', '街道专班核对推荐材料，与诉求平台、考勤和台账数据逐项比对。', '审核意见 · 比对记录', '已完成'],
+                ['公示反馈', '十月下旬', '推荐名单在公告栏与居民群公示七天，接受居民意见并逐条回复。', '公示公告 · 意见回复', '已完成'],
+                ['集体审定', '十一月', '街道会议逐类审定，形成最终名单，未通过的说明原因并反馈到社区。', '最终名单 · 审定记录', '进行中'],
+                ['表彰大会', '十二月', '集中表彰并请获奖者讲一件今年做成的事，会后名单和事迹汇编存档。', '表彰决定 · 事迹汇编', '待举行'],
+            ].map((s, i) => (
+                <Box key={i} style={{ width: 216, height: 336, border: '1.5px solid #C42819', background: '#FFFFFF', padding: '18px 18px 16px 18px', justifyContent: 'space-between' }}>
+                    <Box style={{ gap: 8 }}>
+                        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                            <Text style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.2, color: '#1A1616' }}>{s[0]}</Text>
+                            <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#C42819', lineHeight: 1.4 }}>{s[1]}</Text>
+                        </Box>
+                        <Box style={{ width: 40, height: 4, background: '#E19825' }} />
+                        <Text style={{ marginTop: 4, fontSize: 17, lineHeight: 1.8, color: '#4B5563' }}>{s[2]}</Text>
+                    </Box>
+                    <Box style={{ gap: 8, paddingTop: 10, borderTop: '1px dashed rgba(196,40,25,0.4)' }}>
+                        <Text style={{ fontSize: 13, color: '#6B7280', lineHeight: 1.2 }}>阶段产出</Text>
+                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#C42819', lineHeight: 1.3 }}>{s[3]}</Text>
+                        <Box style={{ flexDirection: 'row', marginTop: 4 }}>
+                            <Box style={{ height: 28, padding: '0 14px', borderRadius: 14, border: '1.5px solid #C42819', background: i === 3 ? '#C42819' : '#FFFFFF', alignItems: 'center', justifyContent: 'center' }}>
+                                <Text style={{ fontSize: 13, color: i === 3 ? '#FFFFFF' : '#C42819', lineHeight: 1 }}>{s[4]}</Text>
+                            </Box>
+                        </Box>
+                    </Box>
+                </Box>
+            ))}
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 9, flexDirection: 'row' }}>
+        <Box style={{ width: 678, height: 9, background: '#C42819' }} />
+        <Box style={{ width: 333, height: 9, background: '#EE5530' }} />
+        <Box style={{ width: 269, height: 9, background: '#F26B40' }} />
+    </Box>
+    <Text style={{ position: 'absolute', right: 64, top: 678, fontFamily: 'Times New Roman', fontSize: 15, fontStyle: 'italic', color: '#6B7280', lineHeight: 1 }}>05 / 08</Text>
+</Slide>

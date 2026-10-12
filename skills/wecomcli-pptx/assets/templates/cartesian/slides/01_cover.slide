@@ -1,0 +1,44 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative', padding: '48px 52px 68px 52px', flexDirection: 'column', gap: 24, fontFamily: 'Microsoft YaHei' }}>
+    <svg width={400} height={400} viewBox='0 0 400 400' style={{ position: 'absolute', left: 824, top: 236 }}>
+        <rect x='0' y='0' width='400' height='400' fill='#FFFFFF' />
+        <circle cx='200' cy='200' r='193' fill='none' stroke='#B5B8BB' strokeWidth='1' opacity='0.7' />
+        <circle cx='200' cy='200' r='154' fill='none' stroke='#B5B8BB' strokeWidth='1' strokeDasharray='3 4' opacity='0.5' />
+    </svg>
+
+    <Box style={{ width: 720, height: 360, marginTop: 117 }}>
+        <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>
+            组会文献汇报 · 交通信息工程及控制
+        </Text>
+        <Text style={{ fontFamily: 'STSong', fontSize: 44, fontWeight: 700, lineHeight: 1.3, color: '#10141A', marginTop: 24, whiteSpace: 'nowrap' }}>
+            城市轨道交通客流短时预测：<br />两类时空建模方法的对比阅读
+        </Text>
+        <Text style={{ fontFamily: 'Times New Roman', fontSize: 18, fontWeight: 400, fontStyle: 'italic', lineHeight: 1.55, color: '#565A5F', marginTop: 18, whiteSpace: 'nowrap' }}>
+            Short-term Passenger Flow Prediction in Urban Rail Transit:<br />A Comparative Reading of Two Spatio-temporal Modelling Approaches
+        </Text>
+
+        <Box style={{ width: 640, height: 1, background: '#B5B8BB', marginTop: 34 }} />
+        <Box style={{ flexDirection: 'row', gap: 56, marginTop: 18 }}>
+            <Box style={{ gap: 8 }}>
+                <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>汇报人</Text>
+                <Text style={{ fontSize: 16, color: '#10141A', whiteSpace: 'nowrap' }}>王雨桐 · 硕士研究生</Text>
+            </Box>
+            <Box style={{ gap: 8 }}>
+                <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>指导教师</Text>
+                <Text style={{ fontSize: 16, color: '#10141A', whiteSpace: 'nowrap' }}>张明远 教授</Text>
+            </Box>
+            <Box style={{ gap: 8 }}>
+                <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>汇报时间</Text>
+                <Text style={{ fontSize: 16, color: '#10141A', whiteSpace: 'nowrap' }}>2026 年 9 月 17 日</Text>
+            </Box>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 52, bottom: 96, width: 256, height: 1, background: '#10141A' }} />
+
+    <Box style={{ position: 'absolute', left: 52, bottom: 28, height: 14 }}>
+        <Text style={{ fontSize: 12, fontWeight: 500, letterSpacing: 2, lineHeight: 1, color: '#6D7176', whiteSpace: 'nowrap' }}>交通运输工程学院 · 智能交通课题组</Text>
+    </Box>
+    <Box style={{ position: 'absolute', right: 52, bottom: 28, height: 14 }}>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 400, letterSpacing: 2, lineHeight: 1, color: '#6D7176' }}>01 / 10</Text>
+    </Box>
+</Slide>

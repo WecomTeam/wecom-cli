@@ -1,0 +1,53 @@
+<Slide style={{ width: 1280, height: 720, background: '#2373DA', padding: '44px 73px 44px', flexDirection: 'column', gap: 24, fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: 3 }}>
+            <>落地节奏 · <span style={{ fontFamily: 'Courier New', letterSpacing: 2 }}>Q4 2026</span></>
+        </Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: 3 }}>三个阶段 · 08</Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 234 }}>
+        <Box style={{ gap: 12 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 17, fontWeight: 700, color: '#FFFFFF', letterSpacing: 5 }}>下一步怎么排</Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 76, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.1, letterSpacing: 0 }}>
+                先立标准，<br />再谈规模
+            </Text>
+        </Box>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 400, color: '#FFFFFF', lineHeight: 1.6, width: 400, marginBottom: 8 }}>
+            三个阶段按季度推进，每阶段只设一个验收口径。前一阶段的口径没达成，后一阶段不启动。
+        </Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', gap: 18, height: 326 }}>
+        <Box style={{ width: 366, height: 326, background: '#FFFFFF', padding: '24px 28px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>
+                    <>第一阶段 · <span style={{ fontFamily: 'Courier New', letterSpacing: 2 }}>Q4</span></>
+                </Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 36, fontWeight: 700, color: '#2373DA', lineHeight: 1.1 }}>统一交付口径</Text>
+                <Box style={{ width: 310, height: 3, background: '#267EF0' }} />
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#10141A', lineHeight: 1.55 }}>把四条业务线各自的验收标准合成一份，签约到上线的每个环节都写明责任方与时限。验收口径不统一，后面的规模化就没有基准。</Text>
+        </Box>
+        <Box style={{ width: 366, height: 326, background: '#DCEBFD', padding: '24px 28px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>
+                    <>第二阶段 · <span style={{ fontFamily: 'Courier New', letterSpacing: 2 }}>Q1</span></>
+                </Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 36, fontWeight: 700, color: '#1A4785', lineHeight: 1.1 }}>两条线先跑</Text>
+                <Box style={{ width: 310, height: 3, background: '#1A4785' }} />
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#1A4785', lineHeight: 1.55 }}>选制造与零售两条线按新口径走一遍，目标是交付周期中位数进一步压到九天，且续约率不下滑。达不到就停下来改口径。</Text>
+        </Box>
+        <Box style={{ width: 366, height: 326, background: '#FFFFFF', padding: '24px 28px 22px', justifyContent: 'space-between' }}>
+            <Box style={{ gap: 12 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>
+                    <>第三阶段 · <span style={{ fontFamily: 'Courier New', letterSpacing: 2 }}>Q2</span></>
+                </Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 36, fontWeight: 700, color: '#2373DA', lineHeight: 1.1 }}>全量铺开</Text>
+                <Box style={{ width: 310, height: 3, background: '#267EF0' }} />
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 400, color: '#10141A', lineHeight: 1.55 }}>四条线全部切到新口径，旧流程同期下线。届时把交付周期与毛利率两项纳入季度经营会的固定议题，不再单独立项汇报。</Text>
+        </Box>
+    </Box>
+</Slide>

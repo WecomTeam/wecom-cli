@@ -1,0 +1,30 @@
+<Slide style={{ width: 1280, height: 720, background: '#F3E9D2', padding: '32px 40px 24px 40px', position: 'relative', flexDirection: 'column', fontFamily: 'Microsoft YaHei' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', left: 0, top: 0 }}>
+        <rect x='0' y='0' width='1280' height='720' fill='#F3E9D2' />
+        <path d='M -40 300 L 1320 -180 L 1320 -136 L -40 344 Z' fill='#E5408C' />
+        <path d='M -40 356 L 1320 -124 L 1320 -80 L -40 400 Z' fill='#F08A3C' />
+        <path d='M -40 412 L 1320 -68 L 1320 -24 L -40 456 Z' fill='#F2C232' />
+        <path d='M -40 468 L 1320 -12 L 1320 32 L -40 512 Z' fill='#3FA34B' />
+        <path d='M -40 524 L 1320 44 L 1320 88 L -40 568 Z' fill='#4A8ED1' />
+    </svg>
+    <Box style={{ position: 'absolute', left: 40, top: 96, flexDirection: 'row' }}>
+        <Box style={{ background: '#F3E9D2', border: '1.5px solid #3B2A1B', padding: '8px 14px 8px 14px' }}>
+            <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', letterSpacing: 3, lineHeight: 1 }}>钉在工作台上方的一句话</Text>
+        </Box>
+    </Box>
+    <Box style={{ position: 'absolute', left: 40, top: 300, width: 906, height: 170 }}>
+        <Box style={{ position: 'absolute', left: 6, top: 6, width: 900, height: 164, background: '#3B2A1B' }} />
+        <Box style={{ position: 'absolute', left: 0, top: 0, width: 900, height: 164, background: '#F3E9D2', border: '2px solid #3B2A1B', padding: '22px 28px 22px 28px', justifyContent: 'center' }}>
+            <Text style={{ width: 840, fontSize: 40, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.2, letterSpacing: -0.5 }}>先把活动办起来，<br />再去写完美的方案。</Text>
+        </Box>
+    </Box>
+    <Box style={{ position: 'absolute', left: 40, top: 500, flexDirection: 'row' }}>
+        <Box style={{ background: '#3B2A1B', padding: '7px 12px 7px 12px' }}>
+            <Text style={{ fontSize: 11, fontWeight: 700, color: '#F3E9D2', letterSpacing: 2, lineHeight: 1 }}>—— 林一禾 · 活动组组长 · 二〇二四年</Text>
+        </Box>
+    </Box>
+    <Box style={{ position: 'absolute', left: 40, top: 664, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 1200, height: 32 }}>
+        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 2, lineHeight: 1 }}>内部材料</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>03 / 08</Text>
+    </Box>
+</Slide>

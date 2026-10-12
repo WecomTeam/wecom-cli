@@ -4,7 +4,7 @@
 
 ## Agent Skills
 
-当前共内置 14 个 Agent Skills：
+当前共内置 15 个 Agent Skills：
 
 | Skill | 品类 | 说明 |
 | ----- | ---- | ---- |
@@ -22,3 +22,4 @@
 | [`wecomcli-sheet`](../skills/wecomcli-sheet/SKILL.md) | 在线表格 | 新建或导入在线表格，读取、修改和追加表格数据，以及管理子表 |
 | [`wecomcli-smartsheet`](../skills/wecomcli-smartsheet/SKILL.md) | 智能表格 | 读取和管理智能表格的数据、结构与样式，包括子表、字段、记录、视图和图表 |
 | [`wecomcli-smartpage`](../skills/wecomcli-smartpage/SKILL.md) | 智能文档 | 创建、导入、读取和修改智能文档，调整页面树结构，并获取内置智能表格信息；未指定类型的文档创建、写作或整理请求默认由该 Skill 承接 |
+| [`wecomcli-pptx`](../skills/wecomcli-pptx/SKILL.md) | 在线 PPT 演示文稿 | 生成、编辑在线 PPT（slide 文档），以及把本地 .ppt/.pptx 导入为在线文档 |

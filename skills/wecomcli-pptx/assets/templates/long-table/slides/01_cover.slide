@@ -1,0 +1,71 @@
+<Slide style={{ width: 1280, height: 720, background: '#E63F26', padding: '50px 64px 0 64px', position: 'relative', fontFamily: 'STSong' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', top: 0, left: 0 }}>
+        <defs>
+            <pattern id='dotsCover' width='6' height='6' patternUnits='userSpaceOnUse'>
+                <circle cx='3' cy='3' r='0.7' fill='#EA5A39' />
+            </pattern>
+        </defs>
+        <rect x='0' y='0' width='1280' height='720' fill='#E63F26' />
+        <rect x='0' y='0' width='1280' height='720' fill='url(#dotsCover)' />
+    </svg>
+    <Box style={{ position: 'absolute', left: -110, top: -110, width: 760, height: 760, background: 'radial-gradient(circle, rgba(255,231,155,0.5) 0%, rgba(255,192,0,0.2) 38%, rgba(230,63,38,0) 70%)' }} />
+    <svg width={500} height={300} viewBox='0 0 500 300' style={{ position: 'absolute', left: 740, top: 60 }}>
+        <rect x='0' y='0' width='500' height='300' fill='#E63F26' />
+        <g fill='#FFC000'>
+            <circle cx='60' cy='70' r='4' opacity='0.9' /><circle cx='130' cy='30' r='2.5' opacity='0.7' /><circle cx='210' cy='120' r='3' opacity='0.6' />
+            <circle cx='300' cy='56' r='5' opacity='0.85' /><circle cx='380' cy='150' r='2.5' opacity='0.6' /><circle cx='440' cy='80' r='4' opacity='0.8' />
+            <circle cx='150' cy='220' r='3' opacity='0.7' /><circle cx='270' cy='200' r='2' opacity='0.5' /><circle cx='460' cy='240' r='2.5' opacity='0.55' />
+        </g>
+    </svg>
+    <Box style={{ position: 'absolute', right: 64, top: 62, width: 220, height: 2, background: '#E19825' }} />
+    <Box style={{ position: 'absolute', right: 64, top: 74, width: 120, height: 2, background: '#FFE79B', opacity: 0.8 }} />
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 60, background: '#C42819' }} />
+    <Box style={{ position: 'absolute', left: 0, top: 658, width: 1280, height: 2, background: '#E19825' }} />
+    <Text style={{ position: 'absolute', right: 64, top: 678, fontFamily: 'Times New Roman', fontSize: 15, fontStyle: 'italic', color: '#FFE79B', lineHeight: 1 }}>01 / 08</Text>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', justifyContent: 'space-between', width: 1152, height: 590 }}>
+        <Box style={{ width: 700 }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, height: 36 }}>
+                <Box style={{ width: 36, height: 36, borderRadius: 18, border: '1.5px solid #FFE79B', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontFamily: 'Times New Roman', fontSize: 16, fontStyle: 'italic', color: '#FFE79B', lineHeight: 1 }}>12</Text>
+                </Box>
+                <Text style={{ fontSize: 20, color: '#FFE79B', lineHeight: 1.2 }}>十二月 · 年度表彰会</Text>
+            </Box>
+            <Box style={{ marginTop: 12, height: 148, justifyContent: 'flex-end' }}>
+                <Text style={{ fontSize: 124, fontWeight: 700, lineHeight: 1, whiteSpace: 'nowrap', backgroundImage: 'linear-gradient(180deg, #FFE79B 0%, #FFC000 46%, #E19825 100%)', backgroundClip: 'text', color: 'transparent', textShadow: '0 8px 20px rgba(120,16,8,0.6)' }}>年度表彰</Text>
+            </Box>
+            <Box style={{ height: 148, justifyContent: 'flex-end' }}>
+                <Text style={{ fontSize: 124, fontWeight: 700, lineHeight: 1, whiteSpace: 'nowrap', backgroundImage: 'linear-gradient(180deg, #FFE79B 0%, #FFC000 46%, #E19825 100%)', backgroundClip: 'text', color: 'transparent', textShadow: '0 8px 20px rgba(120,16,8,0.6)' }}>庆典</Text>
+            </Box>
+            <Box style={{ flexDirection: 'row', alignItems: 'flex-start', marginTop: 12, height: 56 }}>
+                <Box style={{ width: 22, height: 40, background: '#B8791A', marginTop: 10 }} />
+                <Box style={{ width: 520, height: 50, background: 'linear-gradient(90deg, #E19825 0%, #FFC000 50%, #E19825 100%)', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#A81810', letterSpacing: 3, lineHeight: 1 }}>六个类别 · 三十六个集体和个人</Text>
+                </Box>
+                <Box style={{ width: 22, height: 40, background: '#B8791A', marginTop: 10 }} />
+            </Box>
+            <Box style={{ flexDirection: 'row', gap: 16, marginTop: 12, marginLeft: 22 }}>
+                <Box style={{ height: 40, padding: '0 24px', borderRadius: 20, background: '#C42819', border: '1px solid #E19825', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 18, color: '#FFFFFF', lineHeight: 1 }}>颁授 · 年度表彰评审组</Text>
+                </Box>
+                <Box style={{ height: 40, padding: '0 24px', borderRadius: 20, background: '#C42819', border: '1px solid #E19825', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontSize: 18, color: '#FFFFFF', lineHeight: 1 }}>时间 · 2026 年 12 月下旬</Text>
+                </Box>
+            </Box>
+            <Box style={{ flexDirection: 'row', marginTop: 12, marginLeft: 22 }}>
+                <Box style={{ border: '1.5px solid #FFE79B', padding: '7px 16px' }}>
+                    <Text style={{ fontSize: 15, color: '#FFE79B', lineHeight: 1.2 }}>表彰的是一年里做成的事</Text>
+                </Box>
+            </Box>
+            <Text style={{ marginTop: 8, marginLeft: 22, fontSize: 17, lineHeight: 1.6, color: '#FFFFFF', width: 580 }}>把一年里在网格、社区和街面上做成的事集中说一次，让做事的人被看见，也让明年的清单有参照。</Text>
+        </Box>
+
+        <Box style={{ width: 440, alignItems: 'flex-end', justifyContent: 'flex-end', gap: 12 }}>
+            <Box style={{ width: 440, height: 230, alignItems: 'flex-end', justifyContent: 'flex-end' }}>
+                <Text style={{ fontFamily: 'Times New Roman', fontSize: 190, fontStyle: 'italic', fontWeight: 400, lineHeight: 1, letterSpacing: -3, whiteSpace: 'nowrap', color: '#C42819', textShadow: '0 2px 0 rgba(255,231,155,0.35)' }}>2026</Text>
+            </Box>
+            <Text style={{ fontSize: 14, fontWeight: 'bold', letterSpacing: 6, color: '#FFE79B', lineHeight: 1.2 }}>年度 · 表彰 · 庆典</Text>
+            <Text style={{ fontSize: 16, lineHeight: 1.6, color: '#FFFFFF', textAlign: 'right' }}>面向全体社区工作者、网格员<br />和志愿者的年度集中表彰。</Text>
+        </Box>
+    </Box>
+</Slide>

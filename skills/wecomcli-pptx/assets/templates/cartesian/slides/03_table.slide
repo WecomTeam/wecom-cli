@@ -1,0 +1,79 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative', padding: '48px 52px 68px 52px', flexDirection: 'column', gap: 24, fontFamily: 'Microsoft YaHei' }}>
+    <svg width={140} height={140} viewBox='0 0 140 140' style={{ position: 'absolute', left: 1086, top: 16 }}>
+        <rect x='0' y='0' width='140' height='140' fill='#FFFFFF' />
+        <circle cx='70' cy='70' r='67' fill='none' stroke='#B5B8BB' strokeWidth='1' opacity='0.6' />
+        <circle cx='70' cy='70' r='52' fill='none' stroke='#B5B8BB' strokeWidth='1' strokeDasharray='3 4' opacity='0.4' />
+    </svg>
+
+    <Box style={{ width: 1176, height: 80 }}>
+        <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>
+            误差对比 · 同一示例数据集
+        </Text>
+        <Text style={{ fontFamily: 'STSong', fontSize: 32, fontWeight: 700, lineHeight: 1.3, color: '#10141A', marginTop: 12, whiteSpace: 'nowrap' }}>
+            在同一示例数据集上，引入空间结构的方法把高峰误差压低约三成
+        </Text>
+    </Box>
+
+    <Box style={{ width: 1176, height: 500 }}>
+        <Box style={{ height: 388 }}>
+            <Table
+                style={{ width: '100%', height: '100%' }}
+                defaultTextStyle={{ fontSize: 17, textAlign: 'center', color: '#10141A', fontFamily: 'Microsoft YaHei' }}
+                defaultCellStyle={{
+                    border: {
+                        bottom: { width: 1, color: '#B5B8BB' },
+                    },
+                }}
+                cells={[
+                    [
+                        { text: '方法类别', textStyle: { textAlign: 'left', color: '#565A5F' }, cellStyle: { background: { color: '#E7E7E8' } } },
+                        { text: '空间关系建模', textStyle: { color: '#565A5F' }, cellStyle: { background: { color: '#E7E7E8' } } },
+                        { text: '输入粒度', textStyle: { color: '#565A5F' }, cellStyle: { background: { color: '#E7E7E8' } } },
+                        { text: '高峰 MAE（人次）', textStyle: { color: '#565A5F' }, cellStyle: { background: { color: '#E7E7E8' } } },
+                        { text: '高峰 MAPE', textStyle: { color: '#565A5F' }, cellStyle: { background: { color: '#E7E7E8' } } },
+                        { text: '训练时长', textStyle: { color: '#565A5F' }, cellStyle: { background: { color: '#E7E7E8' } } },
+                    ],
+                    [
+                        { text: '历史同期均值', textStyle: { textAlign: 'left' } }, '无', '15 分钟', '168', '18.4%', '—',
+                    ],
+                    [
+                        { text: 'ARIMA（逐站）', textStyle: { textAlign: 'left' }, cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '无', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '15 分钟', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '131', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '14.2%', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '约 3 分钟 / 站', cellStyle: { background: { color: '#F7F7F8' } } },
+                    ],
+                    [
+                        { text: 'LSTM（逐站）', textStyle: { textAlign: 'left' } }, '无', '15 分钟', '104', '11.3%', '约 25 分钟 / 站',
+                    ],
+                    [
+                        { text: '图卷积 + GRU（全网）', textStyle: { textAlign: 'left' }, cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '路网邻接', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '15 分钟', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '79', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '8.6%', cellStyle: { background: { color: '#F7F7F8' } } },
+                        { text: '约 70 分钟 / 全网', cellStyle: { background: { color: '#F7F7F8' } } },
+                    ],
+                    [
+                        { text: '本组复现（图卷积 + GRU，加天气特征）', textStyle: { textAlign: 'left' } }, '路网邻接 + 换乘', '15 分钟', '76', '8.2%', '约 80 分钟 / 全网',
+                    ],
+                ]}
+            />
+        </Box>
+
+        <Box style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 28, borderTop: '1px solid #B5B8BB', paddingTop: 16, marginTop: 22, height: 90 }}>
+            <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 2.2, whiteSpace: 'nowrap' }}>结论</Text>
+            <Text style={{ flex: 1, fontFamily: 'STSong', fontSize: 19, fontWeight: 700, color: '#10141A', lineHeight: 1.6 }}>
+                误差下降主要来自空间结构而非模型规模：从 LSTM 到图卷积的 MAE 降幅（24%）大于从 ARIMA 到 LSTM（21%）；训练时长随之增加，部署时需在精度与算力之间权衡。数据均为示例口径。
+            </Text>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 52, bottom: 28, height: 14 }}>
+        <Text style={{ fontSize: 12, fontWeight: 500, letterSpacing: 2, lineHeight: 1, color: '#6D7176', whiteSpace: 'nowrap' }}>交通运输工程学院 · 智能交通课题组</Text>
+    </Box>
+    <Box style={{ position: 'absolute', right: 52, bottom: 28, height: 14 }}>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 400, letterSpacing: 2, lineHeight: 1, color: '#6D7176' }}>03 / 10</Text>
+    </Box>
+</Slide>

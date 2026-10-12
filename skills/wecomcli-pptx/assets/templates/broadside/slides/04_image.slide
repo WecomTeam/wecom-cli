@@ -1,0 +1,64 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative', padding: '40px 70px 0 70px', fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ width: 1140, height: 112 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 30, borderBottom: '1px solid #E5E7EB' }}>
+            <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                <Box style={{ height: 22, padding: '0 12px', borderRadius: 11, background: '#C42819', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontFamily: 'Arial', fontSize: 12, fontWeight: 'bold', color: '#FFFFFF', letterSpacing: 1, lineHeight: 1 }}>PART 01</Text>
+                </Box>
+                <Text style={{ fontSize: 14, letterSpacing: 2, color: '#6B7280' }}>基础工作</Text>
+            </Box>
+            <Text style={{ fontSize: 14, letterSpacing: 2, color: '#6B7280' }}>现场纪实</Text>
+        </Box>
+
+        <Box style={{ marginTop: 22, flexDirection: 'row', alignItems: 'center', gap: 16, height: 60 }}>
+            <Box style={{ width: 12, height: 44, background: '#C42819' }} />
+            <Text style={{ fontSize: 42, fontWeight: 900, lineHeight: 1.2, color: '#1A1616', whiteSpace: 'nowrap' }}>走访不是打卡：先坐下来听，再把诉求记清楚</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ marginTop: 24, width: 1140, height: 452 }}>
+        <Box style={{ flexDirection: 'row', gap: 24 }}>
+            <Box style={{ width: 396, height: 452 }}>
+                <Box style={{ width: 396, height: 2, background: '#C42819' }} />
+                <Image src="https://placeholder.invalid/image.jpg" style={{ width: 396, height: 396 }} />
+                <Box style={{ marginTop: 14, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <Box style={{ width: 28, height: 4, background: '#E19825' }} />
+                    <Text style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.5, whiteSpace: 'nowrap' }}>网格员在居民家中登记诉求并当面确认</Text>
+                </Box>
+            </Box>
+
+            <Box style={{ width: 720, height: 452, borderRadius: 14, border: '1px solid #E5E7EB', background: '#FFFFFF', overflow: 'hidden' }}>
+                <Box style={{ height: 56, background: '#C42819', flexDirection: 'row', alignItems: 'center', gap: 14, padding: '0 24px' }}>
+                    <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 700, letterSpacing: 2, color: '#FFE79B', lineHeight: 1 }}>/ 01</Text>
+                    <Text style={{ fontSize: 26, fontWeight: 900, color: '#FFFFFF', lineHeight: 1, letterSpacing: 4 }}>走访现场</Text>
+                </Box>
+                <Box style={{ height: 396, padding: '20px 24px 20px 24px', justifyContent: 'space-between' }}>
+                    <Box style={{ gap: 12 }}>
+                        <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#C42819', lineHeight: 1.3 }}>先听，再记，能答的当场答</Text>
+                        <Text style={{ fontSize: 18, color: '#1A1616', lineHeight: 1.75 }}>网格员两人一组入户，不带固定话术，先请居民把事情讲完，再按类别登记到民情台账。能当场答复的当场答复，需要协调的写明反馈时限，并留下联系方式。</Text>
+                    </Box>
+                    <Box style={{ gap: 10, paddingTop: 14, borderTop: '1px solid #E5E7EB' }}>
+                        {[
+                            '两人一组，按网格逐户上门',
+                            '诉求分类登记，一户一页',
+                            '协调事项写明反馈时限',
+                        ].map((t, i) => (
+                            <Box key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                                <Box style={{ width: 6, height: 24, background: '#E19825' }} />
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1A1616', lineHeight: 1.2 }}>{t}</Text>
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 9, flexDirection: 'row' }}>
+        <Box style={{ width: 678, height: 9, background: '#C42819' }} />
+        <Box style={{ width: 333, height: 9, background: '#EE5530' }} />
+        <Box style={{ width: 269, height: 9, background: '#F26B40' }} />
+    </Box>
+    <Text style={{ position: 'absolute', left: 70, top: 678, fontSize: 14, letterSpacing: 2, color: '#6B7280', lineHeight: 1 }}>年度党课宣讲</Text>
+    <Text style={{ position: 'absolute', right: 70, top: 678, fontFamily: 'Courier New', fontSize: 14, color: '#6B7280', lineHeight: 1 }}>06 / 12</Text>
+</Slide>

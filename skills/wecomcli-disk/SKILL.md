@@ -145,7 +145,7 @@ wecom-cli disk files search --json '{"keywords": ["季度汇报"], "search_type"
 | `files[].title_highlight` | string[] | 标题命中关键词的高亮摘要片段；`type=space` 时为空 |
 | `files[].text_highlight` | string[] | 正文命中关键词的高亮摘要片段；`type=space` 时为空 |
 
-> **在线文档命中项处理约束——极重要**：搜索返回的 `type` 若为 `smartsheet` / `smartpage` / `sheet` / `word` / `ppt` / `journal` / `collect` / `mind` / `flow`，这些是**在线协作文档**（正文存云端，非二进制文件），**禁止**走 `disk files download`（会失败或拿到空壳），也不适合走 `disk files get`。其中 `smartsheet` / `smartpage` / `sheet` / `word` 有对应的下游 skill 可读正文，路由见文末【跨技能依赖】表；**`ppt` / `journal` / `collect` / `mind` / `flow` 目前没有任何下游 skill 或 CLI 能读取正文**，命中这些类型且用户要看内容时，直接告知暂不支持读取，引导用户用 `doc_url` 在企业微信客户端内打开查看。仅当 `type=file` 时才可用 `id` 作为 `file_id` 调 `disk files download` 拿本地文件。
+> **在线文档命中项处理约束——极重要**：搜索返回的 `type` 若为 `smartsheet` / `smartpage` / `sheet` / `word` / `ppt` / `journal` / `collect` / `mind` / `flow`，这些是**在线协作文档**（正文存云端，非二进制文件），**禁止**走 `disk files download`（会失败或拿到空壳），也不适合走 `disk files get`。其中 `smartsheet` / `smartpage` / `sheet` / `word` / `ppt` 有对应的下游 skill 可读正文，路由见文末【跨技能依赖】表；**`journal` / `collect` / `mind` / `flow` 目前没有任何下游 skill 或 CLI 能读取正文**，命中这些类型且用户要看内容时，直接告知暂不支持读取，引导用户用 `doc_url` 在企业微信客户端内打开查看。仅当 `type=file` 时才可用 `id` 作为 `file_id` 调 `disk files download` 拿本地文件。
 
 **使用规则**
 
@@ -294,7 +294,7 @@ wecom-cli disk files download --json '{"file_id": "FILE_ID"}'
 **使用规则**
 
 - **仅适用于离线二进制文件**：只有 `type=file`（对应 `file_types` 中的 `offline_word` / `offline_excel` / `offline_ppt` / `offline_pdf` / `image` / `videoaudio` / `design`）才能通过本接口下载到本地。
-- **在线文档形态一律不走下载**：若搜索返回的 `type` 是 `smartsheet` / `smartpage` / `sheet` / `word` / `ppt` / `journal` / `collect` / `mind` / `flow`，**禁止**把它们的 `id` 或 `doc_url` 当 `file_id` / `url` 传入本接口，会失败或拿到无效文件。其中 `smartsheet` / `smartpage` / `sheet` / `word` 要读取内容请按文末【跨技能依赖】表用 `docid` 路由到对应的下游文档技能；`ppt` / `journal` / `collect` / `mind` / `flow` 目前**没有下游技能可读正文**，直接告知用户暂不支持，引导其用 `doc_url` 在企业微信客户端内打开查看。
+- **在线文档形态一律不走下载**：若搜索返回的 `type` 是 `smartsheet` / `smartpage` / `sheet` / `word` / `ppt` / `journal` / `collect` / `mind` / `flow`，**禁止**把它们的 `id` 或 `doc_url` 当 `file_id` / `url` 传入本接口，会失败或拿到无效文件。其中 `smartsheet` / `smartpage` / `sheet` / `word` 要读取内容请按文末【跨技能依赖】表用 `docid` 路由到对应的下游文档技能；`journal` / `collect` / `mind` / `flow` 目前**没有下游技能可读正文**，直接告知用户暂不支持，引导其用 `doc_url` 在企业微信客户端内打开查看。
 - **URL 形态识别**：只有 `https://drive.weixin.qq.com/s?k=...` 是微盘文件分享 URL，可作为 `url` 参数；`https://doc.weixin.qq.com/...` / `https://page.weixin.qq.com/...` 都是在线文档链接，禁止传入本接口。
 
 ### 重命名文件

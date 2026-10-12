@@ -1,0 +1,85 @@
+<Slide style={{ background: '#F0EBDE', padding: '19px 48px 14px 48px', position: 'relative' }}>
+    <svg width={1280} height={719} viewBox='0 0 1280 719' style={{ position: 'absolute', top: 1, left: 0, zIndex: 0 }}>
+        <defs>
+            <pattern id='grid' width='32' height='32' patternUnits='userSpaceOnUse'>
+                <path d='M 32 0 L 0 0 0 32' fill='none' stroke='#DBD8DE' strokeWidth='1' />
+            </pattern>
+        </defs>
+        <rect x='0' y='0' width='1280' height='719' fill='#F0EBDE' />
+        <rect x='0' y='0' width='1280' height='719' fill='url(#grid)' />
+    </svg>
+
+    <Box style={{ position: 'relative', zIndex: 1, width: 1184, height: 687 }}>
+        <Box style={{ width: 1184, height: 1.5, background: '#1F2BE0' }} />
+
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 16, height: 127.5, paddingBottom: 14, borderBottom: '1.5px solid #1F2BE0' }}>
+            <Text style={{ width: 940, fontFamily: 'STSong', fontSize: 34, fontWeight: 700, color: '#1F2BE0', lineHeight: 1.3 }}>后市场利润池正从主机厂授权体系流向独立售后与电池回收，2030 年两者合计份额将翻倍</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 13, color: '#1F2BE0', letterSpacing: 1.5, whiteSpace: 'nowrap', paddingBottom: 6 }}>VALUE CHAIN · 06 SEGMENTS</Text>
+        </Box>
+
+        <Box style={{ width: 1184, height: 436, marginTop: 24 }}>
+            <Box style={{ flexDirection: 'row', height: 18 }}>
+                {['01 供给', '02 授权售后', '03 独立售后', '04 保险延保', '05 二手车', '06 回收再生'].map((t, i) => (
+                    <Text key={i} style={{ width: 193, fontFamily: 'Courier New', fontSize: 13, color: '#1F2BE0', letterSpacing: 1, whiteSpace: 'nowrap' }}>{t}</Text>
+                ))}
+            </Box>
+            <Box style={{ position: 'relative', width: 1184, height: 80, marginTop: 8 }}>
+                <svg width={1184} height={80} viewBox='0 0 1184 80' style={{ position: 'absolute', top: 0, left: 0 }}>
+                    <rect x='0' y='0' width='1184' height='80' fill='#F0EBDE' />
+                    <polygon points='0,0 189,0 215,40 189,80 0,80' fill='#1F2BE0' />
+                    <polygon points='193,0 382,0 408,40 382,80 193,80 219,40' fill='#1F2BE0' />
+                    <polygon points='387,1 574,1 599,40 574,79 387,79 412,40' fill='#F0EBDE' stroke='#1F2BE0' strokeWidth='2' />
+                    <polygon points='579,0 768,0 794,40 768,80 579,80 605,40' fill='#1F2BE0' />
+                    <polygon points='772,0 961,0 987,40 961,80 772,80 798,40' fill='#1F2BE0' />
+                    <polygon points='965,0 1158,0 1184,40 1158,80 965,80 991,40' fill='#1F2BE0' />
+                </svg>
+                <Box style={{ position: 'absolute', top: 0, left: 0, flexDirection: 'row', height: 80 }}>
+                    {['零部件与电池供应', '主机厂授权售后', '独立维修连锁', '保险与延保', '二手车与残值', '电池回收与再生'].map((t, i) => (
+                        <Box key={i} style={{ width: 193, height: 80, alignItems: 'center', justifyContent: 'center', paddingLeft: i === 0 ? 0 : 26 }}>
+                            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 700, color: i === 2 ? '#1F2BE0' : '#F0EBDE', whiteSpace: 'nowrap' }}>{t}</Text>
+                        </Box>
+                    ))}
+                </Box>
+            </Box>
+
+            <Box style={{ flexDirection: 'row', marginTop: 14, height: 110 }}>
+                {[
+                    ['三电备件与线控底盘', '电池 Pack 级维修件', '主机厂配套占比 85%', '3,100 亿'],
+                    ['4S 与品牌直营中心', '保修期内份额约 90%', '客户在出保后流失', '4,200 亿'],
+                    ['出保车辆的主承接方', '三电诊断能力是分水岭', '连锁化率仅 18%', '2,600 亿'],
+                    ['车险定价与电池延保', '零整比推高保费', '延保渗透率 9%', '1,900 亿'],
+                    ['残值评估依赖电池', 'SOH 检测走向标准化', '平均换手周期 4.8 年', '900 亿'],
+                    ['梯次利用与材料再生', '2028 年迎退役高峰', '白名单企业 156 家', '500 亿'],
+                ].map((d, i) => (
+                    <Box key={i} style={{ width: 193, paddingRight: 14 }}>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, color: '#1F2BE0', lineHeight: 1.5 }}>{d[0]}<br />{d[1]}<br />{d[2]}</Text>
+                        <Text style={{ marginTop: 6, fontFamily: 'Courier New', fontSize: 14, color: '#1F2BE0', letterSpacing: 0.5, whiteSpace: 'nowrap' }}>2025 · {d[3]}</Text>
+                    </Box>
+                ))}
+            </Box>
+
+            <Box style={{ flexDirection: 'row', alignItems: 'flex-end', marginTop: 22, paddingBottom: 8, borderBottom: '1.5px solid #1F2BE0' }}>
+                <Text style={{ width: 200, fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 700, color: '#1F2BE0', whiteSpace: 'nowrap' }}>利润池份额 · <span style={{ fontFamily: 'Courier New', letterSpacing: 1.5 }}>EBIT</span></Text>
+                {['供给', '授权售后', '独立售后', '保险延保', '二手车', '回收再生'].map((t, i) => (
+                    <Text key={i} style={{ width: 164, textAlign: 'right', fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 700, color: '#1F2BE0', whiteSpace: 'nowrap' }}>{t}</Text>
+                ))}
+            </Box>
+            {[
+                ['2025 年', ['22%', '34%', '14%', '12%', '11%', '7%']],
+                ['2030E', ['18%', '24%', '24%', '12%', '11%', '11%']],
+                ['五年变化', ['↓ 4pt', '↓ 10pt', '↑ 10pt', '— 0', '— 0', '↑ 4pt']],
+            ].map((row, r) => (
+                <Box key={r} style={{ flexDirection: 'row', alignItems: 'center', height: 40, borderBottom: '1px solid #CAC8DE' }}>
+                    <Text style={{ width: 200, fontFamily: 'STSong', fontSize: 18, fontWeight: 400, color: '#1F2BE0', whiteSpace: 'nowrap' }}>{row[0]}</Text>
+                    {row[1].map((v, i) => (
+                        <Text key={i} style={{ width: 164, textAlign: 'right', fontFamily: 'Courier New', fontSize: 15, color: '#1F2BE0', letterSpacing: 0.5, whiteSpace: 'nowrap', opacity: v.startsWith('↑') || r < 2 ? 1 : 0.6 }}>{v}</Text>
+                    ))}
+                </Box>
+            ))}
+        </Box>
+
+        <Text style={{ position: 'absolute', left: 0, bottom: 26, width: 960, fontFamily: 'Microsoft YaHei', fontSize: 13, color: '#1F2BE0', lineHeight: 1.5 }}>来源：中国汽车流通协会、中国汽车工业协会、上市公司年报、专家访谈；利润池为团队测算（示例数据）<br />注：市场规模为 2025 年服务收入口径，单位亿元；利润池份额按息税前利润计算，六节合计 100%</Text>
+        <Text style={{ position: 'absolute', right: 0, bottom: 30, fontFamily: 'Courier New', fontSize: 13, color: '#1F2BE0', letterSpacing: 1 }}>02 / 12</Text>
+        <Box style={{ position: 'absolute', left: 0, bottom: 0, width: 1184, height: 1.5, background: '#1F2BE0' }} />
+    </Box>
+</Slide>

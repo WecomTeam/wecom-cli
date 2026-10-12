@@ -1,0 +1,39 @@
+<Slide style={{ background: '#2373DA', padding: 0, flexDirection: 'row' }}>
+    <Box style={{ width: 640, height: 720, background: '#FFFFFF', padding: '52px 60px 56px', justifyContent: 'space-between' }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>第一章 · 季度概览</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 700, color: '#1A4785', letterSpacing: 2 }}>8 MIN</Text>
+        </Box>
+        <Text style={{ fontFamily: 'Times New Roman', fontSize: 300, fontWeight: 900, color: '#2373DA', lineHeight: 0.9, letterSpacing: -8, textAlign: 'center' }}>Q3</Text>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>总览</Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>四个主题</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ width: 640, height: 720, padding: '60px 64px 56px 56px', justifyContent: 'space-between' }}>
+        <Box style={{ gap: 24 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 17, fontWeight: 700, color: '#FFFFFF', letterSpacing: 5 }}>本季度的一次通读</Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 78, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.1, letterSpacing: 0 }}>
+                三季度，<br />回顾与判断
+            </Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 19, fontWeight: 400, color: '#FFFFFF', lineHeight: 1.65, marginTop: 6 }}>
+                先说清楚这个季度什么变了、什么没变，以及未来几周团队最该把注意力放在哪里。这一章为后面的数据与决策定下基调。
+            </Text>
+        </Box>
+        <Box style={{ gap: 14 }}>
+            <Box style={{ height: 3, background: '#FFFFFF' }} />
+            <Box style={{ flexDirection: 'row', gap: 10, flexWrap: 'wrap' }}>
+                <Box style={{ background: '#FFFFFF', padding: '7px 15px' }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>三个主题</Text>
+                </Box>
+                <Box style={{ background: '#FFFFFF', padding: '7px 15px' }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>两项决策</Text>
+                </Box>
+                <Box style={{ background: '#FFFFFF', padding: '7px 15px' }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 14, fontWeight: 700, color: '#1A4785', letterSpacing: 3 }}>一个待答问题</Text>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+</Slide>

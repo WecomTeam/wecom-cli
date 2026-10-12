@@ -1,0 +1,46 @@
+<Slide style={{ background: '#FFFFFF', padding: '60px 80px 56px', gap: 20 }}>
+    <Box style={{ height: 106, gap: 12 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>课堂实验 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>LAB NOTES</span></></Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}>机房实验 · 第六周</Text>
+        </Box>
+        <Text style={{ fontFamily: 'STSong', fontSize: 50, fontWeight: 500, color: '#267EF0', lineHeight: 1.15, letterSpacing: 0, whiteSpace: 'nowrap' }}>实验课上用邻接表分别实现两种遍历</Text>
+    </Box>
+
+    <Box style={{ width: 1120, height: 434 }}>
+        <Box style={{ flexDirection: 'row', gap: 16, height: 434 }}>
+            <Image src="https://placeholder.invalid/image.jpg" style={{ width: 434, height: 434 }} />
+            <Box style={{ width: 670, gap: 16 }}>
+                <Box style={{ width: 670, height: 209, background: '#DCEBFD', borderRadius: 6, padding: '24px 26px 22px', justifyContent: 'space-between' }}>
+                    <Box style={{ gap: 14 }}>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1B539A', letterSpacing: 4 }}><>实验 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>LAB</span></></Text>
+                        <Text style={{ fontFamily: 'STSong', fontSize: 33, fontWeight: 500, color: '#1B539A', lineHeight: 1.2, letterSpacing: 0 }}>同一张图上两种遍历，<br />访问顺序完全不同</Text>
+                    </Box>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1B539A', letterSpacing: 4 }}><>随机生成的无向图 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>1,000</span> 个顶点</></Text>
+                </Box>
+                <Box style={{ width: 670, height: 209, background: '#FFFFFF', border: '2px solid #2373DA', borderRadius: 6, padding: '22px 24px 20px', gap: 14 }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>步骤 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>STEPS</span></></Text>
+                    <Box style={{ gap: 8 }}>
+                        <Box style={{ flexDirection: 'row', gap: 12 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 3, lineHeight: 1.7, width: 28 }}>01</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 17, fontWeight: 400, color: '#10141A', lineHeight: 1.6, letterSpacing: 0 }}>先用邻接表读入图，并给每个顶点设置访问标记</Text>
+                        </Box>
+                        <Box style={{ flexDirection: 'row', gap: 12 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 3, lineHeight: 1.7, width: 28 }}>02</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 17, fontWeight: 400, color: '#10141A', lineHeight: 1.6, letterSpacing: 0 }}>深度优先用递归实现，广度优先用队列逐层扩展</Text>
+                        </Box>
+                        <Box style={{ flexDirection: 'row', gap: 12 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 3, lineHeight: 1.7, width: 28 }}>03</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 17, fontWeight: 400, color: '#10141A', lineHeight: 1.6, letterSpacing: 0 }}>记录两种遍历的访问序列与用时，填入实验报告</Text>
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>图 · 机房里同学们在调试遍历程序，<span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>2026.10</span></></Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>数据结构第六讲 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>05/08</span></></Text>
+    </Box>
+</Slide>

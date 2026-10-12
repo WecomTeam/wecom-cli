@@ -1,0 +1,72 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: '50px 64px 0 64px', position: 'relative', fontFamily: 'STSong' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', top: 0, left: 0 }}>
+        <defs>
+            <pattern id='dots' width='6' height='6' patternUnits='userSpaceOnUse'>
+                <circle cx='3' cy='3' r='0.7' fill='#FBF1E0' />
+            </pattern>
+        </defs>
+        <rect x='0' y='0' width='1280' height='720' fill='#FFFFFF' />
+        <rect x='0' y='0' width='1280' height='720' fill='url(#dots)' />
+    </svg>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 84, paddingBottom: 14, borderBottom: '1.5px solid #C42819' }}>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+            <Box style={{ width: 10, height: 44, background: '#C42819' }} />
+            <Text style={{ fontSize: 46, fontWeight: 700, lineHeight: 1.2, color: '#1A1616', whiteSpace: 'nowrap' }}>六个表彰类别</Text>
+        </Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 6 }}>
+            <Box style={{ flexDirection: 'row', gap: 8 }}>
+                <Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825' }} /><Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825', opacity: 0.6 }} /><Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825', opacity: 0.3 }} />
+            </Box>
+            <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.2 }}>年度表彰 · 二〇二六 · 名单按类别排列</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'relative', marginTop: 18, width: 1152, height: 488 }}>
+        <Box style={{ gap: 18 }}>
+            {[
+                [
+                    ['类别 01', '集体', '先进社区工作站', '年度诉求办结率、走访覆盖率和居民满意度三项均列前三的工作站。', '3', '个集体', '评审通过'],
+                    ['类别 02', '个人', '优秀网格员', '全年走访不断线、台账逐月更新、办结事项回访率百分之百的网格员。', '12', '人', '评审通过'],
+                    ['类别 03', '个人', '民生服务标兵', '在老旧小区改造、养老助餐等民生项目中承担主要协调工作的社区工作者。', '6', '人', '评审通过'],
+                ],
+                [
+                    ['类别 04', '集体', '平安建设先进单位', '年度矛盾纠纷社区层面化解率九成以上、无重大安全事故的社区。', '4', '个集体', '评审通过'],
+                    ['类别 05', '个人', '志愿服务之星', '全年志愿服务时长居前、长期参与助餐送餐与巡查的居民志愿者。', '8', '人', '公示通过'],
+                    ['类别 06', '个人', '年度进步奖', '入职两年内、在考核与居民评价中进步最明显的社区工作者新人。', '3', '人', '公示通过'],
+                ],
+            ].map((row, r) => (
+                <Box key={r} style={{ flexDirection: 'row', gap: 18 }}>
+                    {row.map((c, i) => (
+                        <Box key={i} style={{ width: 372, height: 232, border: '1.5px solid #C42819', background: '#FFFFFF' }}>
+                            <Box style={{ height: 40, background: '#C42819', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', padding: '0 20px' }}>
+                                <Text style={{ fontSize: 16, fontWeight: 'bold', letterSpacing: 2, color: '#FFFFFF', lineHeight: 1 }}>{c[0]}</Text>
+                                <Text style={{ fontSize: 15, color: '#FFE79B', lineHeight: 1 }}>{c[1]}</Text>
+                            </Box>
+                            <Box style={{ height: 189, padding: '16px 20px 12px 20px', justifyContent: 'space-between' }}>
+                                <Box style={{ gap: 8 }}>
+                                    <Text style={{ fontSize: 26, fontWeight: 700, lineHeight: 1.2, color: '#1A1616' }}>{c[2]}</Text>
+                                    <Box style={{ width: 40, height: 4, background: '#E19825' }} />
+                                    <Text style={{ marginTop: 2, fontSize: 16, lineHeight: 1.6, color: '#4B5563' }}>{c[3]}</Text>
+                                </Box>
+                                <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: 8, borderTop: '1px dashed rgba(196,40,25,0.4)' }}>
+                                    <Text style={{ fontSize: 15, color: '#C42819', lineHeight: 1.2 }}>
+                                        <span style={{ fontFamily: 'Times New Roman', fontSize: 24, fontWeight: 'bold' }}>{c[4]}</span> {c[5]}
+                                    </Text>
+                                    <Text style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.2 }}>{c[6]}</Text>
+                                </Box>
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+            ))}
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 9, flexDirection: 'row' }}>
+        <Box style={{ width: 678, height: 9, background: '#C42819' }} />
+        <Box style={{ width: 333, height: 9, background: '#EE5530' }} />
+        <Box style={{ width: 269, height: 9, background: '#F26B40' }} />
+    </Box>
+    <Text style={{ position: 'absolute', right: 64, top: 678, fontFamily: 'Times New Roman', fontSize: 15, fontStyle: 'italic', color: '#6B7280', lineHeight: 1 }}>03 / 08</Text>
+</Slide>

@@ -1,0 +1,280 @@
+{
+ "usage": {
+  "shape": "扁平池，无分支。9 套平铺，每套带 scenes_zh 与四维标签（formality 正式度 / density 密度 / tone 明暗 / character 气质）。",
+  "select": "按 create-from-scratch Step4 的打分规则从全池选 3 套作预览卡候选：场景词命中最高优先，其次正式度贴近，再次标签拉开差异（3 套的 tone 或 density 不得全同）。",
+  "gate": "命中 gate 时候选只能在 gate.sets 里取（政务只出 2 张卡），并额外加载 gate.contract；未命中 gate 时全池 9 套都是候选。",
+  "naming": "name 是给用户看的风格名；slug 只是目录名，只用于拼路径和命令，任何对用户说的话里都不出现 slug。",
+  "then": "用户选定后只读该套 DESIGN.preset.md、shell/ 与 slides/。**路径直接照抄该套的 preset / shell / slides 字段**（已是相对技能根目录的完整路径，形如 assets/templates/<slug>/DESIGN.preset.md），不要自己改写目录前缀、不要拼成 references/templates/<slug>/…。不要读其他套。"
+ },
+ "gate": {
+  "id": "government",
+  "name": "政务",
+  "sets": [
+   "broadside",
+   "long-table"
+  ],
+  "contract": "../government-contract.md",
+  "trigger_zh": "主体是党政机关、事业单位、国企央企、街道社区、学校党组织、群团组织；或场景是工作报告、述职述廉、党课、主题教育、宣讲、政策解读、督查巡察、表彰大会、周年纪念、红色文化；或文风为公文体（「一是、二是」「进一步」「切实」）。"
+ },
+ "sets": [
+  {
+   "slug": "sakura-chroma",
+   "name": "活动策划",
+   "scenes_zh": [
+    "活动策划",
+    "发布会",
+    "市集展会"
+   ],
+   "tags": {
+    "formality": "低",
+    "formality_rank": 0,
+    "density": "中",
+    "tone": "亮·彩底",
+    "character": "奶油纸底五色斜彩带，产品目录腔调"
+   },
+   "gate": null,
+   "best_for_zh": "活动策划与执行方案、发布会与展会筹备、校园或社区活动招募、发布排期与产品目录，以及需要热烈直接气质的日程与清单类汇报",
+   "avoid_for_zh": "需要克制稳重的场合（审计、法务、政务、答辩、董事会），以及内容以长段文字为主、没有日程或条目可撑版面的汇报",
+   "preset": "assets/templates/sakura-chroma/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/sakura-chroma/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/sakura-chroma/slides/01_cover.slide",
+    "assets/templates/sakura-chroma/slides/02_products.slide",
+    "assets/templates/sakura-chroma/slides/03_section.slide",
+    "assets/templates/sakura-chroma/slides/04_schedule.slide"
+   ]
+  },
+  {
+   "slug": "cartesian",
+   "name": "专题汇报",
+   "scenes_zh": [
+    "专题汇报",
+    "议题讲解",
+    "对照分析"
+   ],
+   "tags": {
+    "formality": "高",
+    "formality_rank": 4,
+    "density": "低",
+    "tone": "亮",
+    "character": "白纸面衬线标题加发丝线，安静克制"
+   },
+   "gate": null,
+   "best_for_zh": "单一议题讲透的专题汇报、两案对照与方法比较、需要一张正经表格撑住的说明材料、读书会与内部讲解",
+   "avoid_for_zh": "需要强对比色、大量 KPI 卡或热烈氛围的宣讲与成果发布；一页要塞六个以上元素的内容",
+   "preset": "assets/templates/cartesian/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/cartesian/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/cartesian/slides/01_cover.slide",
+    "assets/templates/cartesian/slides/02_compare.slide",
+    "assets/templates/cartesian/slides/03_table.slide"
+   ]
+  },
+  {
+   "slug": "editorial-forest",
+   "name": "教学课件",
+   "scenes_zh": [
+    "教学课件",
+    "课程讲义",
+    "公开课"
+   ],
+   "tags": {
+    "formality": "中",
+    "formality_rank": 2,
+    "density": "中",
+    "tone": "亮",
+    "character": "白底蓝衬线巨字，分节清楚"
+   },
+   "gate": null,
+   "best_for_zh": "课程单讲课件、公开课、培训讲义等需要清楚分节、一页讲透一个知识点的场合",
+   "avoid_for_zh": "需要强冲击力开场或大量数据图表的经营与路演场合",
+   "preset": "assets/templates/editorial-forest/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/editorial-forest/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/editorial-forest/slides/01_cover.slide",
+    "assets/templates/editorial-forest/slides/02_cards.slide",
+    "assets/templates/editorial-forest/slides/03_data.slide",
+    "assets/templates/editorial-forest/slides/04_image.slide"
+   ]
+  },
+  {
+   "slug": "grove",
+   "name": "文献综述",
+   "scenes_zh": [
+    "文献综述",
+    "研究进展",
+    "脉络梳理"
+   ],
+   "tags": {
+    "formality": "中高",
+    "formality_rank": 3,
+    "density": "中",
+    "tone": "明暗交替",
+    "character": "森绿与纸面交替，古典衬线"
+   },
+   "gate": null,
+   "best_for_zh": "文献综述、脉络梳理、调研汇报，以及任何想要安静克制、像一本装订好的专著那样有节奏的场合",
+   "avoid_for_zh": "需要密集图表和大量数字的汇报、需要高饱和配色或活泼氛围的宣讲、每页要塞六个以上元素的内容",
+   "preset": "assets/templates/grove/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/grove/shell/content.jsx",
+    "assets/templates/grove/shell/content_light.jsx"
+   ],
+   "slides": [
+    "assets/templates/grove/slides/01_cover.slide",
+    "assets/templates/grove/slides/02_compare.slide",
+    "assets/templates/grove/slides/03_table.slide"
+   ]
+  },
+  {
+   "slug": "signal",
+   "name": "经营分析",
+   "scenes_zh": [
+    "经营分析",
+    "管理层汇报",
+    "尽调简报"
+   ],
+   "tags": {
+    "formality": "高",
+    "formality_rank": 4,
+    "density": "高",
+    "tone": "明暗交替",
+    "character": "藏青与骨白逐页交替，古金强调，机构感"
+   },
+   "gate": null,
+   "best_for_zh": "经营分析会、管理层汇报、尽调与投后简报等需要「沉稳、有据」的场合",
+   "avoid_for_zh": "需要明快配色的产品发布、招商推介与品牌活动类页面",
+   "preset": "assets/templates/signal/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/signal/shell/content.jsx",
+    "assets/templates/signal/shell/content_dark.jsx"
+   ],
+   "slides": [
+    "assets/templates/signal/slides/01_cover.slide",
+    "assets/templates/signal/slides/02_cards.slide",
+    "assets/templates/signal/slides/03_data.slide"
+   ]
+  },
+  {
+   "slug": "cobalt-grid",
+   "name": "战略咨询",
+   "scenes_zh": [
+    "战略咨询",
+    "行业分析",
+    "市场进入"
+   ],
+   "tags": {
+    "formality": "高",
+    "formality_rank": 4,
+    "density": "中",
+    "tone": "亮",
+    "character": "坐标纸底钴蓝衬线，发丝线网格"
+   },
+   "gate": null,
+   "best_for_zh": "行业战略研究、趋势报告、价值链与利润池分析、需要大量结构化数据行的顾问汇报",
+   "avoid_for_zh": "需要多色语义（涨红跌绿）、摄影主视觉或活泼品牌气质的营销与发布场景",
+   "preset": "assets/templates/cobalt-grid/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/cobalt-grid/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/cobalt-grid/slides/01_cover.slide",
+    "assets/templates/cobalt-grid/slides/02_structure.slide",
+    "assets/templates/cobalt-grid/slides/03_data.slide"
+   ]
+  },
+  {
+   "slug": "emerald-editorial",
+   "name": "开场宣讲",
+   "scenes_zh": [
+    "开场宣讲",
+    "方案开场",
+    "发布介绍"
+   ],
+   "tags": {
+    "formality": "中高",
+    "formality_rank": 3,
+    "density": "中",
+    "tone": "明暗交替",
+    "character": "蓝色整版配白字，双线刊头饰条，衬线巨字"
+   },
+   "gate": null,
+   "best_for_zh": "需要开场有分量的对外宣讲与方案介绍、工作汇报与总结回顾，以及任何想要杂志封面气质、又要用巨型数字撑住结论的日常演示",
+   "avoid_for_zh": "需要安静克制、长时间阅读的场合；蓝色整版很抢眼，与需要中性机构感或多色语义的材料不合",
+   "preset": "assets/templates/emerald-editorial/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/emerald-editorial/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/emerald-editorial/slides/01_cover.slide",
+    "assets/templates/emerald-editorial/slides/02_section.slide",
+    "assets/templates/emerald-editorial/slides/03_data.slide",
+    "assets/templates/emerald-editorial/slides/04_steps.slide"
+   ]
+  },
+  {
+   "slug": "broadside",
+   "name": "政务工作",
+   "scenes_zh": [
+    "政务工作",
+    "党课",
+    "主题教育"
+   ],
+   "tags": {
+    "formality": "中高",
+    "formality_rank": 3,
+    "density": "中",
+    "tone": "亮·红封",
+    "character": "朱红满版封面加红卡头，公文体"
+   },
+   "gate": "government",
+   "best_for_zh": "基层年度宣讲、专题讲座、面向居民与工作者的政策要点解读",
+   "avoid_for_zh": "需要大量图表和数据对比的经营分析、需要摄影配图的宣传片式演示",
+   "preset": "assets/templates/broadside/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/broadside/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/broadside/slides/01_cover.slide",
+    "assets/templates/broadside/slides/02_section.slide",
+    "assets/templates/broadside/slides/03_cards.slide",
+    "assets/templates/broadside/slides/04_image.slide"
+   ]
+  },
+  {
+   "slug": "long-table",
+   "name": "表彰庆典",
+   "scenes_zh": [
+    "表彰庆典",
+    "周年庆典",
+    "荣誉发布"
+   ],
+   "tags": {
+    "formality": "中",
+    "formality_rank": 2,
+    "density": "中",
+    "tone": "亮·红封",
+    "character": "暖奶白加锈红长桌感，名录排布"
+   },
+   "gate": "government",
+   "best_for_zh": "年度表彰会、荣誉名单发布、庆典流程与议程、志愿者致谢",
+   "avoid_for_zh": "需要多色区分系列的数据分析、需要摄影配图的宣传片式演示",
+   "preset": "assets/templates/long-table/DESIGN.preset.md",
+   "shell": [
+    "assets/templates/long-table/shell/content.jsx"
+   ],
+   "slides": [
+    "assets/templates/long-table/slides/01_cover.slide",
+    "assets/templates/long-table/slides/02_cards.slide",
+    "assets/templates/long-table/slides/03_timeline.slide",
+    "assets/templates/long-table/slides/04_image.slide"
+   ]
+  }
+ ]
+}

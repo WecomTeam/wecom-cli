@@ -1,0 +1,79 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative', padding: '48px 52px 68px 52px', flexDirection: 'column', gap: 24, fontFamily: 'Microsoft YaHei' }}>
+    <svg width={140} height={140} viewBox='0 0 140 140' style={{ position: 'absolute', left: 1086, top: 16 }}>
+        <rect x='0' y='0' width='140' height='140' fill='#FFFFFF' />
+        <circle cx='70' cy='70' r='67' fill='none' stroke='#B5B8BB' strokeWidth='1' opacity='0.6' />
+        <circle cx='70' cy='70' r='52' fill='none' stroke='#B5B8BB' strokeWidth='1' strokeDasharray='3 4' opacity='0.4' />
+    </svg>
+
+    <Box style={{ width: 1176, height: 80 }}>
+        <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>
+            两类代表性方法 · 对照阅读
+        </Text>
+        <Text style={{ fontFamily: 'STSong', fontSize: 32, fontWeight: 700, lineHeight: 1.3, color: '#10141A', marginTop: 12, whiteSpace: 'nowrap' }}>
+            统计时序方法胜在可解释与轻量，图神经网络方法胜在路网级空间建模
+        </Text>
+    </Box>
+
+    <Box style={{ width: 1176, height: 500 }}>
+        <Box style={{ flexDirection: 'row', height: 388 }}>
+            <Box style={{ flex: 1, border: '1px solid #B5B8BB', background: '#FFFFFF', padding: '24px 28px' }}>
+                <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+                    <Box style={{ width: 40, height: 40, borderRadius: 20, border: '1px solid #B5B8BB', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontFamily: 'Times New Roman', fontSize: 17, color: '#6D7176', lineHeight: 1 }}>A</Text>
+                    </Box>
+                    <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>方法 A · 统计时序类</Text>
+                </Box>
+                <Text style={{ fontFamily: 'STSong', fontSize: 22, fontWeight: 700, color: '#10141A', lineHeight: 1.3, marginTop: 16 }}>以 ARIMA 类模型对每个站点独立建模</Text>
+                <Text style={{ fontSize: 17, color: '#565A5F', lineHeight: 1.75, marginTop: 10 }}>
+                    将站点进站量视作平稳化后的单变量序列，按工作日与节假日分别拟合参数；不使用相邻站点信息，节假日与突发事件依赖人工设定的干预项。模型参数少、训练快，结果可逐项解释，便于运营人员核对。
+                </Text>
+                <Box style={{ flex: 1 }} />
+                <Box style={{ borderTop: '1px solid #B5B8BB', paddingTop: 12, gap: 8 }}>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontSize: 14, letterSpacing: 1.5, color: '#6D7176' }}>空间关系</Text><Text style={{ fontSize: 16, color: '#10141A' }}>不显式建模</Text></Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontSize: 14, letterSpacing: 1.5, color: '#6D7176' }}>训练成本</Text><Text style={{ fontSize: 16, color: '#10141A' }}>单站分钟级，可在普通工作站完成</Text></Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontSize: 14, letterSpacing: 1.5, color: '#6D7176' }}>高峰 MAPE</Text><Text style={{ fontSize: 16, color: '#10141A' }}>约 14%（示例数据）</Text></Box>
+                </Box>
+            </Box>
+
+            <Box style={{ width: 72, alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <Box style={{ position: 'absolute', top: 0, left: 35.5, width: 1, height: 388, background: '#B5B8BB' }} />
+                <Box style={{ width: 44, height: 44, borderRadius: 22, border: '1px solid #B5B8BB', background: '#FFFFFF', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                    <Text style={{ fontFamily: 'Times New Roman', fontSize: 15, fontStyle: 'italic', color: '#6D7176', lineHeight: 1 }}>vs</Text>
+                </Box>
+            </Box>
+
+            <Box style={{ flex: 1, border: '1px solid #B5B8BB', background: '#FFFFFF', padding: '24px 28px' }}>
+                <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+                    <Box style={{ width: 40, height: 40, borderRadius: 20, border: '1px solid #B5B8BB', alignItems: 'center', justifyContent: 'center' }}>
+                        <Text style={{ fontFamily: 'Times New Roman', fontSize: 17, color: '#6D7176', lineHeight: 1 }}>B</Text>
+                    </Box>
+                    <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 1, whiteSpace: 'nowrap' }}>方法 B · 图神经网络类</Text>
+                </Box>
+                <Text style={{ fontFamily: 'STSong', fontSize: 22, fontWeight: 700, color: '#10141A', lineHeight: 1.3, marginTop: 16 }}>以路网邻接图联合建模全部站点</Text>
+                <Text style={{ fontSize: 17, color: '#565A5F', lineHeight: 1.75, marginTop: 10 }}>
+                    把线路连接与换乘关系编码为站点邻接矩阵，用图卷积聚合相邻站点的客流特征，再以门控循环单元刻画时间演化，一次输出全路网多步预测。对高峰传播与换乘站联动更敏感，但需要 GPU 训练，结果解释依赖事后分析。
+                </Text>
+                <Box style={{ flex: 1 }} />
+                <Box style={{ borderTop: '1px solid #B5B8BB', paddingTop: 12, gap: 8 }}>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontSize: 14, letterSpacing: 1.5, color: '#6D7176' }}>空间关系</Text><Text style={{ fontSize: 16, color: '#10141A' }}>路网邻接 + 换乘关系</Text></Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontSize: 14, letterSpacing: 1.5, color: '#6D7176' }}>训练成本</Text><Text style={{ fontSize: 16, color: '#10141A' }}>全网小时级，需要单卡 GPU</Text></Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between' }}><Text style={{ fontSize: 14, letterSpacing: 1.5, color: '#6D7176' }}>高峰 MAPE</Text><Text style={{ fontSize: 16, color: '#10141A' }}>约 9%（示例数据）</Text></Box>
+                </Box>
+            </Box>
+        </Box>
+
+        <Box style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 28, borderTop: '1px solid #B5B8BB', paddingTop: 16, marginTop: 22, height: 90 }}>
+            <Text style={{ fontSize: 13, fontWeight: 500, letterSpacing: 2.5, color: '#6D7176', lineHeight: 2.2, whiteSpace: 'nowrap' }}>结论</Text>
+            <Text style={{ flex: 1, fontFamily: 'STSong', fontSize: 19, fontWeight: 700, color: '#10141A', lineHeight: 1.6 }}>
+                两类方法并非替代关系：统计模型适合站点级快速部署与结果解释，图网络适合路网级联动预测。本组拟以方法 A 作基线、方法 B 作主模型，在同一示例数据集上同口径对照。
+            </Text>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 52, bottom: 28, height: 14 }}>
+        <Text style={{ fontSize: 12, fontWeight: 500, letterSpacing: 2, lineHeight: 1, color: '#6D7176', whiteSpace: 'nowrap' }}>交通运输工程学院 · 智能交通课题组</Text>
+    </Box>
+    <Box style={{ position: 'absolute', right: 52, bottom: 28, height: 14 }}>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 400, letterSpacing: 2, lineHeight: 1, color: '#6D7176' }}>02 / 10</Text>
+    </Box>
+</Slide>

@@ -1,0 +1,68 @@
+<Slide style={{ background: '#192B1B', padding: '40px 102px 48px', position: 'relative' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 28, borderBottom: '1px solid #3A4434', paddingBottom: 9 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9C9E8E', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>第三部分 · 评测结果</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 13, fontWeight: 400, color: '#9C9E8E', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>03</Text>
+    </Box>
+    <Box style={{ height: 96, marginTop: 20 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#E27871', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}><>统一口径复现 · 六个公开数据集 · <span style={{ fontFamily: 'Courier New' }}>MASE</span></></Text>
+        <Box style={{ width: 36, height: 1, background: '#C8524A', marginTop: 10 }} />
+        <Text style={{ fontFamily: 'STSong', fontSize: 34, fontWeight: 400, color: '#D4CFBF', lineHeight: 1.3, letterSpacing: 0, marginTop: 12, whiteSpace: 'nowrap' }}><span style={{ color: '#C8524A' }}>零样本基础模型</span>首次在未见数据集上全面超过监督模型</Text>
+    </Box>
+    <Box style={{ width: 1076, height: 412, marginTop: 24 }}>
+        <Box style={{ height: 284 }}>
+            <Table
+                style={{ width: '100%', height: '100%' }}
+                defaultTextStyle={{ fontSize: 17, textAlign: 'center', color: '#D4CFBF', fontFamily: 'Microsoft YaHei' }}
+                defaultCellStyle={{
+                    border: {
+                        bottom: { width: 1, color: '#3A4434' },
+                    },
+                }}
+                cells={[
+                    [
+                        { text: '方法', textStyle: { textAlign: 'left', color: '#9C9E8E' }, cellStyle: { background: { color: '#1E3221' } } },
+                        { text: '类别', textStyle: { color: '#9C9E8E' }, cellStyle: { background: { color: '#1E3221' } } },
+                        { text: '发表年份', textStyle: { color: '#9C9E8E' }, cellStyle: { background: { color: '#1E3221' } } },
+                        { text: '训练方式', textStyle: { color: '#9C9E8E' }, cellStyle: { background: { color: '#1E3221' } } },
+                        { text: 'MASE 几何均值', textStyle: { color: '#9C9E8E' }, cellStyle: { background: { color: '#1E3221' } } },
+                        { text: '相对基线', textStyle: { color: '#9C9E8E' }, cellStyle: { background: { color: '#1E3221' } } },
+                    ],
+                    [
+                        { text: '季节性朴素预测', textStyle: { textAlign: 'left' } }, '统计基线', '—', '无需训练', '1.000', '基准',
+                    ],
+                    [
+                        { text: 'AutoARIMA / ETS', textStyle: { textAlign: 'left' } }, '统计与经典', '1970 / 2008', '逐序列拟合', '0.931', '−6.9%',
+                    ],
+                    [
+                        { text: 'DeepAR', textStyle: { textAlign: 'left' } }, '深度监督', '2020', '逐数据集训练', '0.864', '−13.6%',
+                    ],
+                    [
+                        { text: 'PatchTST', textStyle: { textAlign: 'left' } }, '深度监督', '2023', '逐数据集训练', '0.812', '−18.8%',
+                    ],
+                    [
+                        { text: 'Chronos（Base）', textStyle: { textAlign: 'left', color: '#E27871' } },
+                        { text: '预训练基础模型', textStyle: { color: '#E27871' } },
+                        { text: '2024', textStyle: { color: '#E27871' } },
+                        { text: '零样本，不微调', textStyle: { color: '#E27871' } },
+                        { text: '0.780', textStyle: { color: '#E27871' } },
+                        { text: '−22.0%', textStyle: { color: '#E27871' } },
+                    ],
+                ]}
+            />
+        </Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 32, height: 112, borderTop: '1px solid #3A4434', paddingTop: 16, marginTop: 16 }}>
+            <Box style={{ width: 250 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#E27871', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>关键数字</Text>
+                <Text style={{ fontFamily: 'STSong', fontSize: 48, fontWeight: 400, color: '#C8524A', lineHeight: 1, letterSpacing: -1, marginTop: 6, whiteSpace: 'nowrap' }}>−22<span style={{ fontSize: 24, letterSpacing: 0 }}>%</span></Text>
+            </Box>
+            <Box style={{ width: 794 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#E27871', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>— 结论</Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#D4CFBF', lineHeight: 1.5, marginTop: 8 }}>零样本的 Chronos 把误差压到朴素基线的 78%，低于逐数据集训练的 PatchTST；差距主要来自低频与短序列数据集，下一步补入 TimesFM 与 Moirai 复现。</Text>
+            </Box>
+        </Box>
+    </Box>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', height: 32, borderTop: '1px solid #3A4434', paddingTop: 13, marginTop: 20 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9C9E8E', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>本组统一口径复现 · MASE 越低越好 · 相对季节性朴素基线</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 13, fontWeight: 400, color: '#9C9E8E', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>03 / 14</Text>
+    </Box>
+</Slide>

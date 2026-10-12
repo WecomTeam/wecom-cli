@@ -1,0 +1,48 @@
+<Slide style={{ background: '#1C2644', padding: '40px 96px', position: 'relative' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', top: 0, left: 0 }}>
+        <rect x='0' y='0' width='1280' height='720' fill='#1C2644' />
+        <path d='M53.3 0V720M106.7 0V720M160.0 0V720M213.3 0V720M266.7 0V720M320.0 0V720M373.3 0V720M426.7 0V720M480.0 0V720M533.3 0V720M586.7 0V720M640.0 0V720M693.3 0V720M746.7 0V720M800.0 0V720M853.3 0V720M906.7 0V720M960.0 0V720M1013.3 0V720M1066.7 0V720M1120.0 0V720M1173.3 0V720M1226.7 0V720M0 53.3H1280M0 106.7H1280M0 160.0H1280M0 213.3H1280M0 266.7H1280M0 320.0H1280M0 373.3H1280M0 426.7H1280M0 480.0H1280M0 533.3H1280M0 586.7H1280M0 640.0H1280M0 693.3H1280' fill='none' stroke='#FFFFFF' strokeOpacity='0.035' strokeWidth='1' />
+    </svg>
+
+    <Box style={{ position: 'relative', width: 1088, height: 640 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 24, paddingBottom: 9 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#C8A870', whiteSpace: 'nowrap' }}>
+                华东大区 · 经营管理部
+            </Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 500, color: '#8A96A8', letterSpacing: 1.5, whiteSpace: 'nowrap' }}>
+                ANNUAL BUSINESS REVIEW · 2026
+            </Text>
+        </Box>
+
+        <Box style={{ flex: 1, justifyContent: 'flex-end' }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#8A96A8', whiteSpace: 'nowrap' }}>
+                年度经营分析会
+            </Text>
+            <Box style={{ width: 24, height: 1, background: '#C8A870', marginTop: 12 }} />
+
+            <Text style={{ fontFamily: 'STSong', fontSize: 52, fontWeight: 700, color: '#E2DCD0', lineHeight: 1.28, marginTop: 20, whiteSpace: 'nowrap' }}>
+                以<span style={{ color: '#C8A870' }}>门店分层运营</span>驱动的<br />
+                华东区域年度经营分析报告
+            </Text>
+
+            <Text style={{ fontFamily: 'Times New Roman', fontSize: 21, fontWeight: 400, color: '#8A96A8', lineHeight: 1.55, marginTop: 22, whiteSpace: 'nowrap' }}>
+                Annual Business Review of the East China Region<br />
+                Driven by <span style={{ color: '#C8A870', fontStyle: 'italic' }}>Tiered Store Operations</span>
+            </Text>
+
+            <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderTop: '1px solid #1A4785', paddingTop: 14, marginTop: 44, height: 48 }}>
+                <Box style={{ flexDirection: 'row', gap: 40 }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, color: '#E2DCD0', whiteSpace: 'nowrap' }}>
+                        <span style={{ color: '#8A96A8' }}>汇报人　</span>林思远
+                    </Text>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, color: '#E2DCD0', whiteSpace: 'nowrap' }}>
+                        <span style={{ color: '#8A96A8' }}>审阅人　</span>周启明 总经理
+                    </Text>
+                </Box>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#8A96A8', letterSpacing: 1.5, whiteSpace: 'nowrap' }}>
+                    2026 · 12 · 会议稿
+                </Text>
+            </Box>
+        </Box>
+    </Box>
+</Slide>

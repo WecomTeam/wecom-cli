@@ -1,0 +1,68 @@
+<Slide style={{ background: '#1C2644', padding: '40px 96px', position: 'relative' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', top: 0, left: 0 }}>
+        <rect x='0' y='0' width='1280' height='720' fill='#1C2644' />
+        <path d='M53.3 0V720M106.7 0V720M160.0 0V720M213.3 0V720M266.7 0V720M320.0 0V720M373.3 0V720M426.7 0V720M480.0 0V720M533.3 0V720M586.7 0V720M640.0 0V720M693.3 0V720M746.7 0V720M800.0 0V720M853.3 0V720M906.7 0V720M960.0 0V720M1013.3 0V720M1066.7 0V720M1120.0 0V720M1173.3 0V720M1226.7 0V720M0 53.3H1280M0 106.7H1280M0 160.0H1280M0 213.3H1280M0 266.7H1280M0 320.0H1280M0 373.3H1280M0 426.7H1280M0 480.0H1280M0 533.3H1280M0 586.7H1280M0 640.0H1280M0 693.3H1280' fill='none' stroke='#FFFFFF' strokeOpacity='0.035' strokeWidth='1' />
+    </svg>
+
+    <Box style={{ position: 'relative', width: 1088, height: 640 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 24, borderBottom: '1px solid #1A4785', paddingBottom: 8 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#8A96A8', whiteSpace: 'nowrap' }}>第四部分 · 分析结果</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 500, color: '#8A96A8', letterSpacing: 2 }}>03</Text>
+        </Box>
+
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 24, borderBottom: '1px solid #1A4785', marginTop: 8, height: 60 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#C8A870', letterSpacing: 1, whiteSpace: 'nowrap' }}>引导问题</Text>
+            <Text style={{ fontFamily: 'STSong', fontSize: 23, fontWeight: 600, color: '#E2DCD0', lineHeight: 1.35, whiteSpace: 'nowrap' }}>
+                分层运营一年之后，<span style={{ color: '#C8A870' }}>社区门店</span>的坪效究竟提升了多少？
+            </Text>
+        </Box>
+
+        <Box style={{ width: 1088, height: 476, marginTop: 20 }}>
+            <Box style={{ flexDirection: 'row', gap: 36, height: 476 }}>
+                <Box style={{ width: 660, height: 476 }}>
+                    <Chart
+                        style={{ height: 476 }}
+                        chartType='barChart'
+                        barDirection='column'
+                        grouping='clustered'
+                        showLegend={true}
+                        showDataLabels={true}
+                        legendColor='#8A96A8'
+                        axisColor='#8A96A8'
+                        dataLabelColor='#E2DCD0'
+                        colors={['#C8A870', '#4E5A6E']}
+                        background='#1C2644'
+                        data={[
+                            ['门店层级', '2026 年坪效增幅（%）', '2025 年坪效增幅（%）'],
+                            ['旗舰店', 6.2, 5.1],
+                            ['标准店', 9.4, 6.0],
+                            ['社区店', 18.6, 7.3],
+                            ['大区合计', 11.2, 6.1],
+                        ]}
+                    />
+                </Box>
+                <Box style={{ flex: 1, height: 476 }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#C8A870', letterSpacing: 1, whiteSpace: 'nowrap' }}>关键数字</Text>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 72, fontWeight: 600, color: '#C8A870', lineHeight: 1, letterSpacing: -1, marginTop: 12, whiteSpace: 'nowrap' }}>
+                        18.6<span style={{ fontSize: 30, letterSpacing: 0 }}>%</span>
+                    </Text>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, color: '#8A96A8', lineHeight: 1.6, marginTop: 10 }}>
+                        社区店 2026 年坪效增幅，较上年提升 11.3 个百分点（示例数据）
+                    </Text>
+                    <Box style={{ height: 1, background: '#1A4785', marginTop: 18 }} />
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#C8A870', letterSpacing: 1, marginTop: 16, whiteSpace: 'nowrap' }}>洞察</Text>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, color: '#E2DCD0', lineHeight: 1.7, marginTop: 10 }}>
+                        三类门店上年的坪效增幅差距只有 2.2 个百分点，今年却拉开到 12.4 个百分点：社区店的增量主要来自会员复购与到家订单，正是分层运营投入最集中的环节。剔除新开门店后，社区店坪效增幅仍有 15.1%，高于大区合计水平。
+                    </Text>
+                    <Box style={{ flex: 1 }} />
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, color: '#8A96A8', whiteSpace: 'nowrap' }}>示例数据 · 2026 财年 · 可比门店 186 家</Text>
+                </Box>
+            </Box>
+        </Box>
+
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderTop: '1px solid #1A4785', paddingTop: 9, marginTop: 19, height: 33 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, color: '#8A96A8', whiteSpace: 'nowrap' }}>华东大区 · 年度经营分析会</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 12, color: '#8A96A8', letterSpacing: 1.5, whiteSpace: 'nowrap' }}>03 / 24</Text>
+        </Box>
+    </Box>
+</Slide>

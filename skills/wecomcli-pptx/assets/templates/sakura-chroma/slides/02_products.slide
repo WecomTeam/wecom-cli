@@ -1,0 +1,134 @@
+<Slide style={{ width: 1280, height: 720, background: '#F3E9D2', padding: '32px 40px 24px 40px', position: 'relative', flexDirection: 'column', fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: 1200, height: 88, borderBottom: '2px solid #3B2A1B', paddingBottom: 12 }}>
+        <Text style={{ width: 860, fontSize: 48, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.15, letterSpacing: -1 }}>四场活动，一周排完</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1, paddingBottom: 8 }}>FOUR EVENTS / SPRING RELEASE</Text>
+    </Box>
+    <Box style={{ width: 1200, height: 512, marginTop: 20 }}>
+        <Box style={{ flexDirection: 'row', width: 1200, height: 512 }}>
+            <Box style={{ width: 282, height: 512 }}>
+                <Box style={{ width: 282, height: 8, background: '#E24B3B' }} />
+                <Box style={{ width: 282, height: 504, background: '#EBE0C6', padding: '18px 18px 16px 18px', justifyContent: 'space-between' }}>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>SC-01</Text>
+                        <Text style={{ width: 246, fontSize: 22, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3, marginTop: 8 }}>开幕音乐会</Text>
+                        <Text style={{ width: 246, fontSize: 14, color: '#3B2A1B', lineHeight: 1.6, marginTop: 14 }}>傍晚在大草坪开场，三支校内乐队接力演出。舞台朝西，观众背光，摄影组要在开场前把机位定好。</Text>
+                    </Box>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ width: 246, fontSize: 12, color: '#6B5A44', lineHeight: 1.55 }}>门票不收费，凭学生卡入场，现场发放荧光手环。</Text>
+                        <Box style={{ width: 246, height: 1, background: '#C9BBA0', marginTop: 10 }} />
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>形式</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>露天演出</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>时长</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>120 分钟</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>预算</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>12,000</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>日期</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>4 月 12 日</Text>
+                    </Box>
+                    </Box>
+                </Box>
+            </Box>
+            <Box style={{ width: 282, height: 512, marginLeft: 24 }}>
+                <Box style={{ width: 282, height: 8, background: '#E5408C' }} />
+                <Box style={{ width: 282, height: 504, background: '#EBE0C6', padding: '18px 18px 16px 18px', justifyContent: 'space-between' }}>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>SC-02</Text>
+                        <Text style={{ width: 246, fontSize: 22, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3, marginTop: 8 }}>手作市集</Text>
+                        <Text style={{ width: 246, fontSize: 14, color: '#3B2A1B', lineHeight: 1.6, marginTop: 14 }}>三十个摊位沿湖边步道排开，一半留给学生社团，一半对外招募。统一使用活动组提供的桌布与标牌。</Text>
+                    </Box>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ width: 246, fontSize: 12, color: '#6B5A44', lineHeight: 1.55 }}>摊位费全免，售出收入归摊主，活动组只收报名表。</Text>
+                        <Box style={{ width: 246, height: 1, background: '#C9BBA0', marginTop: 10 }} />
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>形式</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>露天市集</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>时长</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>全天</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>预算</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>6,500</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>日期</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>4 月 13 日</Text>
+                    </Box>
+                    </Box>
+                </Box>
+            </Box>
+            <Box style={{ width: 282, height: 512, marginLeft: 24 }}>
+                <Box style={{ width: 282, height: 8, background: '#F08A3C' }} />
+                <Box style={{ width: 282, height: 504, background: '#EBE0C6', padding: '18px 18px 16px 18px', justifyContent: 'space-between' }}>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>SC-03</Text>
+                        <Text style={{ width: 246, fontSize: 22, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3, marginTop: 8 }}>夜间放映</Text>
+                        <Text style={{ width: 246, fontSize: 14, color: '#3B2A1B', lineHeight: 1.6, marginTop: 14 }}>露天幕布放两部校友作品，中场留二十分钟做导演问答。座位用草坪垫，雨天移至报告厅。</Text>
+                    </Box>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ width: 246, fontSize: 12, color: '#6B5A44', lineHeight: 1.55 }}>片单已确认，放映授权由影像社负责取得。</Text>
+                        <Box style={{ width: 246, height: 1, background: '#C9BBA0', marginTop: 10 }} />
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>形式</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>露天放映</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>时长</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>150 分钟</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>预算</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>3,800</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>日期</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>4 月 18 日</Text>
+                    </Box>
+                    </Box>
+                </Box>
+            </Box>
+            <Box style={{ width: 282, height: 512, marginLeft: 24 }}>
+                <Box style={{ width: 282, height: 8, background: '#4A8ED1' }} />
+                <Box style={{ width: 282, height: 504, background: '#EBE0C6', padding: '18px 18px 16px 18px', justifyContent: 'space-between' }}>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>SC-04</Text>
+                        <Text style={{ width: 246, fontSize: 22, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3, marginTop: 8 }}>闭幕晚会</Text>
+                        <Text style={{ width: 246, fontSize: 14, color: '#3B2A1B', lineHeight: 1.6, marginTop: 14 }}>以颁奖开场，回顾整个活动周的照片墙，最后一支乐队压轴。所有志愿者上台致谢，拍一张全员合影。</Text>
+                    </Box>
+                    <Box style={{ width: 246 }}>
+                        <Text style={{ width: 246, fontSize: 12, color: '#6B5A44', lineHeight: 1.55 }}>合影文件三日内发到全员邮箱，同步存档。</Text>
+                        <Box style={{ width: 246, height: 1, background: '#C9BBA0', marginTop: 10 }} />
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>形式</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>室内晚会</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>时长</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>180 分钟</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>预算</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>9,200</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 6 }}>
+                        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 1, lineHeight: 1.3 }}>日期</Text>
+                        <Text style={{ fontSize: 11, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.3 }}>4 月 20 日</Text>
+                    </Box>
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 1200, height: 32, marginTop: 12 }}>
+        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 2, lineHeight: 1 }}>活动组内部材料 · 预算为示例数据</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>02 / 08</Text>
+    </Box>
+</Slide>

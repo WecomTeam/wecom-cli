@@ -1,0 +1,49 @@
+<Slide style={{ background: '#FFFFFF', padding: '60px 80px 56px', gap: 20 }}>
+    <Box style={{ height: 106, gap: 12 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>运行时间 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>RUNNING TIME</span></></Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>每组重复 <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>10</span> 次取均值</></Text>
+        </Box>
+        <Text style={{ fontFamily: 'STSong', fontSize: 50, fontWeight: 500, color: '#267EF0', lineHeight: 1.15, letterSpacing: 0, whiteSpace: 'nowrap' }}>两种遍历用时相近，都随边数线性增长</Text>
+    </Box>
+
+    <Box style={{ width: 1120, height: 434 }}>
+        <Box style={{ height: 434, gap: 16 }}>
+            <Box style={{ flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 28, height: 24 }}>
+                <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <Box style={{ width: 17, height: 17, borderRadius: 2, background: '#267EF0' }} />
+                    <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 3 }}>DFS</Text>
+                </Box>
+                <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <Box style={{ width: 17, height: 17, borderRadius: 2, background: '#ACCFFA' }} />
+                    <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 3 }}>BFS</Text>
+                </Box>
+            </Box>
+            <Chart
+                style={{ height: 394 }}
+                chartType='barChart'
+                barDirection='column'
+                grouping='clustered'
+                showLegend={false}
+                showDataLabels={true}
+                axisColor='#1F68C5'
+                dataLabelColor='#1F68C5'
+                colors={['#267EF0', '#ACCFFA']}
+                background='#FFFFFF'
+                data={[
+                    ['边数', 'DFS 用时 ms', 'BFS 用时 ms'],
+                    ['1 万', 4, 4],
+                    ['2 万', 8, 7],
+                    ['5 万', 19, 18],
+                    ['10 万', 38, 35],
+                    ['20 万', 77, 71],
+                ]}
+            />
+        </Box>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>来源 · 课堂上机实测，<span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>2026</span></></Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>数据结构第六讲 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>03/08</span></></Text>
+    </Box>
+</Slide>

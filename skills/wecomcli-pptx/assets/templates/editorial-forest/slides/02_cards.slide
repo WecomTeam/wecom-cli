@@ -1,0 +1,60 @@
+<Slide style={{ background: '#FFFFFF', padding: '60px 80px 56px', gap: 20 }}>
+    <Box style={{ height: 106, gap: 12 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>本讲内容 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>OUTLINE</span></></Text>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}>五个部分 · 九十分钟</Text>
+        </Box>
+        <Text style={{ fontFamily: 'STSong', fontSize: 50, fontWeight: 500, color: '#267EF0', lineHeight: 1.15, letterSpacing: 0, whiteSpace: 'nowrap' }}>本讲提纲</Text>
+    </Box>
+
+    <Box style={{ width: 1120, height: 434 }}>
+        <Box style={{ flexDirection: 'row', gap: 16, height: 434 }}>
+            <Box style={{ width: 466, height: 434, background: '#2373DA', borderRadius: 6, padding: '26px 26px 24px', justifyContent: 'space-between' }}>
+                <Box style={{ gap: 18 }}>
+                    <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#FFFFFF', letterSpacing: 3 }}>01</Text>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 50, fontWeight: 500, color: '#FFFFFF', lineHeight: 1.15, letterSpacing: 0 }}>图的定义<br />与邻接表存储<br />回顾</Text>
+                </Box>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#FFFFFF', letterSpacing: 4 }}>回顾 · REVIEW</Text>
+            </Box>
+            <Box style={{ width: 638, gap: 16 }}>
+                <Box style={{ flexDirection: 'row', gap: 16, height: 209 }}>
+                    <Box style={{ width: 311, height: 209, background: '#DCEBFD', borderRadius: 6, padding: '24px 26px 22px', justifyContent: 'space-between' }}>
+                        <Box style={{ gap: 14 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1B539A', letterSpacing: 3 }}>02</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 33, fontWeight: 500, color: '#1B539A', lineHeight: 1.2, letterSpacing: 0 }}>深度优先<br />递归与栈</Text>
+                        </Box>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1B539A', letterSpacing: 4 }}>深度优先 · DFS</Text>
+                    </Box>
+                    <Box style={{ width: 311, height: 209, background: '#FFFFFF', border: '2px solid #2373DA', borderRadius: 6, padding: '22px 24px 20px', justifyContent: 'space-between' }}>
+                        <Box style={{ gap: 14 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 3 }}>03</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 33, fontWeight: 500, color: '#1F68C5', lineHeight: 1.2, letterSpacing: 0 }}>广度优先<br />队列与层次</Text>
+                        </Box>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}>广度优先 · BFS</Text>
+                    </Box>
+                </Box>
+                <Box style={{ flexDirection: 'row', gap: 16, height: 209 }}>
+                    <Box style={{ width: 311, height: 209, background: '#ACCFFA', borderRadius: 6, padding: '24px 26px 22px', justifyContent: 'space-between' }}>
+                        <Box style={{ gap: 14 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1B539A', letterSpacing: 3 }}>04</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 33, fontWeight: 500, color: '#1B539A', lineHeight: 1.2, letterSpacing: 0 }}>运行时间<br />实测对比</Text>
+                        </Box>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1B539A', letterSpacing: 4 }}>实验 · LAB</Text>
+                    </Box>
+                    <Box style={{ width: 311, height: 209, background: '#DCEBFD', borderRadius: 6, padding: '24px 26px 22px', justifyContent: 'space-between' }}>
+                        <Box style={{ gap: 14 }}>
+                            <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 500, color: '#1B539A', letterSpacing: 3 }}>05</Text>
+                            <Text style={{ fontFamily: 'STSong', fontSize: 33, fontWeight: 500, color: '#1B539A', lineHeight: 1.2, letterSpacing: 0 }}>连通分量<br />与课后习题</Text>
+                        </Box>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1B539A', letterSpacing: 4 }}>作业 · HOMEWORK</Text>
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}>计算机科学系</Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>数据结构第六讲 · <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>02/08</span></></Text>
+    </Box>
+</Slide>

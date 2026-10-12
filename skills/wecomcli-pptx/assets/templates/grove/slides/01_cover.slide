@@ -1,0 +1,26 @@
+<Slide style={{ background: '#192B1B', padding: '40px 102px 48px', position: 'relative' }}>
+    <Box style={{ position: 'absolute', left: 938, top: 376, width: 240, height: 240, alignItems: 'flex-end' }}>
+        <Text style={{ fontFamily: 'STSong', fontSize: 200, fontWeight: 400, color: '#2A3626', lineHeight: 1, letterSpacing: -6, whiteSpace: 'nowrap' }}>01</Text>
+    </Box>
+
+    <Box style={{ width: 720, height: 580, justifyContent: 'center' }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#E27871', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+            <>计算机科学与技术学院 · 智能数据组会 · <span style={{ fontFamily: 'Courier New' }}>2026</span></>
+        </Text>
+        <Box style={{ width: 36, height: 1, background: '#C8524A', marginTop: 12 }} />
+        <Text style={{ fontFamily: 'STSong', fontSize: 60, fontWeight: 400, color: '#D4CFBF', lineHeight: 1.2, letterSpacing: 0, marginTop: 22, whiteSpace: 'nowrap' }}>
+            时间序列基础模型<br />
+            从逐任务训练到<span style={{ color: '#C8524A' }}>零样本预测</span>
+        </Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 19, fontWeight: 300, color: '#9C9E8E', lineHeight: 1.7, marginTop: 22, width: 600 }}>
+            组会文献综述：梳理 2017 年以来三代预测方法的代表工作、评测口径与开放问题，为下一阶段的复现实验选定基线。
+        </Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', height: 32, borderTop: '1px solid #3A4434', paddingTop: 13, marginTop: 20 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9C9E8E', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>汇报人 · 林一舟　　导师 · 周启明 教授</Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9C9E8E', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>
+            <><span style={{ fontFamily: 'Courier New' }}>2026.09.24</span> · 组会讨论稿</>
+        </Text>
+    </Box>
+</Slide>

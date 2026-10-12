@@ -1,0 +1,65 @@
+<Slide style={{ width: 1280, height: 720, background: '#F3E9D2', padding: '32px 40px 24px 40px', position: 'relative', flexDirection: 'column', fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', width: 1200, height: 88, borderBottom: '2px solid #3B2A1B', paddingBottom: 12 }}>
+        <Text style={{ width: 860, fontSize: 48, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.15, letterSpacing: -1 }}>四月排期一眼看清，两场还没落定</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1, paddingBottom: 8 }}>SCHEDULE / APRIL</Text>
+    </Box>
+    <Box style={{ width: 1200, height: 512, marginTop: 20 }}>
+        <Text style={{ fontSize: 13, color: '#6B5A44', letterSpacing: 2, lineHeight: 1.5 }}>状态色：绿已确认 · 黄招募中 · 橙待授权 · 日期为示例数据</Text>
+        <Box style={{ width: 1200, height: 420, marginTop: 12 }}>
+            <Table
+                style={{ width: '100%', height: '100%' }}
+                defaultTextStyle={{ fontSize: 16, textAlign: 'center', color: '#3B2A1B', fontFamily: 'Microsoft YaHei' }}
+                defaultCellStyle={{ border: { bottom: { width: 1, color: '#C9BBA0' } } }}
+                cells={[
+                            [
+                                { text: '活动', textStyle: { fontWeight: 700, textAlign: 'left', color: '#F3E9D2' }, cellStyle: { background: { color: '#3B2A1B' } } },
+                                { text: '日期', textStyle: { fontWeight: 700, color: '#F3E9D2' }, cellStyle: { background: { color: '#3B2A1B' } } },
+                                { text: '场地', textStyle: { fontWeight: 700, color: '#F3E9D2' }, cellStyle: { background: { color: '#3B2A1B' } } },
+                                { text: '负责人', textStyle: { fontWeight: 700, color: '#F3E9D2' }, cellStyle: { background: { color: '#3B2A1B' } } },
+                                { text: '状态', textStyle: { fontWeight: 700, color: '#F3E9D2' }, cellStyle: { background: { color: '#3B2A1B' } } },
+                            ],
+                            [
+                                { text: '开幕音乐会', textStyle: { fontWeight: 700, textAlign: 'left' } },
+                                { text: '4 月 12 日 18:30' },
+                                { text: '大草坪' },
+                                { text: '演出组 · 周' },
+                                { text: '已确认', textStyle: { fontWeight: 700 }, cellStyle: { background: { color: '#3FA34B' } } },
+                            ],
+                            [
+                                { text: '手作市集', textStyle: { fontWeight: 700, textAlign: 'left' }, cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '4 月 13 日 全天', cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '湖边步道', cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '市集组 · 陈', cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '招募中', textStyle: { fontWeight: 700 }, cellStyle: { background: { color: '#F2C232' } } },
+                            ],
+                            [
+                                { text: '夜间放映', textStyle: { fontWeight: 700, textAlign: 'left' } },
+                                { text: '4 月 18 日 19:30' },
+                                { text: '露天幕布 / 报告厅' },
+                                { text: '影像社 · 吴' },
+                                { text: '待授权', textStyle: { fontWeight: 700 }, cellStyle: { background: { color: '#F08A3C' } } },
+                            ],
+                            [
+                                { text: '闭幕晚会', textStyle: { fontWeight: 700, textAlign: 'left' }, cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '4 月 20 日 19:00', cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '大礼堂', cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '活动组 · 林', cellStyle: { background: { color: '#EBE0C6' } } },
+                                { text: '已确认', textStyle: { fontWeight: 700 }, cellStyle: { background: { color: '#3FA34B' } } },
+                            ],
+                            [
+                                { text: '志愿者培训', textStyle: { fontWeight: 700, textAlign: 'left' } },
+                                { text: '4 月 8 日 14:00' },
+                                { text: '三教 201' },
+                                { text: '活动组 · 林' },
+                                { text: '已确认', textStyle: { fontWeight: 700 }, cellStyle: { background: { color: '#3FA34B' } } },
+                            ],
+                ]}
+            />
+        </Box>
+        <Text style={{ fontSize: 13, color: '#3B2A1B', lineHeight: 1.5, marginTop: 12 }}>待授权的一场若本周内拿不到放映许可，改为校友短片合集，片单由影像社另定。</Text>
+    </Box>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 1200, height: 32, marginTop: 12 }}>
+        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 2, lineHeight: 1 }}>活动组内部材料</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>04 / 08</Text>
+    </Box>
+</Slide>

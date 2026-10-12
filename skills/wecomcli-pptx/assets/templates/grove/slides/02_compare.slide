@@ -1,0 +1,92 @@
+<Slide style={{ background: '#E8E4D6', padding: '40px 102px 48px', position: 'relative' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 28, borderBottom: '1px solid #CBCABC', paddingBottom: 9 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#5A6253', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>第二部分 · 方法脉络</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 13, fontWeight: 400, color: '#5A6253', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>02</Text>
+    </Box>
+    <Box style={{ height: 96, marginTop: 20 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9E3B34', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}><>三代方法 · <span style={{ fontFamily: 'Courier New' }}>1970 — 2024</span></></Text>
+        <Box style={{ width: 36, height: 1, background: '#C8524A', marginTop: 10 }} />
+        <Text style={{ fontFamily: 'STSong', fontSize: 34, fontWeight: 400, color: '#192B1B', lineHeight: 1.3, letterSpacing: 0, marginTop: 12, whiteSpace: 'nowrap' }}>从逐序列拟合到<span style={{ color: '#C8524A' }}>零样本预测</span>，三代方法各自解决了什么</Text>
+    </Box>
+    <Box style={{ width: 1076, height: 412, marginTop: 24 }}>
+        <Box style={{ flexDirection: 'row', height: 351 }}>
+            <Box style={{ width: 324, height: 351 }}>
+                <Box style={{ height: 29, borderBottom: '1px solid #CBCABC', paddingBottom: 10 }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#5A6253', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}><><span style={{ fontFamily: 'Courier New' }}>01</span> · 统计与经典方法</></Text>
+                </Box>
+                <Text style={{ fontFamily: 'STSong', fontSize: 24, fontWeight: 400, color: '#192B1B', lineHeight: 1.25, marginTop: 16 }}>逐序列独立拟合，<br />以可解释性换取泛化能力</Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#5A6253', lineHeight: 1.6, marginTop: 12 }}>ARIMA、指数平滑与 Theta 把每条序列当作独立的平稳过程：参数少、训练快，至今仍是难以逾越的基线。</Text>
+                <Box style={{ gap: 8, marginTop: 12 }}>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>序列之间不共享任何信息</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>节假日与突变依赖人工干预项</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>结果可逐项解释，便于业务核对</Text>
+                    </Box>
+                </Box>
+            </Box>
+            <Box style={{ width: 52, alignItems: 'center' }}>
+                <Box style={{ width: 1, height: 351, background: '#CBCABC' }} />
+            </Box>
+            <Box style={{ width: 324, height: 351 }}>
+                <Box style={{ height: 29, borderBottom: '1px solid #CBCABC', paddingBottom: 10 }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#5A6253', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}><><span style={{ fontFamily: 'Courier New' }}>02</span> · 深度监督模型</></Text>
+                </Box>
+                <Text style={{ fontFamily: 'STSong', fontSize: 24, fontWeight: 400, color: '#192B1B', lineHeight: 1.25, marginTop: 16 }}>一个数据集训一个模型，<br />序列之间共享参数</Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#5A6253', lineHeight: 1.6, marginTop: 12 }}>DeepAR、N-BEATS 与 PatchTST 用一个网络拟合数据集内全部序列，精度大幅提升，但换数据集就得重训。</Text>
+                <Box style={{ gap: 8, marginTop: 12 }}>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>概率输出与多步预测成为标配</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>分块输入让注意力真正奏效</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>小数据集上常不及统计基线</Text>
+                    </Box>
+                </Box>
+            </Box>
+            <Box style={{ width: 52, alignItems: 'center' }}>
+                <Box style={{ width: 1, height: 351, background: '#CBCABC' }} />
+            </Box>
+            <Box style={{ width: 324, height: 351 }}>
+                <Box style={{ height: 29, borderBottom: '1px solid #CBCABC', paddingBottom: 10 }}>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9E3B34', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}><><span style={{ fontFamily: 'Courier New' }}>03</span> · 预训练基础模型</></Text>
+                </Box>
+                <Text style={{ fontFamily: 'STSong', fontSize: 24, fontWeight: 400, color: '#192B1B', lineHeight: 1.25, marginTop: 16 }}>在海量序列上预训练一次，<br />零样本迁移到<span style={{ color: '#C8524A' }}>任何新数据</span></Text>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#5A6253', lineHeight: 1.6, marginTop: 12 }}>TimesFM、Chronos 与 Moirai 沿用语言模型路线，用数十亿观测点预训练一次，不微调即可预测未见数据集。</Text>
+                <Box style={{ gap: 8, marginTop: 12 }}>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>零样本精度已逼近逐数据集训练</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>推理成本高，长序列尤其明显</Text>
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12 }}>
+                        <Text style={{ fontFamily: 'Courier New', fontSize: 18, fontWeight: 400, color: '#9E3B34', lineHeight: 1.35, width: 22 }}>—</Text>
+                        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 300, color: '#192B1B', lineHeight: 1.35 }}>预训练语料与测试集是否重叠存疑</Text>
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 20, height: 47, borderTop: '1px solid #CBCABC', paddingTop: 12, marginTop: 14 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#9E3B34', letterSpacing: 2, lineHeight: 2.1, whiteSpace: 'nowrap' }}>— 小结</Text>
+            <Text style={{ fontFamily: 'STSong', fontSize: 19, fontWeight: 400, color: '#192B1B', lineHeight: 1.5, whiteSpace: 'nowrap' }}>统计方法仍是必报基线，监督模型给出精度参照，基础模型改变的是「每个任务都要重新训练」的前提</Text>
+        </Box>
+    </Box>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', height: 32, borderTop: '1px solid #CBCABC', paddingTop: 13, marginTop: 20 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 400, color: '#5A6253', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>计算机科学与技术学院 · 智能数据组会</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 13, fontWeight: 400, color: '#5A6253', letterSpacing: 2, lineHeight: 1.15, whiteSpace: 'nowrap' }}>02 / 14</Text>
+    </Box>
+</Slide>

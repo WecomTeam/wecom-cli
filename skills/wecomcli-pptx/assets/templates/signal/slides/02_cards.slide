@@ -1,0 +1,67 @@
+<Slide style={{ background: '#F0ECE3', padding: '40px 96px', position: 'relative' }}>
+    <Box style={{ position: 'relative', width: 1088, height: 640 }}>
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 24, borderBottom: '1px solid #CAC4B4', paddingBottom: 8 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#5A6270', whiteSpace: 'nowrap' }}>第二部分 · 分析方法</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 12, fontWeight: 500, color: '#5A6270', letterSpacing: 2 }}>02</Text>
+        </Box>
+
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 24, borderBottom: '1px solid #CAC4B4', marginTop: 8, height: 60 }}>
+            <Text style={{ fontFamily: 'STSong', fontSize: 32, fontWeight: 700, color: '#1A2030', lineHeight: 1.3, whiteSpace: 'nowrap' }}>
+                分析方法：以<span style={{ color: '#8A6A2E' }}>门店分层</span>为主线的三段式经营诊断
+            </Text>
+        </Box>
+
+        <Box style={{ width: 1088, height: 476, marginTop: 20 }}>
+            <Box style={{ flexDirection: 'row', gap: 36, height: 402 }}>
+                <Box style={{ flex: 1, borderTop: '2px solid #8A6A2E', paddingTop: 16 }}>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 34, fontWeight: 600, color: '#8A6A2E', lineHeight: 1 }}>01</Text>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 22, fontWeight: 600, color: '#1A2030', lineHeight: 1.4, marginTop: 8 }}>数据口径与门店分层</Text>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, color: '#1A2030', lineHeight: 1.7, marginTop: 10 }}>
+                        以收银系统的订单流水为主数据源，按门店汇总为周粒度的销售与客流序列；同步接入会员、库存与促销日历，按商圈类型、开业年限、面积与月均销售四个维度把门店分为旗舰、标准、社区三层，并对调拨与退货订单做统一口径清洗。
+                    </Text>
+                    <Box style={{ flex: 1 }} />
+                    <Box style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10 }}>
+                        <Text style={{ fontFamily: 'STSong', fontSize: 30, fontWeight: 600, color: '#8A6A2E', lineHeight: 1, letterSpacing: -0.5, whiteSpace: 'nowrap' }}>186 店 · 12 个月</Text>
+                    </Box>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, color: '#5A6270', marginTop: 8, whiteSpace: 'nowrap' }}>示例数据 · 华东四省一市 · 直营门店</Text>
+                </Box>
+                <Box style={{ flex: 1, borderTop: '2px solid #8A6A2E', paddingTop: 16 }}>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 34, fontWeight: 600, color: '#8A6A2E', lineHeight: 1 }}>02</Text>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 22, fontWeight: 600, color: '#1A2030', lineHeight: 1.4, marginTop: 8 }}>增长来源拆解</Text>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, color: '#1A2030', lineHeight: 1.7, marginTop: 10 }}>
+                        把同比销售增量拆为客流、转化率、客单价与新开门店四项来源，逐层归因到门店层级与商圈；对会员与非会员分别计算复购贡献，剔除促销与节假日的一次性影响后得到可持续增量。以上年同期、年度预算与行业均值作为同口径参照。
+                    </Text>
+                    <Box style={{ flex: 1 }} />
+                    <Box style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10 }}>
+                        <Text style={{ fontFamily: 'STSong', fontSize: 30, fontWeight: 600, color: '#8A6A2E', lineHeight: 1, letterSpacing: -0.5, whiteSpace: 'nowrap' }}>4 项来源 · 3 个层级</Text>
+                    </Box>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, color: '#5A6270', marginTop: 8, whiteSpace: 'nowrap' }}>同比增量归因 · 3 组参照口径对照</Text>
+                </Box>
+                <Box style={{ flex: 1, borderTop: '2px solid #8A6A2E', paddingTop: 16 }}>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 34, fontWeight: 600, color: '#8A6A2E', lineHeight: 1 }}>03</Text>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 22, fontWeight: 600, color: '#1A2030', lineHeight: 1.4, marginTop: 8 }}>效率评价与对标</Text>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, color: '#1A2030', lineHeight: 1.7, marginTop: 10 }}>
+                        以坪效、人效与库存周转三项指标评价门店效率，分别在旺季与淡季两个时段报告，避免全年均值掩盖波动。对标分析依次比较同层级头部门店、同商圈竞品与上年自身水平，定位差距来源；另设新店与成熟店分组评价。
+                    </Text>
+                    <Box style={{ flex: 1 }} />
+                    <Box style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 10 }}>
+                        <Text style={{ fontFamily: 'STSong', fontSize: 30, fontWeight: 600, color: '#8A6A2E', lineHeight: 1, letterSpacing: -0.5, whiteSpace: 'nowrap' }}>3 项指标 × 2 类时段</Text>
+                    </Box>
+                    <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, color: '#5A6270', marginTop: 8, whiteSpace: 'nowrap' }}>坪效 / 人效 / 周转 · 旺季与淡季分别报告</Text>
+                </Box>
+            </Box>
+
+            <Box style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 20, borderTop: '1px solid #CAC4B4', paddingTop: 14, marginTop: 18, height: 56 }}>
+                <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, fontWeight: 500, color: '#8A6A2E', lineHeight: 1.6, whiteSpace: 'nowrap' }}>— 小结</Text>
+                <Text style={{ fontFamily: 'STSong', fontSize: 19, fontWeight: 600, color: '#1A2030', lineHeight: 1.6 }}>
+                    框架的关键在于先分层再归因：增长的判断应落在可持续的客流与复购上，而不是促销带来的一次性销售。
+                </Text>
+            </Box>
+        </Box>
+
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', borderTop: '1px solid #CAC4B4', paddingTop: 9, marginTop: 19, height: 33 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 12, color: '#5A6270', whiteSpace: 'nowrap' }}>华东大区 · 年度经营分析会</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 12, color: '#5A6270', letterSpacing: 1.5, whiteSpace: 'nowrap' }}>02 / 24</Text>
+        </Box>
+    </Box>
+</Slide>

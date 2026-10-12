@@ -1,0 +1,36 @@
+<Slide style={{ background: '#2373DA', padding: '40px 73px 40px', justifyContent: 'space-between', alignItems: 'center' }}>
+    <Box style={{ height: 24, width: 1134 }} />
+
+    <Box style={{ alignItems: 'center', width: 1134 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 40, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.1, letterSpacing: 2, textAlign: 'center' }}>
+            <><span style={{ fontFamily: 'Times New Roman', letterSpacing: 0 }}>2026</span> · 第三季度</>
+        </Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 116, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.0, letterSpacing: 0, textAlign: 'center', marginTop: 10 }}>
+            业务回顾
+        </Text>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 22, width: 1134, height: 52, marginTop: 14 }}>
+            <Box style={{ flex: 1, gap: 2 }}>
+                <Box style={{ height: 3, background: '#FFFFFF' }} />
+                <Box style={{ height: 3, background: '#FFFFFF' }} />
+            </Box>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 45, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.0, letterSpacing: 0 }}>之</Text>
+            <Box style={{ flex: 1, gap: 2 }}>
+                <Box style={{ height: 3, background: '#FFFFFF' }} />
+                <Box style={{ height: 3, background: '#FFFFFF' }} />
+            </Box>
+        </Box>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 116, fontWeight: 700, color: '#FFFFFF', lineHeight: 1.0, letterSpacing: 0, textAlign: 'center', marginTop: 14 }}>
+            增长与效率
+        </Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 18, fontWeight: 700, color: '#FFFFFF', letterSpacing: 5, textAlign: 'center', marginTop: 30 }}>
+            面向管理层的企业微信季度汇报
+        </Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 1134, height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: 3 }}>战略与运营部 出品</Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 700, color: '#FFFFFF', letterSpacing: 3 }}>
+            <>二〇二六年十月 · <span style={{ fontFamily: 'Courier New', letterSpacing: 2 }}>VOL. 03</span></>
+        </Text>
+    </Box>
+</Slide>

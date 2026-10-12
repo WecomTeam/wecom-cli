@@ -1,0 +1,60 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', padding: '50px 64px 0 64px', position: 'relative', fontFamily: 'STSong' }}>
+    <svg width={1280} height={720} viewBox='0 0 1280 720' style={{ position: 'absolute', top: 0, left: 0 }}>
+        <defs>
+            <pattern id='dots' width='6' height='6' patternUnits='userSpaceOnUse'>
+                <circle cx='3' cy='3' r='0.7' fill='#FBF1E0' />
+            </pattern>
+        </defs>
+        <rect x='0' y='0' width='1280' height='720' fill='#FFFFFF' />
+        <rect x='0' y='0' width='1280' height='720' fill='url(#dots)' />
+    </svg>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 84, paddingBottom: 14, borderBottom: '1.5px solid #C42819' }}>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 16 }}>
+            <Box style={{ width: 10, height: 44, background: '#C42819' }} />
+            <Text style={{ fontSize: 46, fontWeight: 700, lineHeight: 1.2, color: '#1A1616', whiteSpace: 'nowrap' }}>优秀网格员是怎样做到的</Text>
+        </Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 14, marginBottom: 6 }}>
+            <Box style={{ flexDirection: 'row', gap: 8 }}>
+                <Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825' }} /><Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825', opacity: 0.6 }} /><Box style={{ width: 8, height: 8, borderRadius: 4, background: '#E19825', opacity: 0.3 }} />
+            </Box>
+            <Text style={{ fontSize: 15, color: '#6B7280', lineHeight: 1.2 }}>年度表彰 · 二〇二六 · 事迹选登</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'relative', marginTop: 18, width: 1152, height: 488 }}>
+        <Box style={{ flexDirection: 'row', gap: 24 }}>
+            <Box style={{ width: 688, height: 488, justifyContent: 'space-between' }}>
+                <Box style={{ gap: 10 }}>
+                    <Text style={{ fontSize: 14, fontWeight: 'bold', letterSpacing: 6, color: '#C42819', lineHeight: 1.2 }}>个人 · 事迹 · 摘要</Text>
+                    <Text style={{ fontSize: 26, fontWeight: 700, lineHeight: 1.2, color: '#1A1616' }}>全年走访不断线，台账逐月更新</Text>
+                    <Box style={{ width: 40, height: 4, background: '#E19825' }} />
+                    <Text style={{ marginTop: 4, fontSize: 17, lineHeight: 1.8, color: '#4B5563' }}>负责的网格共三百余户，全年按月排出走访表，独居老人和困难家庭每月上门一次。</Text>
+                    <Text style={{ fontSize: 17, lineHeight: 1.8, color: '#4B5563' }}>每次走访回来当天更新台账，诉求按类别登记，需要协调的事项写明反馈时限。</Text>
+                    <Text style={{ fontSize: 17, lineHeight: 1.8, color: '#4B5563' }}>办结事项一周内全部回访，居民不认可的重新派单，年底无一件积压。</Text>
+                </Box>
+                <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', paddingTop: 10, borderTop: '1px dashed rgba(196,40,25,0.4)' }}>
+                    <Text style={{ fontSize: 15, color: '#C42819', lineHeight: 1.2 }}>
+                        <span style={{ fontFamily: 'Times New Roman', fontSize: 24, fontWeight: 'bold' }}>12</span> 人获此类别表彰
+                    </Text>
+                    <Text style={{ fontSize: 14, color: '#6B7280', lineHeight: 1.2 }}>评审通过</Text>
+                </Box>
+            </Box>
+
+            <Box style={{ width: 440, height: 488 }}>
+                <Image src="https://placeholder.invalid/image.jpg" style={{ width: 440, height: 440 }} />
+                <Box style={{ height: 48, flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                    <Box style={{ width: 40, height: 4, background: '#E19825' }} />
+                    <Text style={{ fontSize: 14, color: '#4B5563', lineHeight: 1.5 }}>网格员入户走访，在居民家中核对台账并登记新的诉求</Text>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 9, flexDirection: 'row' }}>
+        <Box style={{ width: 678, height: 9, background: '#C42819' }} />
+        <Box style={{ width: 333, height: 9, background: '#EE5530' }} />
+        <Box style={{ width: 269, height: 9, background: '#F26B40' }} />
+    </Box>
+    <Text style={{ position: 'absolute', right: 64, top: 678, fontFamily: 'Times New Roman', fontSize: 15, fontStyle: 'italic', color: '#6B7280', lineHeight: 1 }}>04 / 08</Text>
+</Slide>

@@ -1,0 +1,54 @@
+<Slide style={{ width: 1280, height: 720, background: '#F3E9D2', padding: '32px 40px 24px 40px', position: 'relative', flexDirection: 'column', fontFamily: 'Microsoft YaHei' }}>
+    <svg width={520} height={400} viewBox='0 0 520 400' style={{ position: 'absolute', left: 560, top: 56 }}>
+        <rect x='0' y='0' width='520' height='400' fill='#F3E9D2' />
+        <path d='M 0 4 L 500 184 L 500 220 L 0 40 Z' fill='#E5408C' />
+        <path d='M 0 46 L 500 226 L 500 262 L 0 82 Z' fill='#F08A3C' />
+        <path d='M 0 88 L 500 268 L 500 304 L 0 124 Z' fill='#F2C232' />
+        <path d='M 0 130 L 500 310 L 500 346 L 0 166 Z' fill='#3FA34B' />
+        <path d='M 0 172 L 500 352 L 500 388 L 0 208 Z' fill='#4A8ED1' />
+    </svg>
+    <Box style={{ flexDirection: 'row', alignItems: 'flex-start', width: 1200, height: 100 }}>
+        <svg width={112} height={100} viewBox='0 0 112 100'>
+            <rect x='0' y='0' width='112' height='100' fill='#F3E9D2' />
+            <circle cx='58' cy='26' r='24' fill='#4A8ED1' />
+            <circle cx='26' cy='52' r='22' fill='#E24B3B' />
+            <circle cx='88' cy='52' r='22' fill='#3FA34B' />
+            <circle cx='44' cy='78' r='20' fill='#F08A3C' />
+            <circle cx='72' cy='78' r='20' fill='#F2C232' />
+        </svg>
+        <Box style={{ marginLeft: 20, marginTop: 6 }}>
+            <Text style={{ fontSize: 26, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.15 }}>校园之春<br />活动组</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 11, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1, marginTop: 8 }}>CATALOGUE NO. 7</Text>
+        </Box>
+    </Box>
+    <Text style={{ fontFamily: 'Arial', fontSize: 160, fontWeight: 700, color: '#3B2A1B', lineHeight: 1, letterSpacing: -6, marginTop: 30 }}>2026</Text>
+    <Box style={{ position: 'absolute', left: 1100, top: 250, width: 140 }}>
+        <Text style={{ fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>■ 户外场地</Text>
+        <Text style={{ fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1, marginTop: 24 }}>■ 现场演出</Text>
+        <Text style={{ fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1, marginTop: 24 }}>□ 线上直播</Text>
+        <Text style={{ fontSize: 12, fontWeight: 700, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1, marginTop: 24 }}>□ 周边市集</Text>
+    </Box>
+    <Box style={{ position: 'absolute', left: 40, top: 500, width: 1200 }}>
+        <Box style={{ flexDirection: 'row' }}>
+            <Box style={{ background: '#F2C232', padding: '10px 22px 10px 22px' }}>
+                <Text style={{ fontSize: 52, fontWeight: 700, color: '#3B2A1B', lineHeight: 1.1, letterSpacing: 1 }}>春季活动总策划</Text>
+            </Box>
+        </Box>
+        <Box style={{ width: 1200, height: 2, background: '#3B2A1B', marginTop: 14 }} />
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 1200, marginTop: 14 }}>
+            <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 2, lineHeight: 1 }}>限定版 · 活动组制作 · N.R. ■ 开 □ 关</Text>
+            <Box style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <Box style={{ width: 52, height: 52, borderRadius: 26, background: '#3B2A1B', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ fontFamily: 'Arial', fontSize: 15, fontWeight: 700, color: '#F3E9D2', lineHeight: 1 }}>26</Text>
+                </Box>
+                <Box style={{ background: '#E24B3B', padding: '6px 10px 6px 10px', marginLeft: 12 }}>
+                    <Text style={{ fontFamily: 'Courier New', fontSize: 10, fontWeight: 700, color: '#F3E9D2', letterSpacing: 1, lineHeight: 1.4 }}>AS SEEN ON<br />CAMPUS</Text>
+                </Box>
+            </Box>
+        </Box>
+    </Box>
+    <Box style={{ position: 'absolute', left: 40, top: 664, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', width: 1200, height: 32 }}>
+        <Text style={{ fontSize: 11, color: '#6B5A44', letterSpacing: 2, lineHeight: 1 }}>内部材料</Text>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 12, color: '#3B2A1B', letterSpacing: 2, lineHeight: 1 }}>01 / 08</Text>
+    </Box>
+</Slide>

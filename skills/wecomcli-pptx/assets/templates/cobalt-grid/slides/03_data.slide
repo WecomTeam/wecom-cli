@@ -1,0 +1,60 @@
+<Slide style={{ background: '#F0EBDE', padding: '19px 48px 14px 48px', position: 'relative' }}>
+    <svg width={1280} height={719} viewBox='0 0 1280 719' style={{ position: 'absolute', top: 1, left: 0, zIndex: 0 }}>
+        <defs>
+            <pattern id='grid' width='32' height='32' patternUnits='userSpaceOnUse'>
+                <path d='M 32 0 L 0 0 0 32' fill='none' stroke='#DBD8DE' strokeWidth='1' />
+            </pattern>
+        </defs>
+        <rect x='0' y='0' width='1280' height='719' fill='#F0EBDE' />
+        <rect x='0' y='0' width='1280' height='719' fill='url(#grid)' />
+    </svg>
+
+    <Box style={{ position: 'relative', zIndex: 1, width: 1184, height: 687 }}>
+        <Box style={{ width: 1184, height: 1.5, background: '#1F2BE0' }} />
+
+        <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: 16, height: 127.5, paddingBottom: 14, borderBottom: '1.5px solid #1F2BE0' }}>
+            <Text style={{ width: 940, fontFamily: 'STSong', fontSize: 34, fontWeight: 700, color: '#1F2BE0', lineHeight: 1.3 }}>后市场规模五年再增五成以上，2030 年将达到 2.05 万亿元</Text>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 13, color: '#1F2BE0', letterSpacing: 1.5, whiteSpace: 'nowrap', paddingBottom: 6 }}>MARKET SIZE · 2023–2030E</Text>
+        </Box>
+
+        <Box style={{ width: 1184, height: 436, marginTop: 24 }}>
+            <Box style={{ flexDirection: 'row', height: 436 }}>
+                <Box style={{ width: 380 }}>
+                    <Text style={{ fontFamily: 'STSong', fontSize: 104, fontWeight: 400, color: '#1F2BE0', lineHeight: 0.95, letterSpacing: -1.5, whiteSpace: 'nowrap' }}>2.05<span style={{ fontFamily: 'STSong', fontSize: 40, fontWeight: 400, letterSpacing: 0 }}> 万亿</span></Text>
+                    <Text style={{ marginTop: 10, fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 700, color: '#1F2BE0', whiteSpace: 'nowrap' }}>2030E 市场规模 · <span style={{ fontFamily: 'Courier New', letterSpacing: 1.5 }}>RMB</span></Text>
+                    <Text style={{ marginTop: 8, width: 330, fontFamily: 'Microsoft YaHei', fontSize: 16, color: '#1F2BE0', lineHeight: 1.5 }}>增量的七成来自车龄结构：2025 年出保车辆首次超过在保车辆，维保与三电服务需求随之从主机厂体系外溢。</Text>
+                    <Text style={{ marginTop: 12, fontFamily: 'Times New Roman', fontSize: 72, fontWeight: 400, color: '#1F2BE0', lineHeight: 0.95, letterSpacing: -1, whiteSpace: 'nowrap' }}>9.2%</Text>
+                    <Text style={{ marginTop: 12, fontFamily: 'Microsoft YaHei', fontSize: 13, fontWeight: 700, color: '#1F2BE0', whiteSpace: 'nowrap' }}>2025–2030 复合增速 · <span style={{ fontFamily: 'Courier New', letterSpacing: 1.5 }}>CAGR</span></Text>
+                    <Text style={{ marginTop: 8, width: 330, fontFamily: 'Microsoft YaHei', fontSize: 16, color: '#1F2BE0', lineHeight: 1.5 }}>高于同期新车销售增速 2.8 个百分点，后市场成为产业链中增速最快的一段。</Text>
+                </Box>
+
+                <Box style={{ width: 804, paddingLeft: 40 }}>
+                    <Box style={{ flexDirection: 'row', gap: 12, height: 400, borderBottom: '1.5px solid #1F2BE0' }}>
+                        {[[5, '0.98'], [6, '1.12'], [7, '1.32'], [7, '1.46'], [8, '1.60'], [9, '1.75'], [10, '1.90'], [10, '2.05']].map((c, i) => (
+                            <Box key={i} style={{ width: 85, height: 400, flexDirection: 'column-reverse', gap: 3, paddingBottom: 3 }}>
+                                {Array.from({ length: c[0] }).map((_, j) => (
+                                    <Box key={j} style={{ width: 85, height: 27.5, background: '#1F2BE0' }} />
+                                ))}
+                                <Box style={{ width: 85, height: 27.5, justifyContent: 'center' }}>
+                                    <Text style={{ fontFamily: 'Courier New', fontSize: 14, color: '#1F2BE0', letterSpacing: 0.5, textAlign: 'center', whiteSpace: 'nowrap' }}>{c[1]}</Text>
+                                </Box>
+                                {Array.from({ length: 12 - c[0] }).map((_, j) => (
+                                    <Box key={j} style={{ width: 85, height: 27.5, background: '#DBD8DE' }} />
+                                ))}
+                            </Box>
+                        ))}
+                    </Box>
+                    <Box style={{ flexDirection: 'row', gap: 12, marginTop: 10, height: 18 }}>
+                        {['2023', '2024', '2025', '2026E', '2027E', '2028E', '2029E', '2030E'].map((t, i) => (
+                            <Text key={i} style={{ width: 85, textAlign: 'center', fontFamily: 'Courier New', fontSize: 13, color: '#1F2BE0', letterSpacing: 1, whiteSpace: 'nowrap' }}>{t}</Text>
+                        ))}
+                    </Box>
+                </Box>
+            </Box>
+        </Box>
+
+        <Text style={{ position: 'absolute', left: 0, bottom: 26, width: 960, fontFamily: 'Microsoft YaHei', fontSize: 13, color: '#1F2BE0', lineHeight: 1.5 }}>来源：中国汽车流通协会、公安部保有量数据、上市公司年报；2026–2030 年为团队模型预测（示例数据）<br />注：市场规模含维保、配件、保险、二手车与电池回收服务收入，单位人民币万亿元；每格 0.2 万亿元</Text>
+        <Text style={{ position: 'absolute', right: 0, bottom: 30, fontFamily: 'Courier New', fontSize: 13, color: '#1F2BE0', letterSpacing: 1 }}>03 / 12</Text>
+        <Box style={{ position: 'absolute', left: 0, bottom: 0, width: 1184, height: 1.5, background: '#1F2BE0' }} />
+    </Box>
+</Slide>

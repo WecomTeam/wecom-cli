@@ -1,0 +1,48 @@
+<Slide style={{ width: 1280, height: 720, background: '#E63F26', position: 'relative', padding: '40px 70px 0 70px', fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ position: 'absolute', left: -20, top: -60, width: 840, height: 840, background: 'radial-gradient(circle, rgba(255,231,155,0.5) 0%, rgba(255,192,0,0.2) 38%, rgba(230,63,38,0) 70%)' }} />
+    <svg width={360} height={330} viewBox='0 0 360 330' style={{ position: 'absolute', left: 870, top: 310 }}>
+        <rect x='0' y='0' width='360' height='330' fill='#E63F26' />
+        <g fill='#FFC000'>
+            <circle cx='40' cy='60' r='4' opacity='0.9' /><circle cx='96' cy='24' r='2.5' opacity='0.7' /><circle cx='150' cy='110' r='3' opacity='0.6' />
+            <circle cx='230' cy='48' r='5' opacity='0.85' /><circle cx='310' cy='120' r='2.5' opacity='0.6' /><circle cx='280' cy='230' r='4' opacity='0.8' />
+            <circle cx='120' cy='250' r='3' opacity='0.7' /><circle cx='200' cy='180' r='2' opacity='0.5' /><circle cx='330' cy='300' r='2.5' opacity='0.55' />
+            <circle cx='60' cy='170' r='2' opacity='0.5' /><circle cx='250' cy='290' r='3' opacity='0.65' />
+        </g>
+    </svg>
+    <Box style={{ position: 'absolute', right: 70, top: 78, width: 220, height: 2, background: '#E19825' }} />
+    <Box style={{ position: 'absolute', right: 70, top: 90, width: 120, height: 2, background: '#FFE79B', opacity: 0.8 }} />
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 60, background: '#C42819' }} />
+    <Box style={{ position: 'absolute', left: 0, top: 658, width: 1280, height: 2, background: '#E19825' }} />
+    <Text style={{ position: 'absolute', right: 70, top: 678, fontFamily: 'Courier New', fontSize: 14, color: '#FFE79B', lineHeight: 1 }}>01 / 12</Text>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 30 }}>
+        <Text style={{ fontFamily: 'Courier New', fontSize: 16, fontWeight: 700, letterSpacing: 2, color: '#FFE79B' }}>01</Text>
+        <Text style={{ fontSize: 14, letterSpacing: 2, color: '#FFE79B' }}>年度党课宣讲</Text>
+    </Box>
+
+    <Box style={{ position: 'relative', marginTop: 74, width: 1140, height: 320 }}>
+        <Box style={{ height: 160, justifyContent: 'flex-end' }}>
+            <Text style={{ fontSize: 132, fontWeight: 900, lineHeight: 1, whiteSpace: 'nowrap', backgroundImage: 'linear-gradient(180deg, #FFE79B 0%, #FFC000 46%, #E19825 100%)', backgroundClip: 'text', color: 'transparent', textShadow: '0 8px 20px rgba(120,16,8,0.6)' }}>街道二〇二六年度</Text>
+        </Box>
+        <Box style={{ height: 160, justifyContent: 'flex-end' }}>
+            <Text style={{ fontSize: 132, fontWeight: 900, lineHeight: 1, whiteSpace: 'nowrap', backgroundImage: 'linear-gradient(180deg, #FFE79B 0%, #FFC000 46%, #E19825 100%)', backgroundClip: 'text', color: 'transparent', textShadow: '0 8px 20px rgba(120,16,8,0.6)' }}>基层工作汇报</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', alignItems: 'flex-start', marginTop: 30, height: 56 }}>
+        <Box style={{ width: 22, height: 40, background: '#B8791A', marginTop: 10 }} />
+        <Box style={{ width: 700, height: 50, background: 'linear-gradient(90deg, #E19825 0%, #FFC000 50%, #E19825 100%)', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 22, fontWeight: 'bold', color: '#A81810', letterSpacing: 3, lineHeight: 1 }}>讲清今年做了什么、效果怎样、明年往哪里走</Text>
+        </Box>
+        <Box style={{ width: 22, height: 40, background: '#B8791A', marginTop: 10 }} />
+    </Box>
+
+    <Box style={{ position: 'relative', flexDirection: 'row', gap: 20, marginTop: 20, marginLeft: 22 }}>
+        <Box style={{ height: 40, padding: '0 26px', borderRadius: 20, background: '#C42819', border: '1px solid #E19825', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 18, color: '#FFFFFF', lineHeight: 1 }}>宣讲单位 · 街道年度工作专班</Text>
+        </Box>
+        <Box style={{ height: 40, padding: '0 26px', borderRadius: 20, background: '#C42819', border: '1px solid #E19825', alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 18, color: '#FFFFFF', lineHeight: 1 }}>时间 · 2026 年 12 月</Text>
+        </Box>
+    </Box>
+</Slide>

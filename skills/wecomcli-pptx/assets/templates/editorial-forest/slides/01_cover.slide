@@ -1,0 +1,29 @@
+<Slide style={{ background: '#FFFFFF', padding: '60px 80px 56px', gap: 20 }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', height: 88 }}>
+        <Box style={{ justifyContent: 'center', height: 24 }}>
+            <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 16, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><><span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>LECTURE 06</span> 数据结构课程</></Text>
+        </Box>
+        <Box style={{
+            width: 88, height: 88, borderRadius: 44, border: '2px solid #267EF0',
+            justifyContent: 'center', alignItems: 'center',
+        }}>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 19, fontWeight: 500, color: '#1F68C5', letterSpacing: 2 }}>06</Text>
+        </Box>
+    </Box>
+
+    <Box style={{ width: 1120, height: 452, justifyContent: 'center' }}>
+        <Text style={{
+            fontFamily: 'STSong', fontSize: 112, fontWeight: 500,
+            color: '#267EF0', lineHeight: 1.1, letterSpacing: 0, whiteSpace: 'nowrap',
+        }}>
+            数据结构<br />
+            图的遍历<br />
+            <span style={{ letterSpacing: -2 }}>DFS · BFS</span>
+        </Text>
+    </Box>
+
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 24 }}>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}>计算机科学系</Text>
+        <Text style={{ fontFamily: 'Microsoft YaHei', fontSize: 15, fontWeight: 500, color: '#1F68C5', letterSpacing: 4 }}><>主讲人 · 陈明远 <span style={{ fontFamily: 'Courier New', letterSpacing: 3 }}>/ 2026.10.14</span></></Text>
+    </Box>
+</Slide>

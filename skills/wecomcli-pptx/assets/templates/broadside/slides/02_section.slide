@@ -1,0 +1,58 @@
+<Slide style={{ width: 1280, height: 720, background: '#FFFFFF', position: 'relative', padding: '40px 70px 0 70px', fontFamily: 'Microsoft YaHei' }}>
+    <Box style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', height: 30, borderBottom: '1px solid #E5E7EB' }}>
+        <Text style={{ fontSize: 14, letterSpacing: 2, color: '#6B7280' }}>街道二〇二六年度基层工作汇报</Text>
+        <Text style={{ fontSize: 14, letterSpacing: 2, color: '#6B7280' }}>目录</Text>
+    </Box>
+
+    <Box style={{ marginTop: 24, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-end', height: 116 }}>
+        <Box style={{ gap: 10 }}>
+            <Text style={{ fontFamily: 'Courier New', fontSize: 15, fontWeight: 700, letterSpacing: 3, color: '#C42819', lineHeight: 1.2 }}>CONTENTS</Text>
+            <Box style={{ width: 36, height: 3, background: '#E19825' }} />
+            <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 16, height: 72 }}>
+                <Box style={{ width: 12, height: 46, background: '#C42819' }} />
+                <Text style={{ fontSize: 48, fontWeight: 900, lineHeight: 1.2, color: '#1A1616', whiteSpace: 'nowrap' }}>今年的工作分四个部分讲</Text>
+            </Box>
+        </Box>
+        <Box style={{ flexDirection: 'row', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+            <Box style={{ flexDirection: 'row', gap: 8 }}>
+                <Box style={{ width: 10, height: 10, background: '#E19825' }} /><Box style={{ width: 10, height: 10, background: '#E19825', opacity: 0.6 }} /><Box style={{ width: 10, height: 10, background: '#E19825', opacity: 0.3 }} />
+            </Box>
+            <Box style={{ height: 34, padding: '0 20px', borderRadius: 17, background: '#E19825', alignItems: 'center', justifyContent: 'center' }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#7A1710', lineHeight: 1 }}>年度党课宣讲 · 共四讲</Text>
+            </Box>
+        </Box>
+    </Box>
+
+    <Box style={{ marginTop: 20, width: 1140, height: 410 }}>
+        <Box style={{ borderTop: '2px solid #C42819' }}>
+            {[
+                ['PART 01', '基础工作', '网格走访常态化，民情台账逐月更新', '03'],
+                ['PART 02', '民生服务', '老旧小区改造、养老助餐点和便民设施补齐', '06'],
+                ['PART 03', '平安建设', '矛盾纠纷源头调处，安全隐患分级排查', '09'],
+                ['PART 04', '队伍建设', '社区工作者轮训、考核与后备人员储备', '11'],
+            ].map((r, i) => (
+                <Box key={i} style={{ flexDirection: 'row', alignItems: 'center', height: 100, borderBottom: '1px solid #E5E7EB' }}>
+                    <Box style={{ width: 170, flexDirection: 'row' }}>
+                        <Box style={{ height: 36, padding: '0 18px', borderRadius: 18, background: '#C42819', alignItems: 'center', justifyContent: 'center' }}>
+                            <Text style={{ fontFamily: 'Arial', fontSize: 16, fontWeight: 'bold', color: '#FFFFFF', letterSpacing: 1, lineHeight: 1 }}>{r[0]}</Text>
+                        </Box>
+                    </Box>
+                    <Text style={{ fontSize: 40, fontWeight: 900, lineHeight: 1.2, color: '#1A1616', width: 300 }}>{r[1]}</Text>
+                    <Box style={{ width: 590, flexDirection: 'row', alignItems: 'center', gap: 14 }}>
+                        <Box style={{ width: 28, height: 4, background: '#E19825' }} />
+                        <Text style={{ fontSize: 19, lineHeight: 1.5, color: '#4B5563' }}>{r[2]}</Text>
+                    </Box>
+                    <Text style={{ fontFamily: 'Courier New', fontSize: 22, fontWeight: 700, color: '#C42819', width: 80, textAlign: 'right' }}>{r[3]}</Text>
+                </Box>
+            ))}
+        </Box>
+    </Box>
+
+    <Box style={{ position: 'absolute', left: 0, top: 660, width: 1280, height: 9, flexDirection: 'row' }}>
+        <Box style={{ width: 678, height: 9, background: '#C42819' }} />
+        <Box style={{ width: 333, height: 9, background: '#EE5530' }} />
+        <Box style={{ width: 269, height: 9, background: '#F26B40' }} />
+    </Box>
+    <Text style={{ position: 'absolute', left: 70, top: 678, fontSize: 14, letterSpacing: 2, color: '#6B7280', lineHeight: 1 }}>年度党课宣讲</Text>
+    <Text style={{ position: 'absolute', right: 70, top: 678, fontFamily: 'Courier New', fontSize: 14, color: '#6B7280', lineHeight: 1 }}>02 / 12</Text>
+</Slide>

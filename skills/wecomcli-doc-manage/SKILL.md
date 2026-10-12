@@ -83,7 +83,7 @@ wecom-cli doc search --json '<JSON 参数>'
 
 #### 使用规则
 
-- **`ppt` / `journal` / `collect` / `mind` / `flow` 目前没有任何下游 skill 或 CLI 能读取正文**，命中这些类型且用户要看内容时，直接告知暂不支持读取，引导用户用 `doc_url` 在企业微信客户端内打开查看。
+- **`journal` / `collect` / `mind` / `flow` 目前没有任何下游 skill 或 CLI 能读取正文**，命中这些类型且用户要看内容时，直接告知暂不支持读取，引导用户用 `doc_url` 在企业微信客户端内打开查看。
 - **参数组合按意图分派（含必填约束）**：先判定用户意图，再按对应分支组装参数。禁止所有参数均不传或仅传空值（如 `{}`）。
   - (a) 按内容找 → `keywords`（必填，不得为空数组） + `search_scope=title_content` + `sort_by=best_match`
   - (b) "我最近浏览 / 与我相关 / 我作为成员 / 包含我的文档" → `visitor_userids=[<当前 userid>]`（必填，不得为空） + `sort_by=best_match` + `opened_after`（默认近 7 天）
