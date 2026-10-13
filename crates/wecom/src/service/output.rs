@@ -66,15 +66,27 @@ impl DownloadResult {
 /// (`0o600` on Unix) so that no window exists between the existence check and
 /// creation (TOCTOU-safe).  The caller later writes into `file` and the path
 /// is reported back to the user.
+///
+/// A reservation starts out *unkept*: when the operation fails before the
+/// written content counts as a valid artifact, the orchestrator discards the
+/// file through its own write-end (`OutputFileInfo::rollback`); [`keep`](Self::keep)
+/// disarms that rollback.
 pub(super) struct OutputFileInfo {
     path: PathBuf,
     file: fs::FileWriter,
+    kept: bool,
 }
 
 impl OutputFileInfo {
-    /// Append a single line (with trailing newline) to the output file.
+    /// Append a single line (with trailing newline) to the output file and
+    /// flush it to the kernel.
     ///
-    /// Used by the paginate loop to write each page as one NDJSON line.
+    /// Used by the paginate loop to write each page as one NDJSON line. The
+    /// per-page flush makes every written page durable on its own, so a
+    /// later-page failure keeps the pages already on disk (R2) without relying
+    /// on the final `result_ndjson` flush or on process exit. Pagination is
+    /// bounded by a network round-trip per page, so the flush cost is
+    /// negligible.
     pub(super) async fn write_line(&mut self, line: &str) -> Result<()> {
         for chunk in [line.as_bytes(), b"\n".as_slice()] {
             self.file
@@ -83,6 +95,11 @@ impl OutputFileInfo {
                 .map_err(|e| Error::io(format!("Failed to write to {}", self.path.display()), e))
                 .inspect_err(|e| tracing::error!(error = %e, "write output file failed"))?;
         }
+        self.file
+            .flush()
+            .await
+            .map_err(|e| Error::io(format!("Failed to flush {}", self.path.display()), e))
+            .inspect_err(|e| tracing::error!(error = %e, "flush output file failed"))?;
         Ok(())
     }
 
@@ -95,6 +112,38 @@ impl OutputFileInfo {
         let _ = self.file.flush().await;
         let size = self.file.metadata().await.ok().map(|m| m.len);
         DownloadResult::to_json(&self.path, size, "application/x-ndjson")
+    }
+
+    /// Mark the file as kept: a later failure must not roll it back (idempotent).
+    ///
+    /// Called once the written content counts as a meaningful artifact: the
+    /// first NDJSON page is on disk, the JSON body is synced, or the binary
+    /// stream completed.
+    pub(super) fn keep(&mut self) {
+        self.kept = true;
+    }
+
+    /// Whether the file has been marked as kept.
+    pub(super) fn is_kept(&self) -> bool {
+        self.kept
+    }
+
+    /// Roll back the reservation: discard the created file through its own
+    /// write-end (best-effort; a failed removal is logged, not propagated).
+    ///
+    /// Discarding via the write-end — rather than a path-based delete — is what
+    /// keeps the rollback off any user-facing delete policy the `Fs`
+    /// implementor attaches to `remove_file` (approval prompt, recycle bin).
+    pub(super) async fn rollback(self) {
+        let OutputFileInfo { path, file, .. } = self;
+        if let Err(error) = file.discard().await {
+            tracing::warn!(%error, path = %path.display(), "rollback output file failed");
+        }
+    }
+
+    /// Resolved path of the reserved file.
+    pub(super) fn path(&self) -> &Path {
+        &self.path
     }
 }
 
@@ -112,6 +161,7 @@ pub(super) async fn create_output_file(fs: &dyn fs::Fs, path: &Path) -> Result<O
     Ok(OutputFileInfo {
         path: resolved,
         file,
+        kept: false,
     })
 }
 
@@ -135,6 +185,7 @@ pub(super) async fn create_output_file_unique(
     Ok(OutputFileInfo {
         path: resolved,
         file,
+        kept: false,
     })
 }
 
@@ -142,7 +193,7 @@ pub(super) async fn create_output_file_unique(
 /// user-facing result string.
 ///
 /// Priority:
-/// 1. `output` – write into the pre-reserved file.
+/// 1. `output` – write into the pre-reserved file, sync it, then mark it kept.
 /// 2. Otherwise – return `data` verbatim for stdout.
 ///
 /// `--output-dir` deliberately has no role here: it only governs downloaded
@@ -151,9 +202,9 @@ pub(super) async fn create_output_file_unique(
 /// shell redirection.
 pub(super) async fn handle_json_output(
     data: serde_json::Value,
-    output_file: Option<OutputFileInfo>,
+    output_file: Option<&mut OutputFileInfo>,
 ) -> Result<serde_json::Value> {
-    let Some(mut output) = output_file else {
+    let Some(output) = output_file else {
         return Ok(data);
     };
     // Write into the pre-reserved file and sync to disk.
@@ -171,6 +222,10 @@ pub(super) async fn handle_json_output(
         .inspect_err(|e| tracing::error!(error = %e, "sync output file failed"))?;
 
     let size = output.file.metadata().await.ok().map(|m| m.len);
+
+    // The synced body is a valid artifact: disarm the rollback.
+    output.keep();
+
     Ok(DownloadResult::to_json(
         &output.path,
         size,
@@ -182,59 +237,72 @@ pub(super) async fn handle_json_output(
 /// user-facing result string.
 ///
 /// Both paths use streaming I/O so that large files never need to be buffered
-/// entirely in memory.  When the server provides a `Content-Length` header the
-/// destination file is pre-allocated (`set_len`) before writing so the
-/// filesystem can reserve contiguous space up-front.
+/// entirely in memory.
 ///
 /// Priority:
-/// 1. `output` – stream into the pre-reserved file.
-/// 2. `output_dir` / default output dir (the run's cwd) – stream into a temp
-///    file first, then atomically rename into the target directory
-///    (TOCTOU-safe, `0o600`).
+/// 1. `output` – stream into the pre-reserved file; the caller that reserved
+///    it rolls it back when an unkept download fails.
+/// 2. `output_dir` / default output dir (the run's cwd) – create a uniquely
+///    named file in the target directory and stream into it; an interrupted
+///    download is rolled back here.
 pub(super) async fn handle_binary_output(
     options: &super::RunOptions<'_>,
     response: wecom_transport::HttpResponse,
-    output_file: Option<OutputFileInfo>,
+    output_file: Option<&mut OutputFileInfo>,
     method_path: &[String],
 ) -> Result<serde_json::Value> {
-    let output = if let Some(file_info) = output_file {
-        file_info
-    } else {
-        let target = options.output_dir();
-        let fs = options.run.get_fs();
-        let filename = fs::content_disposition_filename(response.headers())
-            .unwrap_or_else(|| format!("{}.bin", method_path.join("_")));
-        create_output_file_unique(fs.as_ref(), &target.join(fs::sanitize_filename(&filename)))
-            .await?
-    };
-
-    let mut file = output.file;
-
-    // Pre-allocate disk space when the server tells us the size
-    // (prefers Content-Range total over Content-Length).  Best-effort:
-    // a failed pre-allocation must not abort the download.
-    if let Some(len) = response.total_length()
-        && let Err(e) = file.set_len(len).await
-    {
-        tracing::warn!(error = %e, path = %output.path.display(), "file pre-allocation failed; continuing");
+    // With --output the reservation is owned by the caller, which rolls it
+    // back on failure.
+    if let Some(output) = output_file {
+        return finalize_download(output, response).await;
     }
 
+    // Without --output, create a uniquely named file in the target directory
+    // and roll that one back here if the stream is interrupted (R3).
+    let fs = options.run.get_fs();
+    let filename = fs::content_disposition_filename(response.headers())
+        .unwrap_or_else(|| format!("{}.bin", method_path.join("_")));
+    let dest = options.output_dir().join(fs::sanitize_filename(&filename));
+    let mut local = create_output_file_unique(fs.as_ref(), &dest).await?;
+
+    match finalize_download(&mut local, response).await {
+        Ok(result) => Ok(result),
+        Err(e) => {
+            local.rollback().await;
+            Err(e)
+        }
+    }
+}
+
+/// Stream `response` into `output`, reject an empty body, mark the file kept
+/// and build the user-facing download result.
+///
+/// `stream_to_file` already calls `sync_all`; the size is read from the
+/// just-written handle (fd-level, no second path-based lookup). A *completed*
+/// stream is a faithful save and is kept even when it yielded zero bytes (an
+/// empty file the server legitimately returned); only a stream error
+/// (incomplete download) propagates and leaves the file to the caller's
+/// rollback.
+async fn finalize_download(
+    output: &mut OutputFileInfo,
+    response: wecom_transport::HttpResponse,
+) -> Result<serde_json::Value> {
     let content_type = response
         .headers()
         .get("Content-Type")
         .and_then(|s| s.to_str().ok())
         .map(str::to_owned);
 
-    fs::stream_to_file(&mut file, &output.path, response)
+    fs::stream_to_file(&mut output.file, &output.path, response)
         .await
         .inspect_err(|e| tracing::error!(error = %e, "stream to file failed"))?;
 
-    // `stream_to_file` already called `sync_all`; read the size from the
-    // same handle (fd-level, no second path-based lookup).
-    let size = file.metadata().await.ok().map(|m| m.len);
+    let size = output.file.metadata().await.ok().map(|m| m.len);
+
+    output.keep();
 
     Ok(DownloadResult::to_json(
-        &output.path,
+        output.path(),
         size,
         content_type
             .as_deref()
@@ -250,8 +318,10 @@ mod tests {
     //! ### 关键接口
     //! - [create_output_file] — 原子创建输出文件（TOCTOU-safe）
     //! - [create_output_file_unique] — 带唯一后缀冲突避免的文件创建
+    //! - [OutputFileInfo::keep] / [OutputFileInfo::is_kept] — 预留文件的保留标志
     //! - [handle_json_output] — 按优先级写入 JSON 数据（--output 文件 > stdout）
     //! - [handle_binary_output] — 流式写入二进制响应到目标路径（--output > output_dir/默认 cwd）
+    //! - [finalize_download] — 流式落盘、空结果拒绝、keep 并构建下载结果
     //! - [DownloadResult::to_json] — 生成下载结果 JSON
     //! - [DownloadResult::json_schema] / [DownloadResult::ts_doc] — 由 schemars 从结构体派生 schema / TS
     //!
@@ -260,16 +330,22 @@ mod tests {
     //! - 空文件 → DownloadResult 的 size 为 0
     //! - 无 output_file/output_dir → handle_json_output 原样返回数据
     //! - 同名文件冲突 → create_output_file_unique 追加随机后缀
+    //! - 写入/流式过程中断 → 文件未被 keep，由创建方（上层或本函数）回退
+    //! - rollback：discard 成功 → 文件消失；discard 失败 → 只记 warn（错误不传播、已写内容保留）
+    //! - 二进制响应为空（0 字节）但流正常结束 → 保留（保存场景忠实落盘，仅流中断才回退）
     //! - schema / TS 均由 #[derive(schemars::JsonSchema)] 派生，描述来自结构体 doc-comment
     //!
     //! ### 上下游交互
     //! - 上游：[execute::execute_and_output] 调用 handle_json_output/handle_binary_output
-    //! - 下游：依赖 [Fs]（原子写入、创建文件）、tokio 异步 I/O；schema/TS 经 [crate::schema] 派生
+    //! - 下游：依赖 [Fs]（原子写入、创建文件、删除文件）、tokio 异步 I/O；schema/TS 经 [crate::schema] 派生
 
     use std::fs;
+    use std::sync::Arc;
+    use std::sync::atomic::{AtomicUsize, Ordering};
 
     use assert_json_diff::assert_json_include;
     use tempfile::TempDir;
+    use wecom_fs::{FileMeta, FsFuture, FsWrite};
 
     use super::*;
 
@@ -469,18 +545,20 @@ mod tests {
         assert_json_diff::assert_json_eq!(result, data);
     }
 
-    /// P0：[handle_json_output] 写入到预分配的输出文件
-    /// 条件：提供了预分配的 output_file
-    /// 断言：返回 DownloadResult 结构，文件中包含写入的内容
+    /// P0：[handle_json_output] 写入到预留的输出文件并标记保留
+    /// 条件：提供了预留的 output_file
+    /// 断言：返回 DownloadResult 结构，文件中包含写入的内容，句柄 is_kept 为 true
     #[tokio::test]
     async fn handle_json_output_to_file() {
         let tmp = TempDir::new().unwrap();
         let fs_handle = wecom_fs::SandboxedFs::new();
         let path = tmp.path().join("out.json");
-        let output_file = create_output_file(&fs_handle, &path).await.unwrap();
+        let mut output_file = create_output_file(&fs_handle, &path).await.unwrap();
 
         let data = serde_json::json!({"foo": "bar"});
-        let result = handle_json_output(data, Some(output_file)).await.unwrap();
+        let result = handle_json_output(data, Some(&mut output_file))
+            .await
+            .unwrap();
 
         assert_json_diff::assert_json_eq!(
             result["content_type"],
@@ -488,6 +566,7 @@ mod tests {
         );
         let saved = fs::read_to_string(&path).unwrap();
         assert!(saved.contains("bar"));
+        assert!(output_file.is_kept(), "a synced JSON body must be kept");
     }
 
     /// 构造一个 octet-stream 测试响应（无 Content-Length / Content-Disposition）。
@@ -629,92 +708,266 @@ mod tests {
         );
     }
 
-    /// `set_len` 永远失败的 [fs::FileWriter] 替身：写入字节直接丢弃，
-    /// `sync_all` 成功，`metadata` 失败（调用侧均按 `.ok()` 容错处理）。
-    #[derive(Debug)]
-    struct FailSetLenWriter;
+    // ── keep / rollback ──
 
-    impl tokio::io::AsyncWrite for FailSetLenWriter {
+    /// P1：[OutputFileInfo::keep] 标记保留且幂等
+    /// 条件：新建 OutputFileInfo（初始未保留），连续调用 keep 两次
+    /// 断言：keep 前 is_kept 为 false，调用后为 true 且保持 true
+    #[tokio::test]
+    async fn keep_marks_reservation_and_is_idempotent() {
+        let tmp = TempDir::new().unwrap();
+        let fs_handle = wecom_fs::SandboxedFs::new();
+        let mut info = create_output_file(&fs_handle, &tmp.path().join("out.json"))
+            .await
+            .unwrap();
+
+        assert!(!info.is_kept(), "a fresh reservation starts unkept");
+        info.keep();
+        info.keep();
+        assert!(info.is_kept());
+    }
+
+    /// 写端桩：真实落盘（写入 / flush / sync / metadata 都送达文件），只在 `discard`
+    /// 上注入失败并计数——模拟「撤回失败、已写内容保留」这一条故障。
+    ///
+    /// 不用「把占位文件删掉再建同名目录」构造失败：真实写端持有打开句柄，Windows
+    /// 拒绝 unlink 打开中的文件，夹具会在被测代码之前失败。
+    struct UndiscardableWriter {
+        file: tokio::fs::File,
+        discards: Arc<AtomicUsize>,
+    }
+
+    impl tokio::io::AsyncWrite for UndiscardableWriter {
         fn poll_write(
-            self: std::pin::Pin<&mut Self>,
-            _cx: &mut std::task::Context<'_>,
+            mut self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
             buf: &[u8],
         ) -> std::task::Poll<std::io::Result<usize>> {
-            std::task::Poll::Ready(Ok(buf.len()))
+            std::pin::Pin::new(&mut self.file).poll_write(cx, buf)
         }
 
         fn poll_flush(
-            self: std::pin::Pin<&mut Self>,
-            _cx: &mut std::task::Context<'_>,
+            mut self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
         ) -> std::task::Poll<std::io::Result<()>> {
-            std::task::Poll::Ready(Ok(()))
+            std::pin::Pin::new(&mut self.file).poll_flush(cx)
         }
 
         fn poll_shutdown(
-            self: std::pin::Pin<&mut Self>,
-            _cx: &mut std::task::Context<'_>,
+            mut self: std::pin::Pin<&mut Self>,
+            cx: &mut std::task::Context<'_>,
         ) -> std::task::Poll<std::io::Result<()>> {
-            std::task::Poll::Ready(Ok(()))
+            std::pin::Pin::new(&mut self.file).poll_shutdown(cx)
         }
     }
 
-    // 注：本模块 `use std::fs;` 遮蔽了 `crate::fs`，这里用全路径引用 Fs 抽象类型。
-    impl crate::fs::FsWrite for FailSetLenWriter {
-        fn sync_all<'a>(&'a mut self) -> crate::fs::FsFuture<'a, ()> {
-            Box::pin(async { Ok(()) })
-        }
-
-        fn set_len<'a>(&'a mut self, len: u64) -> crate::fs::FsFuture<'a, ()> {
+    impl FsWrite for UndiscardableWriter {
+        fn sync_all<'a>(&'a mut self) -> FsFuture<'a, ()> {
             Box::pin(async move {
-                Err(wecom_fs::Error::other(
-                    format!("set_len({len}) unsupported").into(),
-                ))
+                self.file
+                    .sync_all()
+                    .await
+                    .map_err(|e| wecom_fs::Error::io("sync stub file", e))
             })
         }
 
-        fn metadata<'a>(&'a self) -> crate::fs::FsFuture<'a, crate::fs::FileMeta> {
-            Box::pin(async { Err(wecom_fs::Error::other("no metadata".into())) })
+        fn metadata<'a>(&'a self) -> FsFuture<'a, FileMeta> {
+            Box::pin(async move {
+                let meta = self
+                    .file
+                    .metadata()
+                    .await
+                    .map_err(|e| wecom_fs::Error::io("stat stub file", e))?;
+                Ok(FileMeta {
+                    len: meta.len(),
+                    modified: meta.modified().ok(),
+                    is_dir: meta.is_dir(),
+                    is_file: meta.is_file(),
+                })
+            })
+        }
+
+        fn discard(self: Box<Self>) -> FsFuture<'static, ()> {
+            let UndiscardableWriter { file, discards } = *self;
+            Box::pin(async move {
+                // 释放句柄但保留文件：真实写端 unlink 失败时同样留下文件。
+                drop(file);
+                discards.fetch_add(1, Ordering::SeqCst);
+                Err(wecom_fs::Error::other("injected discard failure".into()))
+            })
         }
     }
 
-    /// P1：[handle_binary_output] 预分配文件句柄且 set_len 失败时仍完成下载
-    /// 条件：传入 OutputFileInfo（其 writer 的 set_len 永远失败），响应带 Content-Length: 4
-    /// 断言：返回 Ok（预分配失败仅告警不中断），content_type 为 octet-stream，size 缺省
+    /// P2：[UndiscardableWriter] 夹具自检：写入真实落盘，只有 discard 被注入失败
+    /// 条件：对桩依次调用 write_all / flush / shutdown / sync_all / metadata / discard
+    /// 断言：写入与元数据可用（len 为 7、盘上内容为 "partial"），discard 返回 Err 且计数为 1
     #[tokio::test]
-    async fn binary_output_with_reserved_file_survives_set_len_failure() {
+    async fn undiscardable_writer_fixture_self_check() {
+        let discards = Arc::new(AtomicUsize::new(0));
+        let tmp = TempDir::new().unwrap();
+        let path = tmp.path().join("self-check.bin");
+        let file = tokio::fs::File::create(&path).await.unwrap();
+        let mut writer: Box<UndiscardableWriter> = Box::new(UndiscardableWriter {
+            file,
+            discards: Arc::clone(&discards),
+        });
+
+        writer.write_all(b"partial").await.unwrap();
+        writer.flush().await.unwrap();
+        writer.sync_all().await.unwrap();
+        assert_eq!(writer.metadata().await.unwrap().len, 7);
+        writer.shutdown().await.unwrap();
+        assert_eq!(fs::read(&path).unwrap(), b"partial");
+
+        assert!(
+            writer.discard().await.is_err(),
+            "the stub injects a discard failure"
+        );
+        assert_eq!(discards.load(Ordering::SeqCst), 1);
+    }
+
+    /// P2：[OutputFileInfo::rollback] discard 失败只记 warn，不 panic 也不向上传播
+    /// 条件：写端桩真实落盘（先写入 "partial"），discard 固定返回 Err
+    /// 断言：rollback 正常返回、discard 恰好被调用一次，且文件连同已写内容留在盘上
+    #[tokio::test]
+    async fn rollback_swallows_discard_failure() {
+        let discards = Arc::new(AtomicUsize::new(0));
+        let tmp = TempDir::new().unwrap();
+        let path = tmp.path().join("out.bin");
+        let file = tokio::fs::File::create(&path).await.unwrap();
+        let mut info = OutputFileInfo {
+            path: path.clone(),
+            file: Box::new(UndiscardableWriter {
+                file,
+                discards: Arc::clone(&discards),
+            }),
+            kept: false,
+        };
+
+        info.file.write_all(b"partial").await.unwrap();
+
+        info.rollback().await;
+
+        assert_eq!(
+            discards.load(Ordering::SeqCst),
+            1,
+            "rollback must attempt exactly one discard"
+        );
+        assert_eq!(
+            fs::read(&path).unwrap(),
+            b"partial",
+            "a failed discard must leave the written content on disk"
+        );
+    }
+
+    /// 构造一个 octet-stream 响应，body 由调用方提供。
+    fn octet_stream_response(body: wecom_transport::ByteStream) -> wecom_transport::HttpResponse {
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            reqwest::header::CONTENT_TYPE,
+            reqwest::header::HeaderValue::from_static("application/octet-stream"),
+        );
+        wecom_transport::HttpResponse::new("http://test/file", 200, headers, body)
+    }
+
+    /// 构造首块之后报错的 octet-stream 响应（模拟流中断）。
+    fn interrupted_response() -> wecom_transport::HttpResponse {
+        let body: wecom_transport::ByteStream = Box::pin(futures::stream::iter(vec![
+            Ok(bytes::Bytes::from_static(b"partial")),
+            Err(wecom_transport::Error::Http {
+                message: "stream interrupted".into(),
+                endpoint: "test://file".into(),
+                status: 500,
+            }),
+        ]));
+        octet_stream_response(body)
+    }
+
+    /// P0：[handle_binary_output] --output 分支流式写入成功后标记保留
+    /// 条件：预留给 OutputFileInfo 的 --output 句柄 + 非空 octet-stream 响应
+    /// 断言：size 与 body 一致、content_type 回显，句柄 is_kept 为 true 且文件内容一致
+    #[tokio::test]
+    async fn binary_output_reserved_file_kept_after_success() {
         let tmp = TempDir::new().unwrap();
         let client = crate::Client::builder()
-            .config_dir(tmp.path())
+            .config_dir(tmp.path().join("config"))
+            .cwd(tmp.path())
             .workspace_fs(std::sync::Arc::new(wecom_fs::SandboxedFs::new()))
             .build()
             .unwrap();
         let run = client.run(vec!["test".into()]);
         let options = crate::service::RunOptions::new(&run);
 
-        let body: wecom_transport::ByteStream = Box::pin(futures::stream::once(async {
-            Ok(bytes::Bytes::from_static(b"data"))
-        }));
-        let mut headers = reqwest::header::HeaderMap::new();
-        headers.insert(
-            reqwest::header::CONTENT_LENGTH,
-            reqwest::header::HeaderValue::from_static("4"),
-        );
-        let response = wecom_transport::HttpResponse::new("http://test/file", 200, headers, body);
+        let fs_handle = wecom_fs::SandboxedFs::new();
+        let path = tmp.path().join("out.bin");
+        let mut info = create_output_file(&fs_handle, &path).await.unwrap();
 
-        let info = OutputFileInfo {
-            path: tmp.path().join("sink.bin"),
-            file: Box::new(FailSetLenWriter),
-        };
-        let result = handle_binary_output(&options, response, Some(info), &["m".into()])
-            .await
-            .expect("set_len failure must not abort the download");
+        let result =
+            handle_binary_output(&options, test_response(), Some(&mut info), &["m".into()])
+                .await
+                .expect("streaming into the reserved file should succeed");
+
         assert_json_diff::assert_json_eq!(
             result["content_type"],
             serde_json::json!("application/octet-stream")
         );
-        assert!(
-            result.get("size").is_none(),
-            "size should be absent: {result}"
+        assert_json_diff::assert_json_eq!(result["size"], serde_json::json!(8));
+        assert!(info.is_kept(), "a completed download must be kept");
+        assert_eq!(fs::read(&path).unwrap(), b"artifact");
+    }
+
+    /// P1：[handle_binary_output] 空二进制（0 字节）完整下载被保留
+    /// 条件：--output 句柄 + 0 字节 body 的 200 octet-stream 响应（流正常结束）
+    /// 断言：返回 Ok（size=0），句柄被 keep，空文件保留在盘上（保存场景忠实落盘）
+    #[tokio::test]
+    async fn binary_output_empty_body_is_saved() {
+        let tmp = TempDir::new().unwrap();
+        let client = crate::Client::builder()
+            .config_dir(tmp.path().join("config"))
+            .cwd(tmp.path())
+            .workspace_fs(std::sync::Arc::new(wecom_fs::SandboxedFs::new()))
+            .build()
+            .unwrap();
+        let run = client.run(vec!["test".into()]);
+        let options = crate::service::RunOptions::new(&run);
+
+        let fs_handle = wecom_fs::SandboxedFs::new();
+        let path = tmp.path().join("empty.bin");
+        let mut info = create_output_file(&fs_handle, &path).await.unwrap();
+
+        let response = octet_stream_response(Box::pin(futures::stream::empty()));
+        let result = handle_binary_output(&options, response, Some(&mut info), &["m".into()])
+            .await
+            .expect("a completed empty download must be saved");
+        assert_json_diff::assert_json_eq!(result["size"], serde_json::json!(0));
+        assert!(info.is_kept(), "a completed empty download must be kept");
+        assert!(path.exists(), "the empty file must stay on disk");
+    }
+
+    /// P0：[handle_binary_output] 无 --output 时流中断回退半成品
+    /// 条件：无 --output（默认落盘 cwd）+ 首块后中断的 octet-stream 响应
+    /// 断言：返回 Err，且 cwd 下不残留截断文件
+    #[tokio::test]
+    async fn binary_output_interrupted_stream_leaves_nothing() {
+        let tmp = TempDir::new().unwrap();
+        let cwd = tmp.path().join("cwd");
+        std::fs::create_dir(&cwd).unwrap();
+        let client = crate::Client::builder()
+            .config_dir(tmp.path().join("config"))
+            .cwd(&cwd)
+            .workspace_fs(std::sync::Arc::new(wecom_fs::SandboxedFs::new()))
+            .build()
+            .unwrap();
+        let run = client.run(vec!["test".into()]);
+        let options = crate::service::RunOptions::new(&run);
+
+        let result =
+            handle_binary_output(&options, interrupted_response(), None, &["m".into()]).await;
+        assert!(result.is_err(), "an interrupted stream must fail");
+        assert_eq!(
+            std::fs::read_dir(&cwd).unwrap().count(),
+            0,
+            "no truncated file may be left behind"
         );
     }
 }

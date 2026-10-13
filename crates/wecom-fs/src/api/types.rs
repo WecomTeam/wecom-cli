@@ -28,17 +28,28 @@ pub trait FsRead: AsyncRead + Send + Unpin {
 pub type FileReader = Box<dyn FsRead>;
 
 /// Write-end of a file created via [`crate::Fs::create_file`] /
-/// [`crate::Fs::create_file_unique`], with durability and pre-allocation
-/// support.
+/// [`crate::Fs::create_file_unique`], with durability support and the ability
+/// to discard (roll back) the file it created.
 pub trait FsWrite: AsyncWrite + Send + Unpin {
     /// Flush buffers and sync file content and metadata to stable storage.
     fn sync_all<'a>(&'a mut self) -> FsFuture<'a, ()>;
 
-    /// Pre-allocate (or truncate) the file to `len` bytes.
-    fn set_len<'a>(&'a mut self, len: u64) -> FsFuture<'a, ()>;
-
     /// Metadata of the opened file (fd-level).
     fn metadata<'a>(&'a self) -> FsFuture<'a, FileMeta>;
+
+    /// Discard the file this write-end created: close the handle and remove
+    /// that file. Used to roll back an output that never became a valid
+    /// artifact (a reservation whose first request failed, an interrupted
+    /// download).
+    ///
+    /// This is **not** a user-directed deletion: it undoes *this* handle's own
+    /// `create_file`, so it must bypass any user-facing delete policy an
+    /// implementor attaches to [`crate::Fs::remove_file`] (approval prompt,
+    /// recycle bin, overwrite backup). Because the write-end itself carries the
+    /// fact "I created this file", the target is never expressed as a
+    /// free-standing path and cannot be redirected at another file. A target
+    /// already gone counts as success.
+    fn discard(self: Box<Self>) -> FsFuture<'static, ()>;
 }
 
 /// Boxed write-end returned by [`crate::Fs::create_file`] /

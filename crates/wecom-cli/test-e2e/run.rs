@@ -107,4 +107,22 @@ mod sandbox_paths {
         use super::*;
         include!("cases/sandbox_paths/008-config-dir-under-cwd-denied/test.rs");
     }
+    mod output_reserved_rolled_back_on_first_page_failure {
+        use super::*;
+        include!(
+            "cases/sandbox_paths/009-output-reserved-rolled-back-on-first-page-failure/test.rs"
+        );
+    }
+    mod ndjson_retained_after_first_page {
+        use super::*;
+        include!("cases/sandbox_paths/010-ndjson-retained-after-first-page/test.rs");
+    }
+    mod binary_download_interrupted_leaves_nothing {
+        use super::*;
+        include!("cases/sandbox_paths/011-binary-download-interrupted-leaves-nothing/test.rs");
+    }
+    mod binary_download_complete_retained {
+        use super::*;
+        include!("cases/sandbox_paths/012-binary-download-complete-retained/test.rs");
+    }
 }

@@ -792,3 +792,42 @@ async fn check_readable_rejects_relative_path() {
     let fs = SandboxedFs::new();
     assert!(fs.check_readable(Path::new("rel.txt")).await.is_err());
 }
+
+// ── FsWrite::discard ──
+
+/// P0：[FsWrite::discard] 删除本写端创建的文件（即便已写入部分内容）
+/// 条件：create_file 建文件并写入 "partial" 后调用 discard
+/// 断言：discard 返回 Ok，文件从磁盘移除（回退不限空文件）
+#[tokio::test]
+async fn created_file_discard_removes_written_file() {
+    use tokio::io::AsyncWriteExt;
+
+    let tmp = TempDir::new().unwrap();
+    let fs = fs_with_roots(&[tmp.path()]);
+    // Go through the `Fs` trait: the inherent `create_file` returns a bare
+    // `std::fs::File`, only the trait returns the `FileWriter` with `discard`.
+    let fs: &dyn Fs = &fs;
+    let path = tmp.path().join("out.bin");
+
+    let (real, mut writer) = fs.create_file(&path).await.unwrap();
+    writer.write_all(b"partial").await.unwrap();
+    assert!(real.exists());
+
+    writer.discard().await.unwrap();
+    assert!(!real.exists(), "discard must remove the created file");
+}
+
+/// P1：[FsWrite::discard] 正常 drop（不 discard）保留文件
+/// 条件：create_file 建文件后直接 drop 写端
+/// 断言：文件仍在磁盘上（只有 discard 才删，drop 只关句柄）
+#[tokio::test]
+async fn created_file_drop_keeps_file() {
+    let tmp = TempDir::new().unwrap();
+    let fs = fs_with_roots(&[tmp.path()]);
+    let fs: &dyn Fs = &fs;
+    let path = tmp.path().join("kept.bin");
+
+    let (real, writer) = fs.create_file(&path).await.unwrap();
+    drop(writer);
+    assert!(real.exists(), "a normal drop must keep the file");
+}

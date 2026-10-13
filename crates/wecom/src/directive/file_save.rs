@@ -21,6 +21,9 @@ struct FileSavePayload {
 
 /// 从 JSON 响应中提取标记了 `x-wecom-file-save` 的字段值，保存为独立文件，
 /// 并将 JSON 中对应的值替换为文件路径。
+///
+/// 写入或 sync 失败时先回退（best-effort 删除）该字段新建的文件，再返回错误：
+/// 半成品不算有效产物，也不残留指向它的 JSON 路径。
 #[tracing::instrument(
     level = "debug",
     name = "directive.file_save",
@@ -103,14 +106,25 @@ pub async fn process_file_save(
         .await
         .inspect_err(|e| tracing::warn!(error = %e, "create output file failed"))?;
 
-    file.write_all(&file_bytes)
-        .await
-        .map_err(|e| Error::io(format!("Failed to write to {}", output_path.display()), e))
-        .inspect_err(|e| tracing::warn!(error = %e, "write file failed"))?;
+    if let Err(e) = async {
+        file.write_all(&file_bytes)
+            .await
+            .map_err(|e| Error::io(format!("Failed to write to {}", output_path.display()), e))
+            .inspect_err(|e| tracing::warn!(error = %e, "write file failed"))?;
 
-    file.sync_all()
-        .await
-        .inspect_err(|e| tracing::warn!(error = %e, "sync file failed"))?;
+        file.sync_all()
+            .await
+            .inspect_err(|e| tracing::warn!(error = %e, "sync file failed"))?;
+
+        Ok::<(), Error>(())
+    }
+    .await
+    {
+        if let Err(error) = file.discard().await {
+            tracing::warn!(%error, path = %output_path.display(), "rollback saved file failed");
+        }
+        return Err(e);
+    }
 
     tracing::info!(path = %output_path.display(), size = file_bytes.len(), "Saved extra file");
 
@@ -148,20 +162,18 @@ mod tests {
     //! - JSON 路径不存在或值非字符串 → 空操作
     //! - content_encoding 为 "base64" → base64 解码；其他值 → 原始字节
     //! - 非法 base64 → 返回 Other Error
-    //! - decode / create / write / sync 任一失败 → Err 经 ? 传播
+    //! - decode / create 失败 → Err 经 ? 传播
+    //! - write / sync 失败 → 回退删除该字段的文件后再返回 Err（不残留半成品）
     //!
     //! ### 上下游交互
     //! - 上游：HTTP 响应处理后调用 process_file_save 执行文件保存指令
     //! - 下游：显式输出目录经 `run.get_fs()`，缺省请求目录经内部 Fs；经 [json_path] 读写 JSON 路径
 
     use std::fs;
-    use std::path::{Path, PathBuf};
-    use std::pin::Pin;
-    use std::task::{Context, Poll};
 
     use super::*;
     use crate::Client;
-    use crate::fs::{DirEntry, FileMeta, FileReader, FileWriter, Fs, FsAccess, FsFuture, FsWrite};
+    use crate::fs::testing::FailingWriterFs;
 
     /// Build a minimal [Client] anchored at [dir] ([cwd] = workspace root),
     /// with [config_dir] in a separate subdirectory — the default workspace_fs
@@ -400,134 +412,15 @@ mod tests {
         assert!(result.is_err());
     }
 
-    /// 写入桩：`poll_write` 或 `sync_all` 按 `fail_on_write` 注入失败。
-    #[derive(Debug)]
-    struct FailingWriter {
-        fail_on_write: bool,
-    }
-
-    impl tokio::io::AsyncWrite for FailingWriter {
-        fn poll_write(
-            self: Pin<&mut Self>,
-            _cx: &mut Context<'_>,
-            buf: &[u8],
-        ) -> Poll<std::io::Result<usize>> {
-            if self.fail_on_write {
-                Poll::Ready(Err(std::io::Error::other("injected write failure")))
-            } else {
-                Poll::Ready(Ok(buf.len()))
-            }
-        }
-
-        fn poll_flush(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
-            Poll::Ready(Ok(()))
-        }
-
-        fn poll_shutdown(self: Pin<&mut Self>, _cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
-            Poll::Ready(Ok(()))
-        }
-    }
-
-    impl FsWrite for FailingWriter {
-        fn sync_all<'a>(&'a mut self) -> FsFuture<'a, ()> {
-            Box::pin(async move {
-                if self.fail_on_write {
-                    Ok(())
-                } else {
-                    Err(wecom_fs::Error::other("injected sync failure".into()))
-                }
-            })
-        }
-
-        fn set_len<'a>(&'a mut self, _len: u64) -> FsFuture<'a, ()> {
-            Box::pin(async { Ok(()) })
-        }
-
-        fn metadata<'a>(&'a self) -> FsFuture<'a, FileMeta> {
-            Box::pin(async {
-                Ok(FileMeta {
-                    len: 0,
-                    modified: None,
-                    is_dir: false,
-                    is_file: true,
-                })
-            })
-        }
-    }
-
-    /// [Fs] 写失败桩：`create_file` 返回 [FailingWriter]，其余方法一律 Permission。
-    #[derive(Debug)]
-    struct FailingWriterFs {
-        fail_on_write: bool,
-    }
-
-    impl FailingWriterFs {
-        fn reject<T>() -> wecom_fs::Result<T> {
-            Err(wecom_fs::Error::Permission("FailingWriterFs stub".into()))
-        }
-
-        /// Build a minimal [Client] whose workspace_fs is this stub.
-        fn client(self, dir: &Path) -> Client {
-            Client::builder()
-                .workspace_fs(std::sync::Arc::new(self))
-                .config_dir(dir)
-                .build()
-                .unwrap()
-        }
-    }
-
-    impl Fs for FailingWriterFs {
-        fn metadata<'a>(&'a self, _path: &'a Path) -> FsFuture<'a, FileMeta> {
-            Box::pin(async { Self::reject() })
-        }
-
-        fn open_for_read<'a>(&'a self, _path: &'a Path) -> FsFuture<'a, (PathBuf, FileReader)> {
-            Box::pin(async { Self::reject() })
-        }
-
-        fn list_dir<'a>(&'a self, _dir: &'a Path) -> FsFuture<'a, Vec<DirEntry>> {
-            Box::pin(async { Self::reject() })
-        }
-
-        fn create_file<'a>(&'a self, path: &'a Path) -> FsFuture<'a, (PathBuf, FileWriter)> {
-            let fail_on_write = self.fail_on_write;
-            let path = path.to_path_buf();
-            Box::pin(async move {
-                Ok((
-                    path,
-                    Box::new(FailingWriter { fail_on_write }) as FileWriter,
-                ))
-            })
-        }
-
-        fn atomic_write<'a>(
-            &'a self,
-            _path: &'a Path,
-            _data: &'a [u8],
-            _mode: Option<u32>,
-        ) -> FsFuture<'a, PathBuf> {
-            Box::pin(async { Self::reject() })
-        }
-
-        fn remove_file<'a>(&'a self, _path: &'a Path) -> FsFuture<'a, ()> {
-            Box::pin(async { Self::reject() })
-        }
-
-        fn resolve<'a>(&'a self, _path: &'a Path, _access: FsAccess) -> FsFuture<'a, PathBuf> {
-            Box::pin(async { Self::reject() })
-        }
-    }
-
-    /// P1：[process_file_save] 写入内容失败时返回错误
-    /// 条件：Fs 桩的 writer 在 write_all 时注入失败
-    /// 断言：返回 Err（write 失败经 ? 传播）
+    /// P1：[process_file_save] 写入内容失败时返回错误且回退半成品
+    /// 条件：Fs 桩的 writer 在 write_all 时注入失败，create_file 已真实落盘
+    /// 断言：返回 Err，且创建过的文件已被回退删除
     #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试断言：确认半成品已被回退删除
     async fn process_file_save_write_failure_returns_err() {
         let dir = tempfile::tempdir().unwrap();
-        let client = FailingWriterFs {
-            fail_on_write: true,
-        }
-        .client(dir.path());
+        let stub = FailingWriterFs::new(true);
+        let client = stub.clone().client(dir.path());
         let run = client.run(vec!["test".into()]);
         let options = test_options(&run, dir.path());
 
@@ -543,18 +436,23 @@ mod tests {
 
         let result = process_file_save(&options, &mut data, &directive).await;
         assert!(result.is_err());
+
+        let created = stub.created_paths();
+        assert!(!created.is_empty(), "create_file must have been called");
+        for path in created {
+            assert!(!path.exists(), "partial file must be rolled back: {path:?}");
+        }
     }
 
-    /// P1：[process_file_save] sync 失败时返回错误
+    /// P1：[process_file_save] sync 失败时返回错误且回退半成品
     /// 条件：Fs 桩的 writer 写入成功但 sync_all 注入失败
-    /// 断言：返回 Err（sync 失败经 ? 传播）
+    /// 断言：返回 Err，且创建过的文件已被回退删除
     #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试断言：确认半成品已被回退删除
     async fn process_file_save_sync_failure_returns_err() {
         let dir = tempfile::tempdir().unwrap();
-        let client = FailingWriterFs {
-            fail_on_write: false,
-        }
-        .client(dir.path());
+        let stub = FailingWriterFs::new(false);
+        let client = stub.clone().client(dir.path());
         let run = client.run(vec!["test".into()]);
         let options = test_options(&run, dir.path());
 
@@ -570,46 +468,12 @@ mod tests {
 
         let result = process_file_save(&options, &mut data, &directive).await;
         assert!(result.is_err());
-    }
 
-    /// P2：[FailingWriterFs] 夹具自检：桩的全部方法可达且按配置失败/拒绝
-    /// 条件：对桩调用全部 Fs 方法与 writer 的 flush/shutdown/set_len/metadata/sync_all
-    /// 断言：Fs 非 create 方法均 Err(Permission)；fail_on_write=true 时 sync_all 为 Ok，
-    ///       false 时 write 成功而 sync_all 失败
-    #[tokio::test]
-    async fn failing_writer_fs_fixture_self_check() {
-        use tokio::io::AsyncWriteExt;
-
-        let fs = FailingWriterFs {
-            fail_on_write: true,
-        };
-        let path = Path::new("/anywhere.txt");
-
-        assert!(matches!(
-            fs.metadata(path).await,
-            Err(wecom_fs::Error::Permission(_))
-        ));
-        assert!(fs.open_for_read(path).await.is_err());
-        assert!(fs.list_dir(path).await.is_err());
-        assert!(fs.atomic_write(path, b"x", None).await.is_err());
-        assert!(fs.remove_file(path).await.is_err());
-        assert!(fs.resolve(path, FsAccess::Read).await.is_err());
-
-        let (_p, mut writer) = fs.create_file(path).await.unwrap();
-        writer.flush().await.unwrap();
-        writer.shutdown().await.unwrap();
-        writer.set_len(0).await.unwrap();
-        assert!(writer.metadata().await.unwrap().is_file);
-        // fail_on_write = true：失败注入在 write 侧，sync_all 走 Ok 侧
-        writer.sync_all().await.unwrap();
-
-        // 另一侧：write 成功、sync_all 失败
-        let fs2 = FailingWriterFs {
-            fail_on_write: false,
-        };
-        let (_p, mut writer2) = fs2.create_file(path).await.unwrap();
-        writer2.write_all(b"x").await.unwrap();
-        assert!(writer2.sync_all().await.is_err());
+        let created = stub.created_paths();
+        assert!(!created.is_empty(), "create_file must have been called");
+        for path in created {
+            assert!(!path.exists(), "partial file must be rolled back: {path:?}");
+        }
     }
 
     // ── file_save Object format ──

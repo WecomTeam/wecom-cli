@@ -24,11 +24,9 @@ use crate::{CliRunOutput, Error, Result, directive, fs, schema};
 )]
 pub(super) async fn execute_and_output(
     method: &MethodHandle<'_>,
-    mut options: RunOptions<'_>,
+    options: RunOptions<'_>,
 ) -> Result<()> {
     let client = method.client;
-
-    let output = options.run.get_output();
 
     let transport_backend = client.transport().name();
     tracing::info!(transport = transport_backend, "executing method");
@@ -53,9 +51,9 @@ pub(super) async fn execute_and_output(
         (vec![], false)
     };
 
-    let fs = options.run.get_fs();
+    let fs = std::sync::Arc::clone(options.run.get_fs());
 
-    // 预留 / 校验 output 路径
+    // 预留 / 校验 output 路径（首页请求之前：提前暴露写权限问题，fail fast）
     let mut output_file = match options.output_path.clone() {
         Some(path) => {
             let corrected = fs.resolve(&path, fs::FsAccess::Write).await?;
@@ -63,6 +61,38 @@ pub(super) async fn execute_and_output(
         }
         None => None,
     };
+
+    let result = run_request(method, options, &directives, multipart, &mut output_file).await;
+
+    // 唯一回退点：核心失败且预留文件未被保留 → 经写端 discard 撤回（不留空壳 /
+    // 半成品）。保留的（已 keep）文件随作用域正常关闭，不删。
+    if result.is_err()
+        && let Some(info) = output_file.take()
+        && !info.is_kept()
+    {
+        info.rollback().await;
+    }
+
+    result
+}
+
+/// Execute the request and route its response to the output destination.
+///
+/// Receives the pre-reserved `output_file` and marks it kept at the point
+/// where the written content counts as a valid artifact (first NDJSON page
+/// written, JSON body synced, binary stream completed); the caller rolls back
+/// any reservation left unkept after a failure.
+async fn run_request(
+    method: &MethodHandle<'_>,
+    mut options: RunOptions<'_>,
+    directives: &[directive::Directive<'_>],
+    multipart: bool,
+    output_file: &mut Option<output::OutputFileInfo>,
+) -> Result<()> {
+    let client = method.client;
+
+    let output = options.run.get_output();
+    let fs = options.run.get_fs();
 
     // Retain the authorized directory for every subsequent output consumer.
     if let Some(path) = options.output_dir.clone() {
@@ -83,14 +113,14 @@ pub(super) async fn execute_and_output(
             client,
             fs,
             &mut options.payload,
-            &directives,
+            directives,
             options.run.get_options(),
         )
         .await?;
     }
 
     // 检查 form-data 上传文件总大小不超过 100 MB
-    check_multipart_body_size(fs.as_ref(), &directives, 100 * 1024 * 1024).await?;
+    check_multipart_body_size(fs.as_ref(), directives, 100 * 1024 * 1024).await?;
 
     // ── 第一页请求 ──────────────────────────────────────────
 
@@ -100,7 +130,7 @@ pub(super) async fn execute_and_output(
         // multipart 经工厂包装（延迟物化）：每次发送/重放时重新打开文件构建独立表单。
         let fs = std::sync::Arc::clone(fs);
         let payload = options.payload.clone();
-        let file_fields = directive::multipart_file_fields(&directives);
+        let file_fields = directive::multipart_file_fields(directives);
         HttpRequestPayload::form(move || {
             let fs = std::sync::Arc::clone(&fs);
             let payload = payload.clone();
@@ -140,7 +170,7 @@ pub(super) async fn execute_and_output(
             let result = output::handle_binary_output(
                 &options,
                 response,
-                output_file,
+                output_file.as_mut(),
                 &method.method_path_segments,
             )
             .await?;
@@ -173,7 +203,7 @@ pub(super) async fn execute_and_output(
             },
             "single page mode, outputting result",
         );
-        let result = output::handle_json_output(data, output_file).await?;
+        let result = output::handle_json_output(data, output_file.as_mut()).await?;
 
         output.print(&serde_json::to_string_pretty(&result).unwrap_or_default());
         return Ok(());
@@ -184,7 +214,12 @@ pub(super) async fn execute_and_output(
     tracing::info!(max_pages = options.page_count, "entering paged mode",);
 
     // 确定写入目标：--output > stdout
-    write_page(output, &data, &mut output_file).await?;
+    write_page(output, &data, output_file).await?;
+
+    // 首页已写入即为有效部分结果：后续分页失败也保留（R2）。
+    if let Some(file) = output_file.as_mut() {
+        file.keep();
+    }
 
     // 翻页循环（从第 2 页开始）
     let mut total_pages: u32 = 1;
@@ -227,14 +262,14 @@ pub(super) async fn execute_and_output(
             &response_schema,
         )
         .await?;
-        write_page(output, &data, &mut output_file).await?;
+        write_page(output, &data, output_file).await?;
         total_pages += 1;
     }
 
     tracing::info!(total_pages = total_pages, "pagination complete");
 
     // 分页完成，如果写入了文件则打印路径信息
-    if let Some(output_file) = &mut output_file {
+    if let Some(output_file) = output_file.as_mut() {
         output.print(
             &serde_json::to_string_pretty(&output_file.result_ndjson().await).unwrap_or_default(),
         );
@@ -337,12 +372,15 @@ mod tests {
     //! ## 模块摘要：execute（请求执行与输出处理）
     //!
     //! ### 关键接口
-    //! - [execute_and_output] — 执行请求并处理响应（JSON/二进制、分页）
+    //! - [execute_and_output] — 执行请求并处理响应（JSON/二进制、分页），失败时回退未保留的 --output
     //! - [extract_next_cursor] — 从 JSON 响应中提取下一页游标
     //! - [write_page] — 输出一页 NDJSON 数据
     //!
     //! ### 关键分支与异常路径
     //! - execute_and_output：HTTP 传输分支；JSON/二进制响应分支；单页/分页分支
+    //! - 首页请求 / media upload 失败 → 未保留的 --output 预留文件回退（R1）
+    //! - 分页首页写入成功后失败 → 文件已 keep，保留部分 NDJSON（R2）
+    //! - 二进制流失败 → 未 keep → 回退（R3）
     //! - extract_next_cursor：has_more 为 false、next_cursor 为空、缺少字段等分支
     //!
     //! ### 上下游交互
@@ -557,17 +595,74 @@ mod tests {
         }
     }
 
-    /// P0：[execute_and_output] 非下载类方法携带 --output-dir：JSON 响应不产文件，
-    ///     但显式声明仍走 WriteDir 沙箱校验
-    /// 条件：方法响应为纯 JSON（无下载产物），output_dir 指向 roots 内/外两种取值
-    /// 断言：roots 内 → 调用成功且目录下不产生文件；roots 外 → 沙箱报错、请求不发出
-    #[tokio::test]
-    #[allow(clippy::disallowed_methods)] // 测试夹具直接落盘播种缓存，与被测 Fs 实现无关
-    async fn output_dir_validated_for_non_download_method() {
-        let tmp = tempfile::tempdir().unwrap();
-        let root = tmp.path().to_path_buf();
+    /// 脚本化后端的一次响应：JSON 成功、二进制响应或传输错误。
+    #[derive(Debug)]
+    enum ScriptedResponse {
+        Json(serde_json::Value),
+        Binary(wecom_transport::HttpResponse),
+        Error(wecom_transport::Error),
+    }
 
-        // 播种 catalog + detail 缓存，使 discovery 不走网络。
+    /// 测试夹具：按调用顺序返回预设结果的可编程后端，用于驱动首页 / 次页失败。
+    #[derive(Debug)]
+    struct ScriptedBackend {
+        responses: std::sync::Mutex<std::collections::VecDeque<ScriptedResponse>>,
+    }
+
+    impl ScriptedBackend {
+        fn new(responses: Vec<ScriptedResponse>) -> Self {
+            Self {
+                responses: std::sync::Mutex::new(responses.into()),
+            }
+        }
+    }
+
+    impl wecom_transport::TransportBackend for ScriptedBackend {
+        fn execute<'a>(
+            &'a self,
+            _endpoint: std::borrow::Cow<'a, wecom_transport::Endpoint>,
+            _payload: wecom_transport::HttpRequestPayload,
+            _options: wecom_transport::RequestOptions,
+        ) -> std::pin::Pin<
+            Box<
+                dyn std::future::Future<
+                        Output = std::result::Result<
+                            wecom_transport::TransportResponse,
+                            wecom_transport::Error,
+                        >,
+                    > + Send
+                    + 'a,
+            >,
+        > {
+            let response =
+                self.responses
+                    .lock()
+                    .unwrap()
+                    .pop_front()
+                    .unwrap_or(ScriptedResponse::Error(wecom_transport::Error::Config(
+                        "scripted backend exhausted".into(),
+                    )));
+            Box::pin(async move {
+                match response {
+                    ScriptedResponse::Json(result) => Ok(wecom_transport::TransportResponse::Json(
+                        wecom_transport::ExecuteOutput {
+                            result,
+                            extra: IndexMap::new(),
+                        },
+                    )),
+                    ScriptedResponse::Binary(response) => {
+                        Ok(wecom_transport::TransportResponse::Binary(response))
+                    }
+                    ScriptedResponse::Error(e) => Err(e),
+                }
+            })
+        }
+    }
+
+    /// 在 `root/cache` 播种 `svc.department.list`（纯 JSON 响应）的 discovery
+    /// 缓存，使 `client.method(...)` 不走网络。
+    #[allow(clippy::disallowed_methods)] // 测试夹具直接落盘播种缓存
+    fn seed_discovery_cache(root: &std::path::Path) {
         let cache_dir = root.join("cache");
         std::fs::create_dir_all(&cache_dir).unwrap();
         std::fs::write(
@@ -600,6 +695,65 @@ mod tests {
             .unwrap(),
         )
         .unwrap();
+    }
+
+    /// 在 `root/cache` 播种 `svc.department.send`（请求带 `x-wecom-file-upload`
+    /// 指令）的 discovery 缓存，使 `client.method(...)` 不走网络。
+    #[allow(clippy::disallowed_methods)] // 测试夹具直接落盘播种缓存
+    fn seed_upload_discovery_cache(root: &std::path::Path) {
+        let cache_dir = root.join("cache");
+        std::fs::create_dir_all(&cache_dir).unwrap();
+        std::fs::write(
+            cache_dir.join("catalog.json"),
+            serde_json::to_string(&json!({ "items": [{ "name": "svc" }] })).unwrap(),
+        )
+        .unwrap();
+        std::fs::write(
+            cache_dir.join("service_svc.json"),
+            serde_json::to_string(&json!({
+                "description": "test service",
+                "base_url": "https://test.example.com/",
+                "schemas": {
+                    "SendReq": {
+                        "type": "object",
+                        "properties": {
+                            "file": { "type": "string", "x-wecom-file-upload": true }
+                        }
+                    },
+                    "SendRes": { "type": "object" }
+                },
+                "methods": {},
+                "resources": {
+                    "department": {
+                        "methods": {
+                            "send": {
+                                "http_method": "POST",
+                                "path": "/send",
+                                "request": { "$ref": "SendReq" },
+                                "response": { "$ref": "SendRes" }
+                            }
+                        },
+                        "resources": {}
+                    }
+                }
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+    }
+
+    /// P0：[execute_and_output] 非下载类方法携带 --output-dir：JSON 响应不产文件，
+    ///     但显式声明仍走 WriteDir 沙箱校验
+    /// 条件：方法响应为纯 JSON（无下载产物），output_dir 指向 roots 内/外两种取值
+    /// 断言：roots 内 → 调用成功且目录下不产生文件；roots 外 → 沙箱报错、请求不发出
+    #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试夹具直接落盘播种缓存，与被测 Fs 实现无关
+    async fn output_dir_validated_for_non_download_method() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().to_path_buf();
+
+        // 播种 catalog + detail 缓存，使 discovery 不走网络。
+        seed_discovery_cache(&root);
 
         let client = crate::Client::builder()
             .config_dir(&root)
@@ -641,6 +795,178 @@ mod tests {
             err.render().contains("目标路径超出可访问范围"),
             "err = {}",
             err.render()
+        );
+    }
+
+    // ── execute_and_output：--output 预留文件的回退（R1 / R2） ──
+
+    /// 构造指向 roots 内、以 `[root]` 为唯一写 roots 的 client（脚本后端）。
+    fn scripted_client(root: &std::path::Path, responses: Vec<ScriptedResponse>) -> crate::Client {
+        crate::Client::builder()
+            .config_dir(root)
+            .workspace_fs(std::sync::Arc::new(wecom_fs::SandboxedFs::confined_to(&[
+                root,
+            ])))
+            .transport(
+                wecom_transport::TransportBuilder::new(ScriptedBackend::new(responses))
+                    .build()
+                    .unwrap(),
+            )
+            .build()
+            .unwrap()
+    }
+
+    /// P0：[execute_and_output] 首页请求失败时回退 --output 预留文件（R1）
+    /// 条件：--output 指向 roots 内新文件，脚本后端对首页请求返回传输错误
+    /// 断言：返回 Err 且预留文件已从磁盘删除（不留空壳）
+    #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试断言：确认空壳已被回退删除
+    async fn output_rolled_back_when_first_request_fails() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().to_path_buf();
+        seed_discovery_cache(&root);
+
+        let client = scripted_client(
+            &root,
+            vec![ScriptedResponse::Error(wecom_transport::Error::Config(
+                "first page failed".into(),
+            ))],
+        );
+        let method = client.method(&["svc", "department", "list"]).await.unwrap();
+        let run = client.run(vec!["test".into()]);
+        let out = root.join("out.json");
+        let mut options = RunOptions::new(&run);
+        options.output_path = Some(out.clone());
+
+        let err = execute_and_output(&method, options)
+            .await
+            .expect_err("a first-page failure must surface");
+        assert!(
+            err.render().contains("first page failed"),
+            "err = {}",
+            err.render()
+        );
+        assert!(!out.exists(), "reserved file must be rolled back");
+    }
+
+    /// P0：[execute_and_output] 首页 NDJSON 写入后分页失败保留文件（R2）
+    /// 条件：--output 指向 roots 内新文件 + page_count=2；首页 has_more + next_cursor，次页传输错误
+    /// 断言：返回 Err，文件存在且含首页 NDJSON 行（部分结果有效）
+    #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试断言：读回落盘 NDJSON
+    async fn ndjson_kept_after_first_page_on_later_failure() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().to_path_buf();
+        seed_discovery_cache(&root);
+
+        let client = scripted_client(
+            &root,
+            vec![
+                ScriptedResponse::Json(json!({
+                    "departments": [{"id": "1"}],
+                    "has_more": true,
+                    "next_cursor": "cursor_1"
+                })),
+                ScriptedResponse::Error(wecom_transport::Error::Config(
+                    "second page failed".into(),
+                )),
+            ],
+        );
+        let method = client.method(&["svc", "department", "list"]).await.unwrap();
+        let run = client.run(vec!["test".into()]);
+        let out = root.join("out.ndjson");
+        let mut options = RunOptions::new(&run);
+        options.output_path = Some(out.clone());
+        options.page_count = Some(2);
+
+        let err = execute_and_output(&method, options)
+            .await
+            .expect_err("a later-page failure must surface");
+        assert!(
+            err.render().contains("second page failed"),
+            "err = {}",
+            err.render()
+        );
+
+        let content = std::fs::read_to_string(&out).unwrap();
+        let lines: Vec<&str> = content.trim().lines().collect();
+        assert_eq!(lines.len(), 1, "only the first page is on disk: {content}");
+        let first: serde_json::Value = serde_json::from_str(lines[0]).unwrap();
+        assert_json_diff::assert_json_include!(
+            actual: first,
+            expected: json!({"departments": [{"id": "1"}]})
+        );
+    }
+
+    /// P1：[execute_and_output] 预留后 media upload 失败同样回退（R1）
+    /// 条件：payload 带存在的本地文件 + schema 标记 x-wecom-file-upload，上传请求传输错误
+    /// 断言：返回 Err 且 --output 预留文件已删除（首页请求未发出）
+    #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试夹具播种上传源文件 / 断言回退结果
+    async fn output_rolled_back_when_media_upload_fails() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().to_path_buf();
+        seed_upload_discovery_cache(&root);
+        let upload_src = root.join("upload.bin");
+        std::fs::write(&upload_src, b"data").unwrap();
+
+        let client = scripted_client(
+            &root,
+            vec![ScriptedResponse::Error(wecom_transport::Error::Config(
+                "upload failed".into(),
+            ))],
+        );
+        let method = client.method(&["svc", "department", "send"]).await.unwrap();
+        let run = client.run(vec!["test".into()]);
+        let out = root.join("out.json");
+        let mut options = RunOptions::new(&run);
+        options.output_path = Some(out.clone());
+        options.payload = json!({ "file": upload_src.to_string_lossy() });
+
+        let err = execute_and_output(&method, options)
+            .await
+            .expect_err("a media-upload failure must surface");
+        assert!(
+            err.render().contains("upload failed"),
+            "err = {}",
+            err.render()
+        );
+        assert!(!out.exists(), "reserved file must be rolled back");
+    }
+
+    /// P1：[execute_and_output] 空二进制（0 字节）完整下载时 --output 预留文件被保留
+    /// 条件：--output 指向 roots 内新文件，脚本后端返回 0 字节的 octet-stream 响应（流正常结束）
+    /// 断言：返回 Ok，预留文件保留在盘上且为 0 字节（保存场景忠实落盘）
+    #[tokio::test]
+    #[allow(clippy::disallowed_methods)] // 测试断言：确认空文件保留在盘上
+    async fn output_kept_on_empty_binary() {
+        let tmp = tempfile::tempdir().unwrap();
+        let root = tmp.path().to_path_buf();
+        seed_discovery_cache(&root);
+
+        let body: wecom_transport::ByteStream = Box::pin(futures::stream::empty());
+        let mut headers = reqwest::header::HeaderMap::new();
+        headers.insert(
+            reqwest::header::CONTENT_TYPE,
+            reqwest::header::HeaderValue::from_static("application/octet-stream"),
+        );
+        let response = wecom_transport::HttpResponse::new("http://test/file", 200, headers, body);
+
+        let client = scripted_client(&root, vec![ScriptedResponse::Binary(response)]);
+        let method = client.method(&["svc", "department", "list"]).await.unwrap();
+        let run = client.run(vec!["test".into()]);
+        let out = root.join("empty.bin");
+        let mut options = RunOptions::new(&run);
+        options.output_path = Some(out.clone());
+
+        execute_and_output(&method, options)
+            .await
+            .expect("a completed empty download must be saved");
+        assert!(out.exists(), "the empty file must be kept on disk");
+        assert_eq!(
+            std::fs::metadata(&out).unwrap().len(),
+            0,
+            "the saved file must be 0 bytes"
         );
     }
 }

@@ -17,9 +17,10 @@
 
 use std::path::{Path, PathBuf};
 use std::pin::Pin;
+use std::sync::Arc;
 use std::task::{Context, Poll};
 
-use super::{SandboxedFs, blocking, io};
+use super::{Policy, SandboxedFs, blocking, io};
 use crate::api::{
     DirEntry, Error, FileMeta, FileReader, FileWriter, Fs, FsAccess, FsFuture, FsRead, FsWrite,
     Result,
@@ -104,8 +105,7 @@ fn file_meta_from_std(m: &std::fs::Metadata) -> FileMeta {
     }
 }
 
-/// Tokio file handle wrapped to satisfy the [`FsRead`] / [`FsWrite`] stream
-/// contracts.
+/// Read-end: a tokio file handle satisfying the [`FsRead`] contract.
 struct TokioFile(tokio::fs::File);
 
 impl tokio::io::AsyncRead for TokioFile {
@@ -115,36 +115,6 @@ impl tokio::io::AsyncRead for TokioFile {
         buf: &mut tokio::io::ReadBuf<'_>,
     ) -> Poll<std::io::Result<()>> {
         Pin::new(&mut self.0).poll_read(cx, buf)
-    }
-}
-
-impl tokio::io::AsyncWrite for TokioFile {
-    fn poll_write(
-        mut self: Pin<&mut Self>,
-        cx: &mut Context<'_>,
-        buf: &[u8],
-    ) -> Poll<std::io::Result<usize>> {
-        Pin::new(&mut self.0).poll_write(cx, buf)
-    }
-
-    fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
-        Pin::new(&mut self.0).poll_flush(cx)
-    }
-
-    fn poll_shutdown(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
-        Pin::new(&mut self.0).poll_shutdown(cx)
-    }
-
-    fn poll_write_vectored(
-        mut self: Pin<&mut Self>,
-        cx: &mut Context<'_>,
-        bufs: &[std::io::IoSlice<'_>],
-    ) -> Poll<std::io::Result<usize>> {
-        Pin::new(&mut self.0).poll_write_vectored(cx, bufs)
-    }
-
-    fn is_write_vectored(&self) -> bool {
-        self.0.is_write_vectored()
     }
 }
 
@@ -159,29 +129,75 @@ impl FsRead for TokioFile {
     }
 }
 
-impl FsWrite for TokioFile {
+/// Write-end of a file created through [`SandboxedFs::create_file`]: the tokio
+/// handle plus the resolved path and write policy needed to discard it.
+///
+/// `discard` removes the created file through the same write policy — a plain
+/// policy-checked unlink, identical to `remove_file` at this layer (the two
+/// only diverge for implementors that attach user-facing semantics to
+/// `remove_file`). A normal drop just closes the handle and keeps the file.
+struct CreatedFile {
+    file: tokio::fs::File,
+    path: PathBuf,
+    policy: Arc<Policy>,
+}
+
+impl tokio::io::AsyncWrite for CreatedFile {
+    fn poll_write(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        buf: &[u8],
+    ) -> Poll<std::io::Result<usize>> {
+        Pin::new(&mut self.file).poll_write(cx, buf)
+    }
+
+    fn poll_flush(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.file).poll_flush(cx)
+    }
+
+    fn poll_shutdown(mut self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<std::io::Result<()>> {
+        Pin::new(&mut self.file).poll_shutdown(cx)
+    }
+
+    fn poll_write_vectored(
+        mut self: Pin<&mut Self>,
+        cx: &mut Context<'_>,
+        bufs: &[std::io::IoSlice<'_>],
+    ) -> Poll<std::io::Result<usize>> {
+        Pin::new(&mut self.file).poll_write_vectored(cx, bufs)
+    }
+
+    fn is_write_vectored(&self) -> bool {
+        self.file.is_write_vectored()
+    }
+}
+
+impl FsWrite for CreatedFile {
     fn sync_all<'a>(&'a mut self) -> FsFuture<'a, ()> {
         Box::pin(async move {
-            tokio::fs::File::sync_all(&self.0)
+            tokio::fs::File::sync_all(&self.file)
                 .await
                 .map_err(|e| Error::io("Failed to sync file", e))
         })
     }
 
-    fn set_len<'a>(&'a mut self, len: u64) -> FsFuture<'a, ()> {
-        Box::pin(async move {
-            tokio::fs::File::set_len(&self.0, len)
-                .await
-                .map_err(|e| Error::io("Failed to set file length", e))
-        })
-    }
-
     fn metadata<'a>(&'a self) -> FsFuture<'a, FileMeta> {
         Box::pin(async move {
-            let m = tokio::fs::File::metadata(&self.0)
+            let m = tokio::fs::File::metadata(&self.file)
                 .await
                 .map_err(|e| Error::io("Failed to read file metadata", e))?;
             Ok(file_meta_from_std(&m))
+        })
+    }
+
+    fn discard(self: Box<Self>) -> FsFuture<'static, ()> {
+        let CreatedFile { file, path, policy } = *self;
+        Box::pin(async move {
+            // Release this handle before unlinking (Windows refuses to remove a
+            // file with an open handle). Remove through the write policy — the
+            // same unlink `remove_file` performs at this layer.
+            drop(file);
+            blocking("discard", move || io::remove_file(&path, &policy)).await
         })
     }
 }
@@ -210,10 +226,12 @@ impl Fs for SandboxedFs {
     fn create_file<'a>(&'a self, path: &'a Path) -> FsFuture<'a, (PathBuf, FileWriter)> {
         Box::pin(async move {
             let (real, file) = SandboxedFs::create_file(self, path).await?;
-            Ok((
-                real,
-                Box::new(TokioFile(tokio::fs::File::from_std(file))) as FileWriter,
-            ))
+            let writer = CreatedFile {
+                file: tokio::fs::File::from_std(file),
+                path: real.clone(),
+                policy: Arc::clone(&self.write),
+            };
+            Ok((real, Box::new(writer) as FileWriter))
         })
     }
 

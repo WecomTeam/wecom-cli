@@ -131,14 +131,6 @@ async fn trait_default_read_to_string_and_create_file_unique() {
                     .map_err(|e| Error::io("sync write-end", e))
             })
         }
-        fn set_len<'a>(&'a mut self, len: u64) -> FsFuture<'a, ()> {
-            Box::pin(async move {
-                self.0
-                    .set_len(len)
-                    .await
-                    .map_err(|e| Error::io("truncate write-end", e))
-            })
-        }
         fn metadata<'a>(&'a self) -> FsFuture<'a, FileMeta> {
             Box::pin(async move {
                 let m = self
@@ -148,6 +140,11 @@ async fn trait_default_read_to_string_and_create_file_unique() {
                     .map_err(|e| Error::io("stat write-end", e))?;
                 Ok(meta_from(&m))
             })
+        }
+        /// This trait-default test double carries no path; the default-method
+        /// tests never exercise discard, so it is a no-op.
+        fn discard(self: Box<Self>) -> FsFuture<'static, ()> {
+            Box::pin(async { Ok(()) })
         }
     }
 
