@@ -99,7 +99,8 @@ Cargo workspace（`resolver = "3"`，edition 2024）+ pnpm workspace（仅管理
 ```bash
 pnpm fmt         # rustfmt +nightly 格式化全部 Rust 代码
 pnpm lint        # cargo clippy --workspace --all-targets -- -D warnings
-pnpm test        # 串行跑 test:default + test:skip-auth-check（cargo test --workspace --all-targets，feature 组合见 package.json）
+pnpm test        # 先跑技能测试，再串行跑 test:default + test:skip-auth-check（Rust feature 组合见 package.json）
+pnpm test:skills # 运行 Python 技能行为与静态契约测试
 pnpm test:doc    # cargo test --workspace --doc（只跑 doctest）
 pnpm check       # cargo check --workspace --all-targets
 
@@ -116,7 +117,7 @@ cargo test -p wecom-cli --test e2e --features custom-endpoint     # process-leve
 cargo test -p wecom --test e2e run::method_call                   # 单个用例
 ```
 
-Git 钩子由 lefthook 管理（`pnpm install` 时自动安装）：pre-commit 跑 rustfmt --check / clippy / eslint，commit-msg 跑 commitlint（Conventional Commits），pre-push 跑 `pnpm test` + `pnpm check`。
+Git 钩子由 lefthook 管理（`pnpm install` 时自动安装）：pre-commit 跑 rustfmt --check / clippy / eslint，commit-msg 跑 commitlint（Conventional Commits）；pre-push 对技能文件跑 `pnpm test:skills`，对 Rust 文件跑 `pnpm test` + `pnpm check`。
 
 ## 测试约定
 

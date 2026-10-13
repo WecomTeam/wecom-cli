@@ -18,7 +18,7 @@
 | [`wecomcli-media`](../skills/wecomcli-media/SKILL.md) | 媒体文件 | 在本地文件与 `media_id` 之间执行上传或下载；只负责文件搬运，不解析文件内容 |
 | [`wecomcli-message`](../skills/wecomcli-message/SKILL.md) | 消息 | 先查询最近会话，再使用列表返回的会话 ID 发送 Markdown、图片、文件、语音或视频 |
 | [`wecomcli-doc-manage`](../skills/wecomcli-doc-manage/SKILL.md) | 文档公共管理 | 搜索各类企业微信文档、查看最近浏览或创建的文档、修改名称、管理成员权限和文档加入规则 |
-| [`wecomcli-doc`](../skills/wecomcli-doc/SKILL.md) | 在线文档 | 新建或导入明确指定为 doc、docx、Word 或在线文档的文件，并读取、追加或覆盖正文内容 |
+| [`wecomcli-doc`](../skills/wecomcli-doc/SKILL.md) | 在线文档 | 新建或导入明确指定为 doc、docx、Word 或在线文档的文件，并读取、追加、局部替换或覆盖正文内容 |
 | [`wecomcli-sheet`](../skills/wecomcli-sheet/SKILL.md) | 在线表格 | 新建或导入在线表格，读取、修改和追加表格数据，以及管理子表 |
 | [`wecomcli-smartsheet`](../skills/wecomcli-smartsheet/SKILL.md) | 智能表格 | 读取和管理智能表格的数据、结构与样式，包括子表、字段、记录、视图和图表 |
 | [`wecomcli-smartpage`](../skills/wecomcli-smartpage/SKILL.md) | 智能文档 | 创建、导入、读取和修改智能文档，调整页面树结构，并获取内置智能表格信息；未指定类型的文档创建、写作或整理请求默认由该 Skill 承接 |

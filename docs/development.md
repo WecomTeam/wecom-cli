@@ -34,8 +34,12 @@
 ```bash
 # 全量检查 / 测试 / lint
 cargo check --workspace
-cargo test --workspace
+pnpm test
 cargo clippy --workspace --all-targets -- -D warnings
+
+# 按范围单独验证
+pnpm test:skills
+cargo test --workspace
 
 # 构建并运行
 cargo run -p wecom-cli -- --help
