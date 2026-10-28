@@ -82,7 +82,7 @@ wecom-cli sheet float image set --json '<JSON 参数>'
 ### 示例
 
 ```bash
-wecom-cli sheet float image set --json '{"docid":"e3_AHsALgbHACcCN1HvTa5u7SFefia8Y","sheet":"数据","image":"https://wdoc-76491.picgzc.qpic.cn/x3WIu_1764596460","anchor":"F50","width":320,"height":240}'
+wecom-cli sheet float image set --json '{"docid":"<docid>","sheet":"数据","image":"<image_url>","anchor":"F50","width":320,"height":240}'
 ```
 
 ### 使用规则
@@ -117,7 +117,7 @@ wecom-cli sheet float image update --json '<JSON 参数>'
 ### 示例
 
 ```bash
-wecom-cli sheet float image update --json '{"docid":"e3_AHsALgbHACcCN1HvTa5u7SFefia8Y","sheet":"数据","image_id":"1106075089","new_image":"https://wdoc-76491.picgzc.qpic.cn/6ddbdae8f"}'
+wecom-cli sheet float image update --json '{"docid":"<docid>","sheet":"数据","image_id":"<image_id>","new_image":"<image_url>"}'
 ```
 
 ### 使用规则
@@ -187,7 +187,7 @@ wecom-cli sheet float image batchset --json '<JSON 参数>'
 ### 示例
 
 ```bash
-wecom-cli sheet float image batchset --json '{"docid":"e3_AHsALgbHACcCN1HvTa5u7SFefia8Y","sheet":"数据","images":[{"image":"https://wdoc-76491.picgzc.qpic.cn/Iu_1764596460","anchor":"H2","width":200,"height":150},{"image":"https://wdoc-76491.picgzc.qpic.cn/b6ddbdae8f","anchor":"H10","width":200,"height":150}]}'
+wecom-cli sheet float image batchset --json '{"docid":"<docid>","sheet":"数据","images":[{"image":"<image_url>","anchor":"H2","width":200,"height":150},{"image":"<image_url>","anchor":"H10","width":200,"height":150}]}'
 ```
 
 ### 使用规则

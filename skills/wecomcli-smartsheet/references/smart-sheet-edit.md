@@ -286,7 +286,7 @@ wecom-cli smartsheet records delete --json '{"docid": "<docid>", "sheet_title": 
 
 **属性枚举值**：必须严格使用 `references/smart-sheet-field-types.md` 中定义的常量。
 
-**字段键名**：必须使用 field_title（字段名称，如 `品牌`），不能使用 field_id（如 `f04Gwj`）。
+**字段键名**：必须使用 field_title（字段名称，如 `品牌`），不能使用 field_id。
 
 **请求示例：**
 
@@ -316,7 +316,7 @@ wecom-cli smartsheet records delete --json '{"docid": "<docid>", "sheet_title": 
   "sheet_title": "任务列表",
   "records": [
     {
-      "record_id": "re9IqD",
+      "record_id": "<record_id>",
       "values": {
         "任务名称": "更新后的任务名",
         "状态": [{ "id": "opt_2", "text": "已完成", "style": 4 }]
@@ -332,7 +332,7 @@ wecom-cli smartsheet records delete --json '{"docid": "<docid>", "sheet_title": 
 {
   "docid": "DOCID",
   "sheet_title": "任务列表",
-  "records": [{ "record_id": "re9IqD" }, { "record_id": "rpS0P9" }]
+  "records": [{ "record_id": "<record_id>" }, { "record_id": "<record_id>" }]
 }
 ```
 > 提示：**values** 中的 key 必须是**字段名称**，可通过 `wecom-cli smartsheet fields list` 获取。各字段类型的 value 格式详见 `references/smart-sheet-record-values.md`。

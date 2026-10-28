@@ -179,10 +179,10 @@ wecom-cli disk files get --json '{"file_id": "FILE_ID"}'
 
 **入参**
 
-| 字段 | 类型 | 必填 | 默认值 | 说明 |
-|---|---|:----:|---|---|
-| `file_id` | string | 二选一 | — | 文件 ID；与 `url` 二选一；同时提供时优先使用 `file_id` |
-| `url` | string | 二选一 | — | 微盘文件分享 URL（形如 `https://drive.weixin.qq.com/s?k=AJEAIQdfAAoN4N17GM`）；与 `file_id` 二选一 |
+| 字段 | 类型 | 必填 | 默认值 | 说明                                                               |
+|---|---|:----:|---|------------------------------------------------------------------|
+| `file_id` | string | 二选一 | — | 文件 ID；与 `url` 二选一；同时提供时优先使用 `file_id`                            |
+| `url` | string | 二选一 | — | 微盘文件分享 URL（形如 `https://drive.weixin.qq.com/xxx`）；与 `file_id` 二选一 |
 
 **返回**
 
