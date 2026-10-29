@@ -179,23 +179,23 @@ wecom-cli smartsheet records query --docid '<docid>' --sql 'SELECT RECORD_ID, `<
 
 **各字段类型在 `rows` 中的常见值形态：**
 
-| 字段类型短枚举值 | `rows` 中的值形态 | 示例 | 说明 |
-| --- | --- | --- | --- |
-| `text` / `phone_number` / `email` / `url` / `barcode` / `autonumber` | string 或 null | `"这是一个纯文本"`、`"17620067816"`、`"1"` | 未填通常返回 `null`；`autonumber` 是系统生成值，空行业务字段未填时也会按显示文本返回 |
-| `number` / `currency` / `percentage` / `progress` | number 或 null | `111`、`20`、`0.18018018018018`、`37` | 未填返回 `null`；`percentage` 返回小数（如 `0.2` 表示 20%）；`progress` 返回显示数值 |
-| `formula` | 取决于公式结果类型，或 null | `0.18018018018018`、`"已完成"`、`true`、`["标签1"]` | 公式可能返回数字、文本、布尔、日期序列号、数组或空值；不要默认当作 number 处理 |
-| `date_time` | number 或 null | `46205`、`null` | 默认按 Excel 序列号返回；需要可读日期时在 SQL 中使用 `DATE_FORMAT` |
-| `created_time` / `modified_time` | number | `46205` | 系统字段，记录存在即通常有值；按 Excel 序列号返回 |
-| `checkbox` | boolean | `true`、`false` | 勾选返回 `true`；未勾选或未填返回 `false`，不要当作缺失值 |
-| `single_select` | string 或 null | `"选项A"` | 直接返回选项文本 |
-| `select` | string[] 或 null | `["标签2","标签1"]` | 直接返回选项文本数组，顺序以服务端返回为准 |
-| `user` | object[] 或 null | `[{"corp_name":"腾讯","id":"14433133094329758785","name":"zhangsan(张三)"}]` | 始终按数组返回；单人/多人由字段属性区分；对象内通常包含 `id`、`name`、`corp_name`；展示给用户用 `name`，不要暴露 `id` |
-| `created_user` / `modified_user` | string | `"zhangsan(张三)"` | 系统字段，返回姓名字符串，不是数组或对象 |
-| `image` / `attachment` | string[] 或 null | `["意图对比.jpg"]`、`["Python3内置SQLite库说明.pdf"]` | 查询结果只给图片名/文件名数组，不是媒体下载 URL |
-| `wwgroup` | string 或 null | `"未命名群聊"` | 查询结果返回群聊名称字符串；未填返回 `null` |
-| `location` | string 或 null | `"广东省广州市番禺区沙溪大道330号"` | 查询结果返回地址文本；未填返回 `null` |
-| `lookup` | 被引用字段的查询值数组或 null | `["这是一个纯文本"]` | 查找引用会展开为引用字段值的数组；数组元素类型跟源字段在 `records query` 中的查询值形态一致；无引用值返回 `null` |
-| `two_way_link_records` | 被关联字段的查询值数组或 null | `["这是一个纯文本"]` | 双向关联会展开为关联记录的显示值数组；数组元素类型跟关联显示字段在 `records query` 中的查询值形态一致；无关联值返回 `null` |
+| 字段类型短枚举值 | `rows` 中的值形态 | 示例                                               | 说明 |
+| --- | --- |--------------------------------------------------| --- |
+| `text` / `phone_number` / `email` / `url` / `barcode` / `autonumber` | string 或 null | `"这是一个纯文本"`、`"138xxxx"`、`"1"`                    | 未填通常返回 `null`；`autonumber` 是系统生成值，空行业务字段未填时也会按显示文本返回 |
+| `number` / `currency` / `percentage` / `progress` | number 或 null | `111`、`20`、`0.2`、`37`                            | 未填返回 `null`；`percentage` 返回小数（如 `0.2` 表示 20%）；`progress` 返回显示数值 |
+| `formula` | 取决于公式结果类型，或 null | `0.2`、`"已完成"`、`true`、`["标签1"]`                   | 公式可能返回数字、文本、布尔、日期序列号、数组或空值；不要默认当作 number 处理 |
+| `date_time` | number 或 null | `46205`、`null`                                   | 默认按 Excel 序列号返回；需要可读日期时在 SQL 中使用 `DATE_FORMAT` |
+| `created_time` / `modified_time` | number | `46205`                                          | 系统字段，记录存在即通常有值；按 Excel 序列号返回 |
+| `checkbox` | boolean | `true`、`false`                                   | 勾选返回 `true`；未勾选或未填返回 `false`，不要当作缺失值 |
+| `single_select` | string 或 null | `"选项A"`                                          | 直接返回选项文本 |
+| `select` | string[] 或 null | `["标签2","标签1"]`                                  | 直接返回选项文本数组，顺序以服务端返回为准 |
+| `user` | object[] 或 null | `[{"corp_name":"xx","id":"xxxx","name":"xxxx"}]` | 始终按数组返回；单人/多人由字段属性区分；对象内通常包含 `id`、`name`、`corp_name`；展示给用户用 `name`，不要暴露 `id` |
+| `created_user` / `modified_user` | string | `"zhangsan(张三)"`                                 | 系统字段，返回姓名字符串，不是数组或对象 |
+| `image` / `attachment` | string[] 或 null | `["样例图.jpg"]`                                    | 查询结果只给图片名/文件名数组，不是媒体下载 URL。（需要下载附件时，必须先完整阅读 `references/smart-sheet-file-download.md`，再按其中说明执行下载） |
+| `ww_group` | string 或 null | `"未命名群聊"`                                        | 查询结果返回群聊名称字符串；未填返回 `null` |
+| `location` | string 或 null | `"示例地区名"`                                        | 查询结果返回地址文本；未填返回 `null` |
+| `lookup` | 被引用字段的查询值数组或 null | `["这是一个纯文本"]`                                    | 查找引用会展开为引用字段值的数组；数组元素类型跟源字段在 `records query` 中的查询值形态一致；无引用值返回 `null` |
+| `two_way_link_records` | 被关联字段的查询值数组或 null | `["这是一个纯文本"]`                                    | 双向关联会展开为关联记录的显示值数组；数组元素类型跟关联显示字段在 `records query` 中的查询值形态一致；无关联值返回 `null` |
 
 未填业务字段通常返回 `null`；例外是 `checkbox` 未填返回 `false`，`autonumber` / `created_user` / `created_time` / `modified_user` / `modified_time` 等系统字段通常仍有值。
 
