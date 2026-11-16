@@ -23,13 +23,17 @@ wecom-cli meeting search --json '{...}'
 | 字段                        | 说明                                     |
 | --------------------------- | ---------------------------------------- |
 | `meetings[].meeting_id`     | 会议 ID                                  |
-| `meetings[].sub_meeting_id` | 子会议 ID, 周期会议涉及                  |
+| `meetings[].sub_meeting_id` | 子会议 ID, 标识周期会议中的某一次        |
 | `meetings[].subject`        | 会议主题                                 |
 | `meetings[].begin_time`     | 会议开始时间                             |
 | `meetings[].end_time`       | 会议结束时间                             |
+| `meetings[].is_repeat_meeting` | 是否为周期性会议, `true` 即周期会议     |
 | `meetings[].attendee_count` | 参会人数量                               |
-| `meetings[].meeting_room`   | 会议室名称                               |
+| `meetings[].creator_name`   | 会议创建人名称                           |
+| `meetings[].meeting_room`   | 会议室名称（文本描述）                   |
 | `meetings[].location`       | 地点                                     |
+| `meetings[].timezone.timezone_id` | 时区 ID, 如 `"Asia/Shanghai"`（IANA 时区标识，优先使用） |
+| `meetings[].timezone.timezone_offset` | 时区偏移量（秒）, 如 28800；`timezone_id` 为空时才使用 |
 | `next_cursor`               | 下一页游标, 传入下次请求的 `cursor` 字段 |
 | `has_more`                  | 是否还有更多数据, `true` 表示可继续翻页  |
 | `meetings_count` | `meetings` 数组元素数量 |
@@ -95,7 +99,12 @@ wecom-cli meeting search --json '{...}'
 搜索结果中的 `meeting_id` 可用于后续操作：
 
 - 获取详情：`wecom-cli meeting get --json '{"meeting_ids": [{"meeting_id": "<meeting_id>"}]}'`
+- 更新会议：参见 [meeting-update](meeting-update.md)
 - 取消会议：参见 [meeting-cancel](meeting-cancel.md)
+
+> 周期会议（`is_repeat_meeting=true`，等价于 `sub_meeting_id` 非空）做后续操作时，除 `meeting_id` 外还须带上该条的 `sub_meeting_id`。
+>
+> `search` 与 `list` 一样：一个周期会议只返回最近的一场，不展开全部场次；后续场次用 `get` 的周期规则推算（见 [meeting-list](meeting-list.md)），禁止靠扩大时间范围或翻页去凑。
 
 ## 示例请求
 

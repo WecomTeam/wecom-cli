@@ -13,13 +13,37 @@ wecom-cli meeting create --json '{...}'
 | `subject`         | string  | 是   | 会议主题                                               |
 | `begin_time`      | string  | 是   | 开始时间, 格式 `YYYY-MM-DD HH:mm:ss`, 必须晚于当前时间 |
 | `end_time`        | string  | 是   | 结束时间, 格式 `YYYY-MM-DD HH:mm:ss`, 必须晚于 `begin_time`, 且与 `begin_time` 间隔不超过 24 小时。**用户未给出时长时默认为 `begin_time` 的 1 小时后（不追问）** |
-| `attendees`       | array   | 否   | 参会人，对象数组，格式 `[{"userid": "woxxx"}, {"userid": "woyyy"}]`（`wo` 前缀）。用户提供的是姓名时通过 `读取 wecomcli-contact 技能` 解析为 userid |
+| `attendees`       | array   | 否   | 参会人，对象数组，格式 `[{"userid": "woxxx"}, {"userid": "woyyy"}]`（`wo` 前缀），最多 300 个。用户提供的是姓名时通过 `读取 wecomcli-contact 技能` 解析为 userid |
 | `location`        | string| 否| 会议地点（文本）。**用户给的地点是某会议室时**：须先经 `rooms search` 预订（见步骤 4），预订成功后**只传 `meeting_room_id`、不再写 `location`**（会议室名由后端关联返回，无需在 `location` 里重复填充）。**用户给的地点不是会议室时**（如"星巴克""客户现场"）：直接写入 `location`，不涉及 `meeting_room_id`。禁止把会议室名仅写进 `location` 却不订房——那样不会真正占用会议室 |
-| `meeting_room_id` | string  | 否   | 会议室 ID，传入即触发后端"建会议 + 占会议室"原子操作。查询会议室拿此 ID 的能力不在本技能，须 `读取 wecomcli-calendar 技能` 的 [会议室查询参考](../../wecomcli-calendar/references/calendar-meeting-room.md)（`buildings list` + `rooms search`）。订会议室时只传本字段即可，**不需要再把会议室名重复填进 `location`**。**该 ID 仅工具链使用，禁止出现在用户回复正文** |
+| `meeting_room_id` | string  | 否   | 会议室 ID，传入即触发后端"建会议 + 占会议室"原子操作（**周期会议同样支持预定会议室**：与 `recurrence` 在同一次 create 中一并传入，会议室按首场时段查询、由服务端占用整个系列）。查询会议室拿此 ID 的能力不在本技能，须 `读取 wecomcli-calendar 技能` 的 [会议室查询参考](../../wecomcli-calendar/references/calendar-meeting-room.md)（`buildings list` + `rooms search`）。订会议室时只传本字段即可，**不需要再把会议室名重复填进 `location`**。**该 ID 仅工具链使用，禁止出现在用户回复正文** |
 | `description`     | string  | 否   | 会议备注/描述                                          |
-| `timezone`        | object  | 否   | 时区设置，用户指定时区时传入，未指定则不传。格式：`{"timezone_id": "Asia/Shanghai", "timezone_offset": 28800}`，`timezone_id` 为 IANA 时区标识，`timezone_offset` 为 UTC 偏移量（秒） |
+| `timezone`        | object  | 否   | 时区设置，用户指定时区时传入，未指定则不传。格式：`{"timezone_id": "Asia/Shanghai", "timezone_offset": 28800}`，`timezone_id` 为 IANA 时区标识（**优先使用**），`timezone_offset` 为 UTC 偏移量（秒，`timezone_id` 为空时才使用） |
+| `cal_id`          | string  | 否   | 所属日历本 ID。仅当上下文已有明确的日历本 ID 时传入，禁止凭记忆 / 猜测编造；用户未指定则省略 |
+| `mark_optional_attendees` | array | 否 | 标记为「可选参与人」的成员，**平铺字符串数组**，格式 `["woxxx", "woyyy"]`（**注意与 `attendees` 的对象数组格式不同，不要写成 `[{"userid": "woxxx"}]`**）。取值须是已出现在 `attendees` 中的 userid；仅当用户明确说了某人"可选 / 可不来 / 有空再来"时才传，未提及则省略 |
+| `recurrence`      | object  | 否   | 周期规则。**不传、或传 `is_repeat=false` 即创建单次会议**；用户要"每天 / 每周 / 每月 / 每个工作日"重复时传入本对象，子字段见下方「[周期规则（recurrence）](#周期规则recurrence)」 |
 
 > **会议室预订能力在 wecomcli-calendar 技能 [CRITICAL]**：本技能不直接定义会议室查询接口——用户提出"订会议室 / 在 1605 开 / 找个会议室 / 某栋楼的会议室"等诉求时，须 `读取 wecomcli-calendar 技能` 的 [会议室查询参考](../../wecomcli-calendar/references/calendar-meeting-room.md)（`buildings list` + `rooms search`）查到真实会议室，拿 `meeting_room_id` 传入本创建（见步骤 4）。禁止把会议室名仅写进 `location`（那样不会真正占用会议室），也禁止凭记忆 / 猜测编造 `meeting_room_id`。仅当用户给的是非会议室的普通文本地点时，才只写 `location`。
+
+## 周期规则（recurrence）
+
+`recurrence` 为选填对象：**不传、或 `is_repeat=false` 即创建单次会议**。传入即在同一次 `meeting create` 中由服务端一次性展开为整个系列，禁止批量调用 create 创建多条单次会议来模拟周期。
+
+| 字段 | 类型 | 说明 |
+| ---- | ---- | ---- |
+| `is_repeat` | bool | 是否为周期会议。`true` 才按周期展开 |
+| `repeat_type` | string | 重复类型：`daily` 每天 / `weekly` 每周 / `monthly` 每月 / `work_day` 每个工作日。**不支持 `monthly_on_the_nth_day`（每月第 N 个星期几）、`yearly`（每年）、`yearly_on_the_nth_day`（每年第 N 个）** |
+| `repeat_time` | int | 结束次数（展开后的总场次数，**含首场**）：1~200；`repeat_type=monthly` 及"每两周"（`weekly` + `repeat_interval=2`）时上限 50。与 `repeat_until` 二选一即可，都传时以 `repeat_until` 为准 |
+| `repeat_interval` | int | 重复间隔：每 N（天/周/月）重复一次，**需配合 `is_custom=true` 生效**；上限：`daily` 99、`weekly` 12、`monthly` 12 |
+| `repeat_until` | string | 重复结束时刻，格式 `YYYY-MM-DD HH:mm:ss`；必须晚于会议开始时间，且不能超过当前时间起约 49 年。与 `repeat_time` 二选一即可，只传 `repeat_time` 时服务端自动换算成本字段 |
+| `repeat_day_of_week` | array | 每周周几重复（`repeat_type=weekly` 时生效）：`MO` 周一 ~ `SU` 周日，最多 7 个。**服务端会自动并入会议开始时间当天，首场必在周期内** |
+| `repeat_day_of_month` | array | 每月哪几天重复（`repeat_type=monthly` 时生效）：取值 1~31，最多 31 个。**服务端会自动并入会议开始时间当天，首场必在周期内** |
+| `is_custom` | bool | 是否自定义重复周期：`true` 时 `repeat_interval` 才生效（如每 3 天 / 每 2 周） |
+
+> **首场自动并入 [CRITICAL]**：`repeat_day_of_week` / `repeat_day_of_month` 会被服务端自动并入 `begin_time` 当天，所以组装参数时须先把 `begin_time` 对齐到用户指定的第一个星期几 / 日期，否则会凭空多出一场（如用户要"每周二、四"但 `begin_time` 落在周一，实际会变成每周一/二/四）。
+>
+> **`repeat_interval` 必须配 `is_custom=true`**：只传 `repeat_interval` 而不传 `is_custom=true` 时间隔不生效。"每两周一次" = `repeat_type="weekly"` + `repeat_interval=2` + `is_custom=true`。
+>
+> **结束条件二选一**：`repeat_time`（次数）与 `repeat_until`（截止时刻）只需给一个，都传时以 `repeat_until` 为准。
 
 ## 返回字段
 
@@ -33,8 +57,12 @@ wecom-cli meeting create --json '{...}'
 
 - 开始时间必须晚于当前时间, 否则创建失败
 - 结束时间 `end_time` 必须晚于 `begin_time`, 且与 `begin_time` 间隔不超过 24 小时（86400 秒）。用户要建超过 24h 的单场会议时，直接告知不支持并拒绝，禁止自行拆分成多场会议或用其他方式变通绕过；如确需多天安排，由用户明确拆分要求后再分别创建
-- 参会人总数不超过 100 人
-- **不支持创建周期/重复会议**：API 仅支持创建单次会议。用户希望创建"每周/每月/每天重复"等周期会议时，**直接告知用户目前不支持创建周期会议，并引导用户在企业微信客户端手动预订周期会议**；不要尝试任何变通绕过的做法——包括但不限于：批量调用 create 接口创建多条单次会议模拟周期效果、传入参数表中未列出的字段、创建后再用 update 改造为周期会议。原因：API 层根本无此能力，伪造的"周期"会议在企微客户端中也无法被识别为周期，反而会造成多条独立会议难以批量管理。
+- 参会人总数不超过 300 人
+- **支持创建周期 / 重复会议**：通过 `recurrence` 字段在同一次 create 中一次性创建整个系列（见「[周期规则（recurrence）](#周期规则recurrence)」）。禁止批量调用 create 接口创建多条单次会议来模拟周期效果——那样在企微客户端中不会被识别为周期会议，反而造成多条独立会议难以批量管理。
+- **`repeat_type` 仅支持 `daily` / `weekly` / `monthly` / `work_day` 四种**：用户要"每月第 N 个星期几"（`monthly_on_the_nth_day`）、"每年"（`yearly` / `yearly_on_the_nth_day`）等重复方式时，**直接告知用户不支持该重复方式，并引导用户在企业微信客户端手动预订**；禁止用 `monthly` 等其他类型近似替代，禁止批量创建多条单次会议模拟。
+- **周期会议创建后可改、可取消，但操作粒度受限**：`meeting update` 支持修改（须带 `sub_meeting_id` + `repeat_edit_type`，见 [meeting-update](meeting-update.md)）；`meeting cancel` 支持取消（不传 `sub_meeting_id` 取消整个系列、传则仅取消该场次，见 [meeting-cancel](meeting-cancel.md)）。但 `list` / `search` 对一个周期系列只返回最近要开的一场，**系列中间的某一场拿不到 `sub_meeting_id`，无法单独操作**，此类需求只能引导用户在企业微信客户端调整。
+- `mark_optional_attendees` 是平铺字符串数组（`["woxxx"]`），与 `attendees` 的对象数组格式不同，且其成员须已包含在 `attendees` 中
+- `cal_id` 仅在上下文已有明确日历本 ID 时传入，禁止编造
 - userid（前缀为 `wo`）不接受姓名直接传入；用户提供的是姓名时通过 `读取 wecomcli-contact 技能` 解析为 userid，禁止把姓名当 userid 拼接，禁止凭记忆或猜测编造
 - 时区字段（`timezone`）仅在用户明确指定时区时传入，否则省略
 
@@ -86,7 +114,11 @@ wecom-cli meeting create --json '{...}'
 |---------|---------|
 | `begin_time` 早于当前时间 | 提示用户时间已过, 请重新选择未来时间 |
 | `end_time` 与 `begin_time` 间隔超过 24 小时 | 提示用户会议时长不可超过 24 小时, 请调整；禁止自行拆分成多场会议 |
-| 参会人数超过 100 | 提示用户参会人数已达上限, 需减少人数 |
+| 参会人数超过 300 | 提示用户参会人数已达上限, 需减少人数 |
+| 用户要"每月第 N 个星期几 / 每年"重复 | `repeat_type` 不支持该重复方式，告知用户并引导其在企业微信客户端手动预订；禁止用 `monthly` 等近似替代或批量创建单次会议 |
+| `repeat_time` 超上限（>200，或 `monthly`/每两周 >50） | 告知实际上限，请用户确认调整后的场次或改用 `repeat_until`，禁止静默截断 |
+| `repeat_interval` 超上限（daily>99 / weekly>12 / monthly>12） | 告知实际上限并请用户调整间隔 |
+| `repeat_until` 早于会议开始时间或超过约 49 年 | 提示结束时刻必须晚于会议开始时间且不能过远，请重新给定 |
 | wecomcli-contact 技能搜索无结果 | 用文字提示用户重新输入：`未找到「{姓名}」，请确认姓名是否正确` |
 | wecomcli-contact 技能返回多个候选人 | 用文字询问用户（列出候选姓名 + 部门），等待用户选择后汇总继续 |
 | 创建接口返回错误 | 检查参数格式, 重新阅读本文档确认用法 |
@@ -135,6 +167,8 @@ wecom-cli meeting create --json '{...}'
 
 ## 示例请求
 
+**单次会议**（不传 `recurrence`）：
+
 ```json
 {
   "subject": "产品需求评审",
@@ -154,7 +188,49 @@ wecom-cli meeting create --json '{...}'
 }
 ```
 
+**周期会议**（每周二、四，共 8 场；`begin_time` 已对齐到周二）：
+
+```json
+{
+  "subject": "项目周会",
+  "begin_time": "<最近的周二日期> 14:00:00",
+  "end_time": "<最近的周二日期> 15:00:00",
+  "attendees": [
+    {"userid": "userid1"},
+    {"userid": "userid2"}
+  ],
+  "mark_optional_attendees": ["userid2"],
+  "recurrence": {
+    "is_repeat": true,
+    "repeat_type": "weekly",
+    "repeat_day_of_week": ["TU", "TH"],
+    "repeat_time": 8
+  }
+}
+```
+
+**周期会议**（每两周一次，到指定时刻结束）：
+
+```json
+{
+  "subject": "双周复盘",
+  "begin_time": "<最近的周三日期> 16:00:00",
+  "end_time": "<最近的周三日期> 17:00:00",
+  "attendees": [{"userid": "userid1"}],
+  "recurrence": {
+    "is_repeat": true,
+    "repeat_type": "weekly",
+    "repeat_interval": 2,
+    "is_custom": true,
+    "repeat_day_of_week": ["WE"],
+    "repeat_until": "2026-12-31 23:59:59"
+  }
+}
+```
+
 > `meeting_room_id` 为可选，订会议室时才传，来自 `读取 wecomcli-calendar 技能` 的会议室查询（`rooms search`，见 [会议室查询参考](../../wecomcli-calendar/references/calendar-meeting-room.md)）；订会议室时只传 `meeting_room_id` 即可，无需再把会议室名重复填进 `location`（会议室名由后端关联返回）。`location`仅在用户给的是非会议室的普通文本地点时才填。
+>
+> `recurrence` 不传或 `is_repeat=false` 即单次会议；`repeat_time` 与 `repeat_until` 只需给一个；`repeat_interval` 必须搭配 `is_custom=true`；`mark_optional_attendees` 是平铺字符串数组，其成员须已在 `attendees` 中。
 
 ## 示例输出
 

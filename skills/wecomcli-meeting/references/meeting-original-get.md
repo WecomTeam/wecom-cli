@@ -18,7 +18,7 @@ wecom-cli meeting original get --json '{...}'
 | 字段             | 类型    | 必填 | 说明                                                                                                                     |
 | ---------------- | ------- | ---- | ------------------------------------------------------------------------------------------------------------------------ |
 | `meeting_id`     | string  | 是   | 会议 ID（`mt` 前缀长字符串，如 `mtkSFfCg...`），非 9 位数字会议号                                                          |
-| `sub_meeting_id` | string  | 否   | 子会议 ID，周期会议查某一场时指定                                                                                          |
+| `sub_meeting_id` | string  | 否   | 子会议 ID。**周期会议必传**（否则拿不到该场次的转写），取值来自 `list`/`search` 返回值，禁止编造；非周期会议不传 |
 | `media_index`      | integer | 否   | 媒体索引，指定拉取第几段转写，从 0 开始。**不传则返回全部段的转写**；仅当用户明确要"第 N 段"时才传 `N-1`（第 1 段传 0、第 2 段传 1） |
 | `cursor`         | string  | 否   | 分页游标，首次请求不传                                                                                                     |
 | `limit`          | integer | 否   | 每页数量，默认 100，上限 500                                                                                               |
@@ -44,7 +44,7 @@ wecom-cli meeting original get --json '{...}'
 
 ### 正常路径
 
-1. **定位会议**：从上下文或 `list` / `search` 取得 `meeting_id`（周期会议带 `sub_meeting_id`）。
+1. **定位会议**：从上下文或 `list` / `search` 取得 `meeting_id`（周期会议同时取该场次的 `sub_meeting_id`）。
 2. **确定段落**：用户明确指定"第 N 段" → `media_index = N-1`；**未指定 → 不传 `media_index`**（接口返回全部段），不主动追问。
 3. **拉取转写**：调用 `wecom-cli meeting original get --json '{...}'`。
 4. **翻页拼接**：`has_more == true` 时携带 `next_cursor` 续拉，直到 `false`，按返回顺序拼接 `original_data`。

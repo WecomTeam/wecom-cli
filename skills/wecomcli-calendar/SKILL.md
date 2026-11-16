@@ -14,17 +14,16 @@ metadata:
 
 ### 适用
 
-- 预约 / 创建日程（含纯线下面对面碰头，即不带在线会议链接的安排）
+- 预约 / 创建日程（含纯线下面对面碰头，即不带在线会议链接的安排；**支持创建周期日程**）
 - 查看 / 浏览日程（今天有什么安排、查本周日程）
 - 搜索日程（按关键词、按组织人、按参与人找某个日程）
-- 更新 / 修改日程（改时间、改地点、加减人、换会议室；不支持更新周期日程）
-- 取消日程（不支持取消周期日程）
+- 更新 / 修改日程（改时间、改地点、加减人、换会议室；**支持更新周期日程**）
+- 取消日程（**支持取消周期日程**）
 - 查忙闲 / 约多人共同空闲时段
 - 订会议室、查会议室空不空、查办公楼
 
 ### 不适用
 
-- 创建、更新、取消周期 / 重复日程（每周 / 每月 / 每天重复）→ 均不支持，引导用户在企业微信客户端手动操作
 - 回复 / 拒绝日程邀请（接受 / 拒绝 / 待定，含"拒绝这个日程""不参加"）→ 不支持，引导用户在企业微信客户端操作或私信发起人
 
 ### 易混淆场景路由
@@ -117,11 +116,12 @@ metadata:
 
 ### 3. 取消日程
 
-先定位日程（有**日程主题关键词**走搜索；只给时间/日期而无主题关键词走列表浏览 `list`，禁止把日期当 `keywords` 喂给 `search`），再判断是否周期日程（可直接读取列表返回的 `repeat_rule`，无需额外读取单条详情）——**周期日程不支持取消**，告知用户并引导其在企业微信客户端操作（见「已知限制」）。普通日程**不预先按"是否本人创建"拦截取消**，直接执行取消并根据工具返回结果判断能否取消（成功返回 `{}`，无权限则返回错误，此时告知用户并建议联系创建人）。**若用户意图实为"改约 / 挪到 / 顺延"（即使带"取消"字样），按上文「改约 / 重建日程前必须先识别会议关联」走更新流程。** 完整流程见 [calendar-cancel](references/calendar-cancel.md)。
+先定位日程（有**日程主题关键词**走搜索；只给时间/日期而无主题关键词走列表浏览 `list`，禁止把日期当 `keywords` 喂给 `search`），再判断是否周期日程（可直接读取列表返回的 `repeat_rule`，无需额外读取单条详情）——**周期日程支持取消**，须带 `repeat_mod` 指定取消范围（`repeat_edit_type` 由用户拍板 + 目标场次的 `repeat_event_time`）。**不预先按"是否本人创建"拦截取消**，直接执行取消并根据工具返回结果判断能否取消（成功返回 `{}`，无权限则返回错误，此时告知用户并建议联系创建人）。**若用户意图实为"改约 / 挪到 / 顺延"（即使带"取消"字样），按上文「改约 / 重建日程前必须先识别会议关联」走更新流程。** 完整流程见 [calendar-cancel](references/calendar-cancel.md)。
 
 ### 4. 更新日程
 
-- 先定位日程（有**日程主题关键词**走搜索；只给时间/日期而无主题关键词走列表浏览 `list`，禁止把日期当 `keywords` 喂给 `search`），判断是否周期日程——**周期日程不支持更新**，告知用户并引导其在企业微信客户端操作（见「已知限制」），禁止逐场 `update` 拼凑或改为取消重建。普通日程收集修改内容后执行更新，**不预先按"是否本人创建"拦截修改**，直接执行更新并根据工具返回结果判断能否修改（成功返回更新后的 `detail`，无权限则返回错误，此时告知用户并建议联系创建人）。
+- 先定位日程（有**日程主题关键词**走搜索；只给时间/日期而无主题关键词走列表浏览 `list`，禁止把日期当 `keywords` 喂给 `search`），判断是否周期日程——**周期日程支持更新**，须带 `repeat_mod` 指定修改范围（`repeat_edit_type` 由用户拍板 + 目标场次的 `repeat_event_time`），禁止改为取消重建。收集修改内容后执行更新，**不预先按"是否本人创建"拦截修改**，直接执行更新并根据工具返回结果判断能否修改（成功返回更新后的 `detail`，无权限则返回错误，此时告知用户并建议联系创建人）。
+- **连续修改同一周期日程时须重新定位 [CRITICAL]**：只改部分场次时（`this_only`，或作用于中间场次的 `this_and_future`）会重新分配 `schedule_id`，每次写操作后要以返回的新 id 或重新 `list` 的结果为准，禁止复用上一步的 id；已拆为独立日程的场次（`repeat_rule` 为空）用其自身 id 更新、不再传 `repeat_mod`。
 - **改时间/改地点/加减人/换会议室都走更新，不要取消重建。** 换会议室时须先经 `rooms search` 确认新会议室 `status=bookable` 再把新 `meeting_room_id` 传入更新（见 [calendar-meeting-room](references/calendar-meeting-room.md)）。
 - **含在线会议链接的日程（定位结果中 `meeting` 非空）改时间不在本技能 update**，须改用 `读取 wecomcli-meeting 技能`（见上文「改约 / 重建日程前必须先识别会议关联」）。
 - 更新日程的完整流程见 [calendar-update](references/calendar-update.md)。
@@ -135,6 +135,7 @@ metadata:
 - **日程（Schedule）**：日程系统中的单个事件，含主题、起止时间、参与人等属性。
 - **全天日程（All-day）**：`is_all_day=true`，只按日期占用，结束日期包含在日程内。
 - **周期日程（Recurring）**：`repeat_rule.is_repeat=true`，按规则重复出现。
+- **周期日程的 `schedule_id` [CRITICAL]**：周期系列内所有场次**共用同一 `schedule_id`**，具体场次由 `repeat_event_time` 指定。修改只覆盖系列**部分场次**时（`this_only`，或作用于中间场次的 `this_and_future`），被改动的部分会脱离原系列并**重新分配 `schedule_id`**（即 `update` 返回的 `detail.schedule_id`）；覆盖**全部场次**时（`all`，或作用于首场的 `this_and_future`）id 不变。写操作后须以返回的新 id 或重新 `list` 的结果为准，详见 [calendar-update](references/calendar-update.md)、[calendar-cancel](references/calendar-cancel.md)。
 - **参与人（Attendee）**：以 `userid`（`wo` 前缀）标识。用户提供的是姓名时通过 `读取 wecomcli-contact 技能` 解析为 `userid`。
 - **忙闲（FreeBusy）**：查询参与人在指定时段是否有日程占用。
 - **地点（Location）**：日程的地点为一段自由文本（`location` 字段）。用户给的地点是**公司会议室**时，须经会议室查询（`rooms search`）预订、以 `meeting_room_id` 占用（见 [calendar-meeting-room](references/calendar-meeting-room.md)），不要把会议室名仅写进 `location`；用户给的是**非会议室的普通文本地点**时才直接写入 `location`。
@@ -197,7 +198,7 @@ metadata:
 | [`calendar-agenda`](references/calendar-agenda.md) | 查看/获取日程详情时 | 查看日程安排（list + get） |
 | [`calendar-create`](references/calendar-create.md) | 创建日程时 | 创建日程并邀请参与人 |
 | [`calendar-search`](references/calendar-search.md) | 搜索日程时 | 按关键词搜索日程 |
-| [`calendar-cancel`](references/calendar-cancel.md) | 取消日程时 | 取消日程（不支持周期日程） |
+| [`calendar-cancel`](references/calendar-cancel.md) | 取消日程时 | 取消日程（周期日程须带 `repeat_mod`） |
 | [`calendar-update`](references/calendar-update.md) | 更新/修改日程时 | 更新日程信息（主题、时间、参与人、地点等） |
 | [`calendar-freebusy`](references/calendar-freebusy.md) | 需要协调时间 / 查共同空闲时 | 查询共同空闲时段，协调日程时间 |
 | [`calendar-meeting-room`](references/calendar-meeting-room.md) | 预订/更换会议室 / 查办公楼或会议室可订性时 | 办公楼清单（`buildings list`）+ 会议室可订性（`rooms search`），拿 `meeting_room_id` 供创建占用或更新改订 |
@@ -214,9 +215,9 @@ metadata:
 | 搜索（search） | `schedules[].creator_name` | 直接展示日程创建者姓名 |
 | 搜索（search） | `next_cursor` + `has_more` | 分页翻页控制 |
 | wecomcli-contact 技能搜索 | `userid`（`wo` 前缀） | 创建/更新日程的 `attendees` / `add_attendees` / `remove_attendees`、忙闲查询的 `userids`、搜索的 `has_attendees`（均组装为对象数组 `[{"userid": "woxxx"}]`）；搜索的 `organizer` 为单值 userid 字符串 |
-| 搜索 / 列表浏览 / 单条详情 | `repeat_rule` | 判断是否周期日程（`is_repeat=true`）：命中时取消 / 更新均不支持，告知用户并引导企业微信客户端操作；`search`/`list` 均直接返回，无需补 `get` |
+| 搜索 / 列表浏览 / 单条详情 | `repeat_rule` | 判断是否周期日程（`is_repeat=true`）：命中时更新 / 取消均须带 `repeat_mod` 指定范围；`search`/`list` 均直接返回，无需补 `get` |
 | 搜索 / 列表浏览 / 单条详情 | `meeting.meeting_code` | 识别该日程含在线会议链接（非空即「会议形态日程」，search/list/get 均直接返回，无需额外补 `get`）；改约 / 取消含会议链接日程时，直接把 `meeting.meeting_id` 传入 `wecomcli-meeting` 的 `meeting update` / `meeting cancel`，无需在 wecomcli-meeting 重新 search 定位 |
-| 搜索 / 列表浏览 + 单条详情 | 搜索取 `schedules[].schedule_id`、列表/详情取 `schedule_list[].schedule_id` 与 `schedule_list[].repeat_rule` | 更新日程的定位与周期日程判断（命中周期日程则不支持更新） |
+| 搜索 / 列表浏览 + 单条详情 | 搜索取 `schedules[].schedule_id`、列表/详情取 `schedule_list[].schedule_id` 与 `schedule_list[].repeat_rule` | 更新 / 取消日程的定位；命中周期日程时另取该场次 `begin_time` 作为 `repeat_mod.repeat_event_time` |
 | 忙闲查询 | `slots[]`（含 `available_users`、`available_count`、`busy_users`） | 直接展示推荐时段，挑前几个让用户选择；展示时只用人名，userid 仅回传创建日程的 `attendees` |
 | 会议室可订性查询（`rooms search`） | `target[].room.meeting_room_id` 或 `recommendations[].meeting_room_id` | 创建日程的 `meeting_room_id`（原子占用会议室）、更新日程的 `meeting_room_id`（改订会议室）；ID仅工具链流转，禁止展示，对用户只露会议室 name |
 
@@ -271,7 +272,8 @@ metadata:
 
 **日程列表展示规范 [REQUIRED]**（列表/搜索浏览均适用）：
 - **禁止使用 markdown 表格**；每条日程作为独立条目顺序输出，按开始时间升序排序。
-- 每个条目 **只展示三项：主题、时间、参与人**（不展示地点、提醒、schedule_id 等）。
+- 每个条目 **只展示三项：主题、时间、参与人**（不展示地点、提醒、schedule_id 等）。**唯一例外**：周期日程存在被改过的例外场次时，追加第四项「调整」行，见 [calendar-agenda](references/calendar-agenda.md)「周期日程须先核对例外场次再回复」。
+- **周期日程须先核对例外场次再回复**：结果含 `repeat_rule.is_repeat=true` 的日程时，必须先用其 `exception[].except_schedule_id` 与本次结果比对、确认哪些场次被改过，归并到所属系列条目下用「调整」行说明，禁止平铺成多条同名日程。
 - **超过 10 条时只展示前 10 条**，并在末尾告知"还有 N 条，需要查看更多吗？"。
 - **会议 / 日程 分两部分展示**：判断依据是该日程是否带有会议链接——`meeting.meeting_code` 有值（非空）归为「会议」，为空 / 不存在归为「日程」（`search`/`list`/`get` 返回均含 `meeting` 字段，可直接判断）。**仅当本次结果中同时存在「会议」和「日程」两类时**，才把结果分成「（会议）」和「（日程）」两个部分分别展示：先列「（会议）」部分、再列「（日程）」部分；每部分内部按开始时间升序、逐条只展示主题/时间/参与人；末尾追加汇总"共 N 场，其中会议 X 场、日程 Y 场"。**当结果只有单一类别时**（全是会议或全是日程），不分部分、不加「（会议）」/「（日程）」标题，按普通列表直接展示。
 - 分部分格式：
@@ -297,8 +299,7 @@ metadata:
 
 | 限制 | 替代方案 |
 |------|---------|
-| **schedules list 查询窗口 ≤ 前后 30 天** | `begin_time`/`end_time` 必须落在「当前时刻前后 30 天」窗口内，超出范围服务端不返回。超出时直接告知用户超出可查范围、请重新给一个更短的时间范围，等用户重新提供后再调用 |
-| **不支持创建/更新/取消周期（重复）日程** | 用户希望创建"每周/每月/每天重复"等周期日程，或对已识别为周期日程（`repeat_rule.is_repeat=true`）的日程发起更新、取消时，均直接告知用户目前不支持，并引导用户在企业微信客户端手动操作；禁止用创建多条单次日程、逐场 `update` 拼凑、`cancel`+`create` 重建、传入未公开参数等方式变通绕过 |
+| **周期（重复）日程须指定操作范围** | 创建用 `schedules create` 的 `repeat_rule` 一次性建整个系列（见 [calendar-create](references/calendar-create.md)）；更新 / 取消须带 `repeat_mod` 指定生效范围（`repeat_edit_type`：`this_only` / `this_and_future` / `all`，由用户拍板；`repeat_event_time` 取目标场次的 `begin_time`），见 [calendar-update](references/calendar-update.md)、[calendar-cancel](references/calendar-cancel.md) |
 | **不支持回复 / 拒绝日程邀请（RSVP）** | 本技能不支持对收到的日程邀请做接受 / 拒绝 / 待定等回复（含"拒绝这个日程""不参加""婉拒邀请"等）。用户有此需求时，告知其本技能不支持，建议直接在企业微信客户端对该日程邀请操作，或通过消息告知日程发起人 |
 | **共同空闲查询限制** | 周期日程仅查看最近两个月有修改的；单次查询窗口 ≤ 24h，超出需分批；`begin_time` 早于服务端当前时刻的部分会被自动截断，传纯历史窗口会返回空 `slots` |
 

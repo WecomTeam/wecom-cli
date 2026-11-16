@@ -36,7 +36,7 @@ wecom-cli calendar schedules search --json '{"keywords": ["周会"], "cursor": "
 | `begin_time` | string | 否 | 搜索区间起始时间（格式 YYYY-MM-DD HH:mm:ss） |
 | `end_time` | string | 否 | 搜索区间结束时间（格式 YYYY-MM-DD HH:mm:ss） |
 | `cursor` | string | 否 | 分页游标，首次请求不传，翻页时传上次返回的 `next_cursor` |
-| `limit` | number | 否 | 单页返回数量，最大 50 |
+| `limit` | number | 否 | 单页返回数量，不传默认 10，最大 1000 |
 
 > **必填约束**：`keywords`、`organizer`、`has_attendees` 三者至少传入一个，否则接口报错。
 

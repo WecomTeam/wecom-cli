@@ -22,21 +22,16 @@ wecom-cli calendar schedules list --json '{"begin_time": "2026-04-06 00:00:00", 
 
 | 参数 | 类型 | 必填 | 说明 |
 |------|------|:----:|------|
-| `begin_time` | string | 否 | 查询开始时间（格式 YYYY-MM-DD HH:mm:ss）。必须与 `end_time` 同时传入或同时省略，禁止单独传入其中一个。 |
-| `end_time` | string | 否 | 查询结束时间（格式 YYYY-MM-DD HH:mm:ss）。必须与 `begin_time` 同时传入或同时省略，禁止单独传入其中一个；同时传入时，`end_time` 必须晚于 `begin_time`。 |
+| `begin_time` | string | 否 | 查询范围开始时间（格式 YYYY-MM-DD HH:mm:ss），不传则默认当前时间 |
+| `end_time` | string | 否 | 查询范围结束时间（格式 YYYY-MM-DD HH:mm:ss），不传则默认开始时间 + 30 天 |
 
-> **时间参数约束**：`begin_time` 和 `end_time` 必须**同时存在**或**同时为空**，禁止只传其中一个。两者同时传入时，`end_time` 必须严格晚于 `begin_time`，否则视为非法参数。
->
-> **查询窗口上限：当前时刻前后 30 天 [REQUIRED]**：`schedules list` 仅支持查询**当前时刻前后 30 天以内**的日程，超出范围的部分服务端不返回。
-> - 用户给的时间范围部分或完全超出窗口（`begin_time` 早于「今天 - 30 天」或 `end_time` 晚于「今天 + 30 天」）时，**直接告知用户「日程查询仅支持当前时刻前后 30 天范围内，请重新给一个更短的时间范围」**，等用户重新提供时间后再调用。
->
 > **未指定时间时的默认范围策略 [REQUIRED]**：调用前先显式计算好时间范围再传入，不依赖服务端默认值——
 > - 用户已明确时间（如"今天"、"本周"、"4月15日到4月20日"）→ 直接映射为 `begin_time`/`end_time`。
 > - 用户未明确时间（如"查一下我的日程"、"看看我的安排"）→ **默认策略：今天起未来 7 天**（`begin_time = 今天 00:00:00`，`end_time = 7 天后 23:59:59`），无需追问。
 > - 用户说"最近"或"近期" → 使用"过去 3 天到未来 7 天"（`begin_time = 3 天前 00:00:00`，`end_time = 7 天后 23:59:59`）。
 > - 用户只提供了模糊但有意义的范围（如"上个月"）→ 解析为对应日期范围。
 
-**返回**：`schedule_list[]` 数组，每项字段如下：
+**返回**：`schedule_list[]` 数组（另有 `schedule_list_count` 为其元素数量），每项字段如下：
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
@@ -47,12 +42,15 @@ wecom-cli calendar schedules list --json '{"begin_time": "2026-04-06 00:00:00", 
 | `attendees` | object[] | 参与人列表，格式 `[{"userid": "USERID", "name": "englishname(name)"}]` |
 | `meeting_room` | object | 会议室信息，含 `meeting_room_id` + `meeting_room_name` |
 | `location` | string | 日程地点 |
-| `meeting` | object | 在线会议信息（关联了会议时才有），含 `meeting_id`/`meeting_code` |
+| `meeting` | object | 在线会议信息（关联了会议时才有），含 `meeting_id`/`meeting_code`/`meeting_link` |
 | `description` | string | 日程描述 |
 | `creator_name` | string | 日程创建者名字 |
+| `cal_id` | string | 所属日历本 ID |
+| `calendar_name` | string | 日历本名称 |
+| `is_share_cal` | bool | 所属日历是否为共享日历（日历创建者非当前用户） |
 | `allow_self_join` | bool | 是否允许非参与人主动加入日程 |
 | `is_all_day` | bool | 是否全天事件（`true` 是 / `false` 否） |
-| `repeat_rule` | object | 重复规则（`is_repeat=false` 时无此字段或为空），见下表 |
+| `repeat_rule` | object | 周期规则，见下表 |
 | `reminders` | object | 提醒设置，含 `is_remind`（是否开启，bool，`true` 是 / `false` 否）和 `reminder_time`（int[]，与开始时间的差值秒数，负数为提前提醒） |
 | `timezone` | object | 时区信息，含 `timezone_id`（IANA 标识，如 `Asia/Shanghai`，优先使用）和 `timezone_offset`（UTC 偏移量秒数，`timezone_id` 为空时使用） |
 
@@ -63,15 +61,25 @@ wecom-cli calendar schedules list --json '{"begin_time": "2026-04-06 00:00:00", 
 | `is_repeat` | bool | 是否重复日程 |
 | `repeat_type` | string | 重复类型：`daily`/`weekly`/`monthly`/`monthly_on_the_nth_day`/`yearly`/`yearly_on_the_nth_day`/`work_day` |
 | `repeat_flag` | string[] | 重复标记，数组，可选值：`leap_month`（闰月）、`never_ends`（永不结束） |
-| `repeat_time` | int | 重复次数，`0` 表示无限 |
+| `repeat_time` | int | 重复次数，`0` 表示不限次数 |
 | `repeat_interval` | int | 重复间隔 |
-| `repeat_until` | string | 重复截止时间（格式 YYYY-MM-DD HH:mm:ss） |
+| `repeat_until` | string | 重复截止时间（格式 YYYY-MM-DD HH:mm:ss），`0` 表示永不结束 |
 | `repeat_week_of_month` | string[] | 每月第几周，数组，可选值：`first`/`second`/`third`/`fourth`/`last` |
-| `repeat_day_of_week` | string[] | 每周周几，数组，可选值：`MO`/`TU`/`WE`/`TH`/`FR`/`SA`/`SU` |
-| `repeat_month_of_year` | int[] | 每年哪几个月，数组，取值范围：1~12 |
-| `repeat_day_of_month` | int[] | 每月哪几天，数组，取值范围：1~31 |
+| `repeat_day_of_week` | string[] | 每周周几，数组，可选值：`MO`/`TU`/`WE`/`TH`/`FR`/`SA`/`SU`。仅自定义重复且 `repeat_type=weekly` 时有效 |
+| `repeat_month_of_year` | int[] | 每年哪几个月，数组，取值范围：1~12。仅自定义重复且 `repeat_type=yearly` 时有效 |
+| `repeat_day_of_month` | int[] | 每月哪几天，数组，取值范围：1~31。仅自定义重复且 `repeat_type` 为 `monthly` / `yearly` 时有效 |
 | `is_custom` | bool | 是否自定义重复 |
-| `exception` | object[] | 例外日程列表，每项含 `begin_time`/`end_time`/`flag`/`except_schedule_id` |
+| `exception` | object[] | 例外场次列表（周期日程中被删除或被单独改过时间的单场），子字段见下表 |
+
+**`exception[]` 子字段：**
+
+| 字段 | 说明 |
+|------|------|
+| `begin_time` | 该场次**按周期规则本应开始的原时刻**（不是改后的新时间）——禁止把它当作改后时间展示给用户 |
+| `end_time` | 预留 |
+| `flag` | 例外标志（企微位掩码）：`2048`（`0x800`）= 该场**已删除**；`0` 或字段缺省 = 该场**被改过时间** |
+| `except_schedule_id` | 该场被改期后产生的新日程 ID；被删除的场次为空。仅工具链使用，禁止出现在用户回复正文 |
+
 
 ### get — 读取日程详情
 
@@ -85,7 +93,12 @@ wecom-cli calendar schedules get --json '{"schedule_ids": ["<schedule_id1>", "<s
 |------|------|:----:|------|
 | `schedule_ids` | string[] | 是 | 日程 ID 列表，支持传入一个或多个 |
 
-**返回**：`schedule_list[]` 数组，每项字段如下：
+> **周期日程的 `get` [CRITICAL]**：`get` 无指定场次的入参，而周期系列所有场次共用同一 `schedule_id`。用**系列 id** 调 `get` 返回的是**系列定义**——`begin_time`/`end_time` 为系列起始时间，不随场次改动更新，可能指向一个已不存在的时间点（该场次被 `this_only` 改过时）。
+> - **需要某一场的时间 → 用 `list` 按时间范围查**，其返回的每条都是实际场次并带该场次当前的 `schedule_id`
+> - 周期日程的 `get` 仅用于取系列级属性：`subject` / `attendees` / `location` / `repeat_rule`
+> - 已拆出的独立日程（`repeat_rule` 为空）用其**自身 id** 调 `get`，各字段均准确
+
+**返回**：`schedule_list[]` 数组（另有 `schedule_list_count` 为其元素数量），每项字段如下：
 
 | 字段 | 类型 | 说明 |
 |------|------|------|
@@ -96,12 +109,15 @@ wecom-cli calendar schedules get --json '{"schedule_ids": ["<schedule_id1>", "<s
 | `attendees` | object[] | 参与人列表，格式 `[{"userid": "USERID", "name": "englishname(name)"}]`，直接取 `name` 展示，禁止展示 userid |
 | `meeting_room` | object | 会议室信息，含 `meeting_room_id` + `meeting_room_name` |
 | `location` | string | 日程地点 |
-| `meeting` | object | 在线会议信息（关联了会议时才有），含 `meeting_id`/`meeting_code` |
+| `meeting` | object | 在线会议信息（关联了会议时才有），含 `meeting_id`/`meeting_code`/`meeting_link` |
 | `description` | string | 日程描述 |
 | `creator_name` | string | 日程创建者名字 |
+| `cal_id` | string | 所属日历本 ID |
+| `calendar_name` | string | 日历本名称 |
+| `is_share_cal` | bool | 所属日历是否为共享日历（日历创建者非当前用户） |
 | `allow_self_join` | bool | 是否允许非参与人主动加入日程 |
 | `is_all_day` | bool | 是否全天事件（`true` 是 / `false` 否） |
-| `repeat_rule` | object | 重复规则（`is_repeat=false` 时无此字段或为空），见下表 |
+| `repeat_rule` | object | 周期规则，见下表 |
 | `reminders` | object | 提醒设置，含 `is_remind`（是否开启，bool，`true` 是 / `false` 否）和 `reminder_time`（int[]，与开始时间的差值秒数，负数为提前提醒） |
 | `timezone` | object | 时区信息，含 `timezone_id`（IANA 标识，如 `Asia/Shanghai`，优先使用）和 `timezone_offset`（UTC 偏移量秒数，`timezone_id` 为空时使用） |
 
@@ -112,15 +128,25 @@ wecom-cli calendar schedules get --json '{"schedule_ids": ["<schedule_id1>", "<s
 | `is_repeat` | bool | 是否重复日程 |
 | `repeat_type` | string | 重复类型：`daily`/`weekly`/`monthly`/`monthly_on_the_nth_day`/`yearly`/`yearly_on_the_nth_day`/`work_day` |
 | `repeat_flag` | string[] | 重复标记，数组，可选值：`leap_month`（闰月）、`never_ends`（永不结束） |
-| `repeat_time` | int | 重复次数，`0` 表示无限 |
+| `repeat_time` | int | 重复次数，`0` 表示不限次数 |
 | `repeat_interval` | int | 重复间隔 |
-| `repeat_until` | string | 重复截止时间（格式 YYYY-MM-DD HH:mm:ss） |
+| `repeat_until` | string | 重复截止时间（格式 YYYY-MM-DD HH:mm:ss），`0` 表示永不结束 |
 | `repeat_week_of_month` | string[] | 每月第几周，数组，可选值：`first`/`second`/`third`/`fourth`/`last` |
-| `repeat_day_of_week` | string[] | 每周周几，数组，可选值：`MO`/`TU`/`WE`/`TH`/`FR`/`SA`/`SU` |
-| `repeat_month_of_year` | int[] | 每年哪几个月，数组，取值范围：1~12 |
-| `repeat_day_of_month` | int[] | 每月哪几天，数组，取值范围：1~31 |
+| `repeat_day_of_week` | string[] | 每周周几，数组，可选值：`MO`/`TU`/`WE`/`TH`/`FR`/`SA`/`SU`。仅自定义重复且 `repeat_type=weekly` 时有效 |
+| `repeat_month_of_year` | int[] | 每年哪几个月，数组，取值范围：1~12。仅自定义重复且 `repeat_type=yearly` 时有效 |
+| `repeat_day_of_month` | int[] | 每月哪几天，数组，取值范围：1~31。仅自定义重复且 `repeat_type` 为 `monthly` / `yearly` 时有效 |
 | `is_custom` | bool | 是否自定义重复 |
-| `exception` | object[] | 例外日程列表，每项含 `begin_time`/`end_time`/`flag`/`except_schedule_id` |
+| `exception` | object[] | 例外场次列表（周期日程中被删除或被单独改过时间的单场），子字段见下表 |
+
+**`exception[]` 子字段：**
+
+| 字段 | 说明 |
+|------|------|
+| `begin_time` | 该场次**按周期规则本应开始的原时刻**（不是改后的新时间）——禁止把它当作改后时间展示给用户 |
+| `end_time` | 预留 |
+| `flag` | 例外标志（企微位掩码）：`2048`（`0x800`）= 该场**已删除**；`0` 或字段缺省 = 该场**被改过时间** |
+| `except_schedule_id` | 该场被改期后产生的新日程 ID；被删除的场次为空。仅工具链使用，禁止出现在用户回复正文 |
+
 
 ## 输出格式
 
@@ -143,7 +169,7 @@ wecom-cli calendar schedules get --json '{"schedule_ids": ["<schedule_id1>", "<s
 > 上例为"模糊会议查询"（日程 + 会议都查）且**两类同时存在**时的呈现：合并日程 `list` 与会议 `list` 的结果，按是否含在线会议链接分成「（会议）」「（日程）」两个部分（来自会议 `list` 或 `meeting.meeting_code` 非空者归会议），同一场会议两边都出现时按"主题 + 时间"去重，末尾给汇总；若本次结果只有单一类别（全是会议或全是日程），则不分部分、不加「（会议）」/「（日程）」标题，按普通列表直接展示；普通"看日程"查询也可不分部分、省略汇总行。
 
 **展示规则：**
-- 每个条目 **只展示三项：主题、时间、参与人**（不展示地点、会议室等其他字段）。
+- 每个条目 **只展示三项：主题、时间、参与人**（不展示地点、会议室等其他字段）。**唯一例外**：周期日程存在被改过的例外场次时，追加第四项「调整」行，见下方「周期日程须先核对例外场次再回复」。
 - **时间默认省略年份**（只到月日）；仅当日程年份与当前年份不同（跨年）时，才在月日前带上年份。
 - **昨天 / 今天 / 明天**的日程，时间行在月日前加相对词（如 `明天 6月11日 14:00-15:00`）；其余日期按月日展示。
 - **超过 10 条时只展示前 10 条**，并在末尾告知"还有 N 条，需要查看更多吗？"。
@@ -182,6 +208,30 @@ wecom-cli calendar schedules get --json '{"schedule_ids": ["<schedule_id1>", "<s
 - `repeat_until` 为空 且 `repeat_time=0` → 展示"无截止"
 - `repeat_time > 0` → 展示"共 {repeat_time} 次"
 
+### 周期日程须先核对例外场次再回复 [REQUIRED]
+
+结果中存在 `repeat_rule.is_repeat=true` 的日程时，**必须先核对其 `exception` 数组、确认哪些场次被改过，再组织回复**。
+
+核对方法：`flag=2048` 的场次已删除，直接剔除、不展示也不提及；`flag=0` 或缺省的是被改过时间的场次，用其 `except_schedule_id` 与本次结果中其他条目的 `schedule_id` 比对，命中者即该场次改动后的日程（它们 `repeat_rule` 为空、`schedule_id` 与系列不同，不核对就会被当成无关的同名日程平铺展示）。
+
+例外场次不单独成条，归并到所属系列条目下，追加一行「调整」：
+
+```
+1. 周会（每天一次，截止 9月14日）
+   时间：9月10日、9月13日、9月14日 09:00-09:30
+   参与人：zhangsan(张三)
+   调整：9月11日 改为 15:00-15:30、9月12日 改为 16:00-16:30
+```
+
+- 时间行合并同系列未改场次的日期，时刻统一；时刻不一致时（罕见）逐场列出
+- 「调整」行的日期取 `exception[].begin_time` 的日期部分——它是该场次**按周期规则本应开始的原时刻**，**禁止把它当作改后时间展示**；改后的时刻取所命中条目的 `begin_time`/`end_time`
+- 「调整」是周期日程的**第四项**，仅在存在改期类例外场次时出现
+
+**两条边界 [CRITICAL]**
+
+1. **系列条目不在本次结果中时，不归并、不猜测**：查询范围只覆盖例外场次时（如只查 9月10日），拿不到 `exception`，按普通单次日程独立展示，禁止依据"主题相同"推测其归属。
+2. **`except_schedule_id` 未命中本次结果时一律忽略**：`exception` 可能含切分系列时从原系列复制来、时间点落在本系列之外的记录。命中不了就不处理，不得据此声称存在某个场次。
+
 ## 典型场景
 
 ### 1. 查看今日日程
@@ -212,10 +262,9 @@ wecom-cli calendar schedules get --json '{"schedule_ids": ["<schedule_id1>", "<s
 ## 提示
 
 - 无日程时告知用户"今天日程清空"。
-- **查询窗口上限 [REQUIRED]**：`schedules list` 仅覆盖当前时刻前后 30 天以内。用户给的时间范围超出窗口时，直接告知用户超出可查范围、请重新给一个更短的时间范围，等用户重新提供后再调用。
 - **顺序列表展示**：每条日程作为独立条目顺序输出，禁止 markdown 表格，每个条目只含主题/时间/参与人。超过 10 条只展示前 10 条，并告知"还有 N 条，需要查看更多吗？"。
 - `list` 和 `get` 均返回 `repeat_rule`，可直接判断是否周期日程；`meeting`（含 `meeting_id`/`meeting_code`）在 `search`/`list`/`get` 中均直接返回，判断会议形态无需额外补 `get`。
-- **周期日程必须说明 [REQUIRED]**：结果中只要存在 `repeat_rule.is_repeat=true` 的日程，必须在该日程**主题后追加**周期频率（由 `repeat_type` 推导）和时间范围（由 `repeat_until`/`repeat_time` 推导）标注，保持条目仍只含主题/时间/参与人三项。禁止仅展示日程条目而不说明其为周期日程。
+- **周期日程必须说明 [REQUIRED]**：结果中只要存在 `repeat_rule.is_repeat=true` 的日程，必须在该日程**主题后追加**周期频率（由 `repeat_type` 推导）和时间范围（由 `repeat_until`/`repeat_time` 推导）标注。禁止仅展示日程条目而不说明其为周期日程。同时须按「周期日程须先核对例外场次再回复」核对 `exception`，存在例外场次时追加「调整」行。
 - **参与人展示**：`list` 返回的 `attendees` 格式为 `[{"userid": "USERID", "name": "englishname(name)"}]`，直接取 `name` 字段展示，禁止展示 userid，无需反查通讯录。
 
 ## 参考

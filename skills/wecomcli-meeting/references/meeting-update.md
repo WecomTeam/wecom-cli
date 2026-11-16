@@ -1,6 +1,6 @@
 # 操作参考：更新会议
 
-更新已创建会议的信息，包括主题、时间、参会人、地点等。**写操作**，参数就绪后直接执行。不预先按"是否本人创建"拦截，能否修改由接口返回结果判断。**暂不支持更新周期会议**，识别到周期会议时应告知用户并引导其在企业微信客户端操作（见下文工作流与约束）。
+更新已创建会议的信息，包括主题、时间、参会人、地点等。**写操作**，参数就绪后直接执行。不预先按"是否本人创建"拦截，能否修改由接口返回结果判断。**支持更新周期会议**，见下文「周期会议更新」。
 
 ## 命令
 
@@ -21,17 +21,34 @@ wecom-cli meeting update --json '{...}'
 | `location` | string | 否 | 新的会议地点（文本）。用户给的是**会议室**时须走 `meeting_room_id` 改订（见工作流「会议室变更解析」），不要把会议室名仅写进 `location`；用户给的是**非会议室的普通文本地点**时直接写入 `location` |
 | `meeting_room_id` | string | 否 | 会议室 ID，传入预定（改订）会议室。用户要更换会议室时，须先经 `rooms search`（会议室查询接口定义在 `读取 wecomcli-calendar 技能` 的 [会议室查询参考](../../wecomcli-calendar/references/calendar-meeting-room.md)）查询新会议室状态，确认`status=bookable` 可用后才传入新的 `meeting_room_id`；ID 仅工具链使用，禁止出现在用户回复正文 |
 | `description` | string | 否 | 新的会议备注 |
+| `sub_meeting_id` | string | 否 | 子会议 ID，标记要修改周期会议中的哪一场。**周期会议必传**，取值来自 `list`/`search` 返回值，禁止编造；非周期会议不传 |
+| `repeat_edit_type` | string | 否 | 周期会议修改类型，**周期会议场景下必传**，非周期会议不传：`this_only` 仅修改此场次子会议 / `this_and_future` 修改此场次及将来所有场次 |
+
+> **只传要改的字段**：未传入的字段保持原值不变。其中 `location` / `description` 传**空字符串**是"清空"语义，与"不传"（保持原值）不同——用户没提到地点 / 备注时一律不传该字段，只有用户明确要"去掉地点 / 清掉备注"时才传空字符串。
+
+## 周期会议更新
+
+周期会议（`is_repeat_meeting=true`）可以更新，但除 `sub_meeting_id`（标记改哪一场）外，还必须传 `repeat_edit_type` 标记**修改范围**，否则接口无法确定要改的是一场还是整个系列：
+
+| 取值 | 含义 | 适用表达 |
+| ---- | ---- | ---- |
+| `this_only` | 仅修改此场次子会议 | "只改这一次""就这周的挪一下""下周那场单独改" |
+| `this_and_future` | 修改此场次及将来所有场次 | "以后都改成""这个点固定下来""后面每次都改""整个系列都改" |
+
+> **修改范围必须由用户拍板 [CRITICAL]**：用户表达里没有明确"只改这一次"还是"以后都改"时，**必须用文字追问，禁止自行默认任一取值**——两者影响范围差别极大（改错会波及整个系列或只动一场），且改完无法一键回滚。文字提问：`这是周期会议，本次修改的范围是？（请回复：仅这一场 / 这一场及以后所有场次）`
+>
+> **非周期会议禁止传这两个字段**：非周期的普通会议不传 `sub_meeting_id` 与 `repeat_edit_type`。
 
 ## 返回字段
 
 | 字段 | 说明 |
 | ---- | ---- |
 | `meeting_id` | 会议 ID |
-| `sub_meeting_id` | 子会议 ID（周期会议时返回） |
+| `sub_meeting_id` | 子会议 ID，唯一标识一场周期会议下的子会议；**周期会议修改的场景才返回**，不传则不涉及子会议 |
 | `subject` | 更新后的会议主题 |
 | `begin_time` | 更新后的开始时间 |
 | `end_time` | 更新后的结束时间 |
-| `attendees` | 更新后的完整参会人列表，扁平对象数组，每项含 `userid` / `name` / `is_external`；内部成员与外部联系人统一用 `userid`，由 `is_external` 区分。展示取 `name`，禁止展示 userid |
+| `attendees` | 更新后的完整参会人列表，扁平对象数组，每项含 `userid` / `name` / `is_external`；内部成员与外部联系人统一用 `userid`，由 `is_external` 区分（`true` 为外部参会人）。`name` 为框架按 userid 注入的展示名（只读）。展示取 `name`，禁止展示 userid |
 | `attendees_count` | `attendees` 数组元素数量 |
 | `location` | 更新后的会议地点 |
 | `description` | 更新后的会议备注 |
@@ -40,7 +57,7 @@ wecom-cli meeting update --json '{...}'
 
 - **不预先按"是否本人创建"拦截修改**，直接执行 `update`，能否修改由接口返回结果判断：返回更新后的字段即成功；返回权限类错误则说明当前用户无权修改，告知用户并建议联系会议发起人
 - 只需传入要修改的字段，未传入字段保持原值不变
-- **周期会议不支持更新**：检测到目标会议 `repeat_rule` 非空时，直接告知用户目前暂不支持更新周期会议，引导其在企业微信客户端操作，禁止逐场 `update` 拼凑或改为取消重建等变通方式
+- **周期会议支持更新**，但须带 `sub_meeting_id` + `repeat_edit_type`（见「周期会议更新」）。禁止对周期会议逐场 `update` 拼凑整体修改，也禁止改为取消重建
 - 修改时间时 `end_time` 必须晚于 `begin_time`
 - **更换会议室**：用户要换会议室时，`meeting_room_id` 必须先经 `rooms search` 查询、确认新会议室 `status=bookable` 可用后才传入；禁止跳过查询凭记忆/猜测直接传，禁止把会议室名仅写进 `location`（那样不会真正占用会议室）。会议室查询接口须 `读取 wecomcli-calendar 技能` 的 [会议室查询参考](../../wecomcli-calendar/references/calendar-meeting-room.md)
 - userid（前缀为 `wo`）不接受姓名直接传入；用户提供的是姓名时通过 `读取 wecomcli-contact 技能` 解析为 userid，禁止把姓名当 userid 拼接，禁止凭记忆或猜测编造
@@ -62,9 +79,16 @@ wecom-cli meeting update --json '{...}'
     |   |     列出候选（如"项目评审 - 4月8日 14:00 / 项目评审 - 4月15日 14:00"，最多 4 条）
     |   +-- 无匹配 → 建议修改关键词或扩大时间范围重试
     |
-    +-- 判断是否周期会议（依据 meeting get 返回的 repeat_rule）
-    |   +-- repeat_rule 为空 → 非周期会议，直接收集修改内容，执行更新
-    |   +-- repeat_rule 非空 → 周期会议，终止操作，用文字告知用户："目前暂不支持更新周期会议，请在企业微信客户端对该会议进行修改"，禁止逐场 update 拼凑或改为取消重建
+    +-- 判断是否周期会议（用定位阶段 search/list 已返回的 is_repeat_meeting，无需额外调 get）
+    |   +-- 非周期会议 → 直接收集修改内容，执行更新（不传 sub_meeting_id / repeat_edit_type）
+    |   +-- 周期会议 → 补齐两个必传字段后再更新：
+    |   |   +-- sub_meeting_id：取定位阶段 list/search 返回的该系列最近一场的 sub_meeting_id；
+    |   |   |     用户指定的是中间某一场（非最近一场）→ 不执行，如实告知只能修改最近一场（给出该场日期）
+    |   |   |     或最近一场及以后所有场次，让用户选择；禁止拿最近一场顶替，禁止编造 sub_meeting_id
+    |   |   +-- repeat_edit_type：用户已明确"只改这一次" → this_only；明确"以后都改 / 整个系列" → this_and_future；
+    |   |         未明确 → 必须用文字追问，禁止自行默认：
+    |   |         文字提问："这是周期会议，本次修改的范围是？（请回复：仅这一场 / 这一场及以后所有场次）"
+    |   > **关键约束**：两个字段缺任一时禁止调用 update；修改范围未经用户拍板前禁止执行。
     |
     +-- 参会人变更解析（如有）
 |   +-- 上下文中已有合法 userid（`wo` 前缀）→ 直接使用，跳过搜索
@@ -122,7 +146,8 @@ wecom-cli meeting update --json '{...}'
 | 异常情况 | 处理方式 |
 |---------|---------|
 | 接口返回无权修改（非发起人） | 直接执行 update 后依返回判断；返回权限错误时告知用户无权操作，建议联系会议发起人 |
-| 周期会议更新 | 目前暂不支持更新周期会议，告知用户并引导其在企业微信客户端对该会议进行修改 |
+| 用户要修改周期系列中间的某一场 | 拿不到该场 `sub_meeting_id`，如实告知只能修改最近一场（给出日期）或最近一场及以后所有场次，让用户选择；或引导其在企业微信客户端操作。禁止拿最近一场顶替，禁止编造 `sub_meeting_id` |
+| 周期会议修改范围未明确 | 用文字追问：`这是周期会议，本次修改的范围是？（请回复：仅这一场 / 这一场及以后所有场次）`，据此传 `this_only` / `this_and_future`，禁止自行默认 |
 | 修改时间冲突（end ≤ begin） | 提示用户结束时间必须晚于开始时间，请重新输入 |
 | wecomcli-contact 技能搜索无结果 | 提示用户确认人名是否正确，或尝试其他搜索词 |
 | wecomcli-contact 技能返回多个候选人 | 用文字询问用户（列出候选姓名 + 部门），等待用户选择后汇总继续 |
@@ -158,6 +183,28 @@ wecom-cli meeting update --json '{...}'
 }
 ```
 
+**修改周期会议的某一场**（`sub_meeting_id` + `repeat_edit_type` 必传）：
+```json
+{
+  "meeting_id": "<meeting_id>",
+  "sub_meeting_id": "<sub_meeting_id>",
+  "repeat_edit_type": "this_only",
+  "begin_time": "2026-09-08 15:00:00",
+  "end_time": "2026-09-08 16:00:00"
+}
+```
+
+**修改周期会议的此场及将来所有场次**：
+```json
+{
+  "meeting_id": "<meeting_id>",
+  "sub_meeting_id": "<sub_meeting_id>",
+  "repeat_edit_type": "this_and_future",
+  "begin_time": "2026-09-08 16:00:00",
+  "end_time": "2026-09-08 17:00:00"
+}
+```
+
 ## 典型场景
 
 ### 1. 修改会议时间
@@ -182,13 +229,26 @@ wecom-cli meeting update --json '{...}'
 → 展示更新后完整参会人列表
 ```
 
-### 3. 修改周期会议（不支持）
+### 3. 修改周期会议
 
 ```
-用户：下周一的周会改到下午3点，只改这一次
-→ 调用 meeting search（keywords=["周会"]）→ 找到周期会议
-→ 调用 meeting get → repeat_rule 非空（周期会议）
-→ 不调用 update → 告知：目前暂不支持更新周期会议，请在企业微信客户端对该会议进行修改
+用户：下周一的周会改到下午3点，只改这一次（下周一即最近一场）
+→ 调用 meeting search（keywords=["周会"]）→ 找到周期会议（is_repeat_meeting=true），拿到 meeting_id 与最近一场的 sub_meeting_id
+→ 用户已明确"只改这一次" → repeat_edit_type="this_only"（无需追问）
+→ 忙闲检查（改时间且新旧时段不重叠 → 查完整新时段）
+→ 调用 update：meeting_id + sub_meeting_id + repeat_edit_type="this_only"
+   + begin_time="<下周一日期> 15:00:00" + end_time="<下周一日期> 16:00:00"
+→ 展示更新结果
+
+用户：周会以后都改到下午3点
+→ 定位到周期会议，取最近一场的 sub_meeting_id（this_and_future 从最近一场起生效）
+→ 用户已明确"以后都改" → repeat_edit_type="this_and_future"
+→ 调用 update → 展示更新结果
+
+用户：周会改到下午3点
+→ 定位到周期会议 → 修改范围未明确
+→ 必须用文字追问：这是周期会议，本次修改的范围是？（请回复：仅这一场 / 这一场及以后所有场次）
+→ 用户拍板后才调用 update，禁止自行默认任一取值
 ```
 
 ### 4. 更换会议室
